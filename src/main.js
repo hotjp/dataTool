@@ -1,11 +1,12 @@
 /*
  * @Author: hotjp 
  * @Date: 2017-11-06 13:40:14 
- * @Last Modified by:   hotjp 
- * @Last Modified time: 2017-11-06 13:40:14 
+ * @Last Modified by: hotjp
+ * @Last Modified time: 2017-11-06 15:33:26
  */
 import Vue from 'vue';
 import ElementUI from 'element-ui';
+import 'animate.css/animate.min.css';
 import 'element-ui/lib/theme-default/index.css';
 import './assets/css/app.less';
 // import axios from 'axios'
