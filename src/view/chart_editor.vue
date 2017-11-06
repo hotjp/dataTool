@@ -1,6 +1,6 @@
 <template>
   <div id="index">
-    <ul v-for="item in arr">
+    <ul v-for="(item,index) in arr" :key="index">
       <li><input type="text" :value="item.name" @change="trigger"></li>
     </ul>
     <el-button @click.native="startHacking">Yes!</el-button>

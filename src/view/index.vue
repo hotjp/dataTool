@@ -1,6 +1,6 @@
 <template>
   <div id="index">
-    <ul v-for="item in arr">
+    <ul v-for="(item,index) in arr" :key="index">
       <li><input type="text" :value="item.name" @change="trigger"></li>
     </ul>
     <el-button @click.native="startHacking">Yes!</el-button>
@@ -12,7 +12,7 @@ export default {
   mounted() {
     var inputs = this.$el.getElementsByTagName("input");
     var evt = document.createEvent("HTMLEvents");
-    evt.initEvent('change', true, true);
+    evt.initEvent("change", true, true);
     for (var i = 0; i < inputs.length; i++) {
       inputs[i].dispatchEvent(evt);
     }

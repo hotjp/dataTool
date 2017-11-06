@@ -26,8 +26,8 @@ export default {
     }
   },
   extendOption(data, style = {}) {
-    return Assign(this.option, data, style)
+    return Assign(this.option, data, style);
   }
 
 
-}
+};
