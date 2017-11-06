@@ -1,0 +1,9 @@
+{
+  "globalDevDependencies": {
+    "axios": "registry:dt/axios#0.9.1+20161016142654"
+  },
+  "globalDependencies": {
+    "less": "registry:dt/less#0.0.0+20161212190028",
+    "swiper": "registry:dt/swiper#3.4.0+20170120190008"
+  }
+}
