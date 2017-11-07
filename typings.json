@@ -4,6 +4,7 @@
   },
   "globalDependencies": {
     "less": "registry:dt/less#0.0.0+20161212190028",
+    "moment": "registry:dt/moment#2.11.1+20161010105546",
     "swiper": "registry:dt/swiper#3.4.0+20170120190008"
   }
 }

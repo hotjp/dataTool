@@ -16,6 +16,7 @@
     "fundebug-javascript": "^0.3.3",
     "less": "^2.7.3",
     "less-loader": "^4.0.5",
+    "lodash": "^4.17.4",
     "moment": "^2.19.1",
     "swiper": "^4.0.3",
     "vue": "^2.4.2",

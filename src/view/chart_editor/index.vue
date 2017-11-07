@@ -36,6 +36,7 @@ export default {
   data() {
     return {
       pageName: '图表编辑',
+      tableName:'当前表名',
       arr: [{
         name: '1111ssssssssss1111111111111111111111'
       }]
