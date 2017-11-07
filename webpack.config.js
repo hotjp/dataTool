@@ -1,8 +1,8 @@
-const resolve = require('path').resolve
-const webpack = require('webpack')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const url = require('url')
-const publicPath = ''
+const resolve = require('path').resolve;
+const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const url = require('url');
+const publicPath = '';
 
 module.exports = (options = {}) => ({
   entry: {
@@ -17,27 +17,31 @@ module.exports = (options = {}) => ({
   },
   module: {
     rules: [{
-        test: /\.vue$/,
-        use: ['vue-loader']
-      },
-      {
-        test: /\.js$/,
-        use: ['babel-loader'],
-        exclude: /node_modules/
-      },
-      {
-        test: /\.(less|css)$/,
-        use: ['style-loader', 'css-loader', 'less-loader', 'postcss-loader']
-      },
-      {
-        test: /\.(png|jpg|jpeg|gif|eot|ttf|woff|woff2|svg|svgz)(\?.+)?$/,
-        use: [{
-          loader: 'url-loader',
-          options: {
-            limit: 10000
-          }
-        }]
-      }
+      test: /\.vue$/,
+      use: ['vue-loader']
+    },
+    {
+      test: /\.js$/,
+      use: ['babel-loader'],
+      exclude: /node_modules/
+    },
+    {
+      test: /\.less$/,
+      use: [ 'style-loader', 'css-loader', 'less-loader']
+    },
+    {
+      test: /\.css$/,
+      use: ['style-loader', 'css-loader', 'postcss-loader']
+    },
+    {
+      test: /\.(png|jpg|jpeg|gif|eot|ttf|woff|woff2|svg|svgz)(\?.+)?$/,
+      use: [{
+        loader: 'url-loader',
+        options: {
+          limit: 10000
+        }
+      }]
+    }
     ]
   },
   plugins: [
@@ -71,4 +75,4 @@ module.exports = (options = {}) => ({
   },
   devtool: options.dev ? '#source-map' : ''
   // devtool: options.dev ? '#source-map' : '#eval-source-map'
-})
+});

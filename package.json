@@ -10,11 +10,13 @@
   "dependencies": {
     "animate.css": "^3.5.2",
     "d3": "^4.11.0",
-    "element-ui": "^1.4.2",
+    "element-ui": "^2.0.0",
+    "eslint-plugin-vue": "^2.1.0",
     "extract-text-webpack-plugin": "^3.0.2",
     "fundebug-javascript": "^0.3.3",
     "less": "^2.7.3",
     "less-loader": "^4.0.5",
+    "moment": "^2.19.1",
     "swiper": "^4.0.3",
     "vue": "^2.4.2",
     "vue-echarts-v3": "^1.0.5"

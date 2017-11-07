@@ -1,8 +1,8 @@
 /*
  * @Author: hotjp 
  * @Date: 2017-11-06 13:40:18 
- * @Last Modified by:   hotjp 
- * @Last Modified time: 2017-11-06 13:40:18 
+ * @Last Modified by: hotjp
+ * @Last Modified time: 2017-11-07 09:51:21
  */
 {
   "env": {
@@ -15,7 +15,9 @@
     "sourceType": "module"
 
   },
-
+  "plugins": [
+    "vue"
+  ],
   "extends": "eslint:recommended",
   "rules": {
     "indent": ["error", 2],
