@@ -37,18 +37,17 @@ export default {
     };
   },
   watch: {
-    input: function(val) {
+    input: function() {
       this.updateSize();
     }
   },
   methods: {
     // 方法，可用this.trigger直接调用
-    trigger() {
-    },
+    trigger() {},
     updateSize() {
-      var el = this.$el.getElementsByClassName("input")[0];
+      var el = this.$el.getElementsByClassName('input')[0];
       if (el.scrollWidth > el.clientWidth) {
-        el.style.width = el.scrollWidth + "px";
+        el.style.width = el.scrollWidth + 'px';
       }
     }
   }
