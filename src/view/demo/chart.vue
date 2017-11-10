@@ -7,27 +7,27 @@
 
 <script type="text/babel">
   import IEcharts from 'vue-echarts-v3/src/full.vue';
-  import ChartUtil from '../../vendor/chart_util'
+  import ChartUtil from '../../vendor/chart_util';
   var chartData  = ChartUtil.extendOption({
-        title: {
-          text: 'ECharts Hello World'
-        },
-        tooltip: {},
-        xAxis: {
-          data: ['Shirt', 'Sweater', 'Chiffon Shirt', 'Pants', 'High Heels', 'Socks']
-        },
-        yAxis: {},
-        series: [{
-          name: 'Sales',
-          type: 'bar',
-          data: [5, 20, 36, 10, 10, 20]
-        },
-        {
-          name: 'Sales1',
-          type: 'bar',
-          data: [5, 20, 36, 10, 10, 20]
-        }]
-      })
+    title: {
+      text: 'ECharts Hello World'
+    },
+    tooltip: {},
+    xAxis: {
+      data: ['Shirt', 'Sweater', 'Chiffon Shirt', 'Pants', 'High Heels', 'Socks']
+    },
+    yAxis: {},
+    series: [{
+      name: 'Sales',
+      type: 'bar',
+      data: [5, 20, 36, 10, 10, 20]
+    },
+    {
+      name: 'Sales1',
+      type: 'bar',
+      data: [5, 20, 36, 10, 10, 20]
+    }]
+  });
   export default {
     name: 'view',
     components: {

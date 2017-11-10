@@ -2,7 +2,7 @@
  * @Author: hotjp 
  * @Date: 2017-11-06 13:40:14 
  * @Last Modified by: hotjp
- * @Last Modified time: 2017-11-07 11:21:39
+ * @Last Modified time: 2017-11-10 09:26:50
  */
 
 import Vue from 'vue';
@@ -37,13 +37,19 @@ import chart_editor from './view/chart_editor/index.vue';
 // 声明路由关系
 const routes = [
   // 演示页
-  { path: '/demo/tpl', component: tpl },
+  { path: '/demo/tpl', component: tpl, name: '全生命周期模板' },
   { path: '/demo/chart', component: chart },
   // { path: '/demo/option_list', component: option_list },
 
   // 路由
   { path: '/', component: index },
-  { path: '/chart_editor', component: chart_editor}
+  {
+    path: '/chart_editor', 
+    components: {
+      default: chart_editor,
+      header: commonHeader
+    }
+  }
 ];
 
 // 实例化路由

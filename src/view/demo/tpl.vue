@@ -1,7 +1,7 @@
 <template>
-  <div id="tpl">
+  <el-main id="tpl">
       <input class="input" type="text" v-model="input">
-  </div>
+  </el-main>
 </template>
 
 <script>
