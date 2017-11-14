@@ -2,7 +2,7 @@
  * @Author: hotjp 
  * @Date: 2017-11-06 13:40:14 
  * @Last Modified by: hotjp
- * @Last Modified time: 2017-11-10 09:26:50
+ * @Last Modified time: 2017-11-13 08:44:06
  */
 
 import Vue from 'vue';
@@ -21,7 +21,7 @@ import App from './App.vue';
 // demo路由
 import tpl from './view/demo/tpl.vue';
 import chart from './view/demo/chart.vue';
-import option_list from './view/demo/option_list.vue';
+// import option_list from './view/demo/option_list.vue';
 
 // 通用组件
 import commonHeader from './components/commonHeader.vue';
@@ -44,7 +44,7 @@ const routes = [
   // 路由
   { path: '/', component: index },
   {
-    path: '/chart_editor', 
+    path: '/chart_editor/:viewId', 
     components: {
       default: chart_editor,
       header: commonHeader
