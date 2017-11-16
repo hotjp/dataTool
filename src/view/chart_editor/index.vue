@@ -7,7 +7,7 @@
                   字段：
                   日期单独做
                   <el-card>
-                    <ul v-for="{item,index} in columns" :key="index" class="colums_list">
+                    <ul v-for="(item,index) in columns" :key="index" class="colums_list">
                       <li class="colums_item">
                         <i>{{item.type}}</i>
                         {{item.text}}
@@ -20,30 +20,42 @@
                 <div class="grid-content full">
                   <div class="query">
                     <div class="xAxis">
-                      <ul v-for="{column,index} in queryInfo.categoryColumns" :key="index">
+                      <ul v-for="(column,index) in queryInfo.categoryColumns" :key="index">
                         <li>
                           {{column.name}}
                           {{column.text}}
                           {{column.aggr}}
                         </li>
                       </ul>
-                      <ul v-for="{column,index} in queryInfo.valueColumns" :key="index">
+                      <ul v-for="(column,index) in queryInfo.valueColumns" :key="index">
                         <li></li>
                       </ul>
                     </div>
                     <div class="yAxis"></div>
                   </div>
                   <IEcharts style="width:400px;height:400px" :resizable="chartOptions.resizable" :option="chartOptions.option" :loading="chartOptions.loading" @ready="onChartReady"></IEcharts>
-                  <a @click="getChartData" href="javascript:;">点击使用query获取data</a>
+                  <a @click="getChartData" href="javascript:;">点击使用query获取data并判断可用图表</a>
                 </div>
 
             </el-col>
             <el-col class="full" :span="8">
                 <div class="grid-content full">
                   <input type="text" v-model="charts.chartStyles.layout.title.text" placeholder="图表标题">
+                  <br>序列风格
                   <ul v-for="(colors,index) in seriesColors" :key="index">
                     <li>
                       <a @click="onClickSeriesColors(index)" href="javascript:;">{{colors.name}}</a>
+                    </li>
+                  </ul>
+                  <br>图表类型
+                  <ul>
+                    <li v-for="(type,key) in chartTypes" :key="key" :class="type.allowUse? 'isAllow':''">
+                      <a @click="onClickType(key)" href="javascript:;">
+                        {{type.name}} ({{type.allowUse?'可用':'不可用'}})
+                      </a>
+                      <div v-for="(rule,index) in type.rules" :key="index">
+                        <i>{{rule.columns.text}} 维度</i><br><i>{{rule.values.text}} 数值</i>
+                      </div>
                     </li>
                   </ul>
                 </div>
@@ -53,24 +65,41 @@
 </template>
 <script>
 // import chartUI from '../../assets/js/chartUI';
+import chartTypes from '../../assets/js/chart_types';
 import vars from '../../assets/js/vars';
 import axios from 'axios';
 import IEcharts from 'vue-echarts-v3/src/full.vue';
+function evalConditional(first, condition, second) {
+  if (arguments.length != 3) {
+    console.error('参数不足');
+    return false;
+  }
+
+  if (second == 'any') {
+    second = first;
+  }
+  if (isNaN(first) || isNaN(second)) {
+    console.error('数据包含非数字');
+    return false;
+  }
+  return new Function('return ' + first + condition + second)();
+}
+
 export default {
   mounted() {
     let that = this,
       params = that.$route.params;
     axios({
-      url: 'dataviewInfo.do',
+      url: '/dataviewInfo.do',
       baseURL: vars.api,
-      data: {
+      params: {
         view: params.viewId
       }
     })
       .then(function (res) {
         var resData = res.data;
         if (resData.success) {
-          // console.log(resData);
+          console.log(resData);
           that.columns = resData.data.columns;
         }
       })
@@ -83,15 +112,76 @@ export default {
   },
   data() {
     return {
+      // 现有图表类型
+      chartTypes: chartTypes,
       // 当前报表数据列
       columns: [],
       // 当前查询
       queryInfo: {
-        // xAxis
-        categoryColumns: [],
-        // yAxis
-        valueColumns: [],
-        filters: []
+        'valueColumns': [
+          {
+            'name': 'price',
+            'aggr': 'sum'
+          },
+          {
+            'name': 'price',
+            'aggr': 'min'
+          },
+          {
+            'name': 'qty',
+            'aggr': 'sum'
+          }
+        ],
+        'categoryColumns': [
+          {
+            'name': 'date',
+            'gran': 'trunc_quarter',
+            'sort': 'asc'
+          },
+          {
+            'name': 'type'
+          }
+        ],
+        'filters': [
+          {
+            'conj': 'and',
+            'name': 'price',
+            'op': 'gt',
+            'values': [
+              1
+            ]
+          },
+          {
+            'conj': 'and',
+            'name': 'qty',
+            'op': 'lt',
+            'values': [
+              99999
+            ]
+          },
+          {
+            'conj': 'and',
+            'exprs': [
+              {
+                'conj': 'or',
+                'name': 'type',
+                'op': 'eq',
+                'values': [
+                  'requirement'
+                ]
+              },
+              {
+                'conj': 'or',
+                'name': 'status',
+                'op': 'in',
+                'values': [
+                  'closed',
+                  'done'
+                ]
+              }
+            ]
+          }
+        ]
       },
       // 系列风格
       seriesColors: [
@@ -270,27 +360,63 @@ export default {
     onClickSeriesColors(index) {
       this.charts.chartStyles.series.color = this.seriesColors[index].value;
     },
+    // 点击切换图表
+    onClickType(type) {
+
+    },
+    // 根据数据确定哪些图表可用
+    checkChartType() {
+      let that = this,
+        queryInfo = that.queryInfo,
+        chartTypes = that.chartTypes;
+      const columnNum = queryInfo.categoryColumns.length,
+        valueNum = queryInfo.valueColumns.length;
+        // 循环所有类型
+      for (const key in chartTypes) {
+        if (chartTypes.hasOwnProperty(key)) {
+          const type = chartTypes[key],
+            rules = type.rules;
+            // 禁用全部
+          type.allowUse = false;
+          // 循环条件
+          for (let i = 0; i < rules.length; i++) {
+            const rule = rules[i];
+            // 如果构建条件语句成功则启用
+            if (evalConditional(columnNum, rule.columns.rule, rule.columns.num) && evalConditional(valueNum, rule.values.rule, rule.values.num)) {
+              type.allowUse = true;
+            }
+          }
+        }
+      }
+      // resData.
+    },
     getChartData() {
       let that = this,
         params = that.$route.params;
       // 查询图表源 数据
-      axios('query.do', {
+      axios({
+        url: '/query.do',
         baseURL: vars.api,
         params: {
-          view: params.viewId,
-          queryInfo: JSON.stringify(that.queryInfo)
-        }
+          view: '',
+          query: JSON.stringify(that.queryInfo)
+        },
+        data: {}
       })
         .then(function (res) {
-          var resData = res.data;
+          let resData = res.data;
           if (resData.success) {
             console.log(resData);
-            that.columns = resData.data.columns;
+            that.chartData = resData.data;
+            that.checkChartType();
           }
         })
         .catch(function (res) {
           console.log(res);
         });
+    },
+    // queryInfo请求回来的纯数据
+    makeItBar(data) {
 
     }
   }
@@ -301,4 +427,5 @@ export default {
   font-family: Helvetica, sans-serif;
   text-align: center;
 }
+
 </style>
