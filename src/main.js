@@ -2,7 +2,7 @@
  * @Author: hotjp 
  * @Date: 2017-11-06 13:40:14 
  * @Last Modified by: hotjp
- * @Last Modified time: 2017-11-14 13:24:44
+ * @Last Modified time: 2017-11-17 11:34:36
  */
 
 import Vue from 'vue';
@@ -26,10 +26,13 @@ import tableView from './view/demo/tableView.vue';
 
 // 通用组件
 import commonHeader from './components/commonHeader.vue';
+// 图表标题
+import title from './components/title.vue';
 
 Vue.component('commonHeader', commonHeader);
 
 // 页面路由
+
 import index from './view/index.vue';
 
 // 编辑器
@@ -37,6 +40,9 @@ import chart_editor from './view/chart_editor/index.vue';
 
 // 仪表盘
 import datebase from './view/datebase/index.vue';
+
+// 属性面板
+import chartConfig from './view/demo/chartConfig.vue';
 
 // 声明路由关系
 const routes = [
@@ -55,6 +61,7 @@ const routes = [
     }
   },
   { path: '/demo/tableView', component: tableView },
+  { path: '/demo/chartConfig', component: chartConfig },
   {
     path: '/datebase', 
     components: {
@@ -63,6 +70,7 @@ const routes = [
     }
   }
 ];
+
 // 实例化路由
 const router = new VueRouter({
   routes
