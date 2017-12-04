@@ -1,6 +1,6 @@
 <template>
   <el-main id="tpl">
-      <input class="input" type="text" v-model="input">
+    <input class="input" type="text" v-model="input">
   </el-main>
 </template>
 
@@ -30,20 +30,17 @@ export default {
   destroyed() {
     // 销毁后
   },
-  data() {
-    // 组件数据
-    return {
-      input: 'sssssssssssssssssssssssssss'
-    };
+  data: () => ({
+    input: 'sssssssssssssssssssssssssss'
+  }),
+  computed: {
+
   },
   watch: {
-    input: function() {
-      this.updateSize();
-    }
   },
   methods: {
     // 方法，可用this.trigger直接调用
-    trigger() {},
+    trigger() { },
     updateSize() {
       var el = this.$el.getElementsByClassName('input')[0];
       if (el.scrollWidth > el.clientWidth) {

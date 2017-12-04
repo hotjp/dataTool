@@ -23,73 +23,10 @@
       // 类切换的标识
       hideTable:false
     }),
+    props:['myMessage'],
     mounted() {
       let that=this;
-      // 取数据所需参数
-      let queryInfo = {
-        // 数值列
-        valueColumns: [{
-          name: 'price', // 列名
-          aggr: 'sum'    // 聚合方式(sum/min/max/avg)
-        }, {
-          name: 'price',
-          aggr: 'min'
-        }, {
-          name: 'qty',
-          aggr: 'sum'
-        }],
-        categoryColumns: [{
-          name: 'date',          // 列名
-          gran: 'trunc_quarter', // 粒度：按季度
-          sort: 'asc'            // 排序
-        }, {
-          name: 'type'
-        }],
-        filters: [
-          {
-            conj: 'and',   // 条件关系，同级别条件的关系运算符应相同，第一个表达式的条件没有作用
-            name: 'price',  // 列名
-            op: 'gt',       // 操作符(gt/gte/lt/lte/eq/ne/in/not_in/between)
-            values: [1]     // 目标值列表，数量根据操作符决定
-          },
-          {
-            conj: 'and',
-            name: 'qty',
-            op: 'lt',
-            values: [99999]
-          },
-          {
-            conj: 'and',
-            exprs: [{
-              conj: 'or',
-              name: 'type',
-              op: 'eq',
-              values: ['requirement']
-            }, {
-              conj: 'or',
-              name: 'status',
-              op: 'in',
-              values: ['closed', 'done']
-            }]
-          }
-        ]
-      };
-      // 获取数据chartData
-      axios({
-        method:'get',
-        url:'http://119.180.98.134:8880/dataviz/api/query.do',
-        params:{
-          view: '',
-          query: JSON.stringify(queryInfo)
-        },
-        data:{}
-      })
-        .then(function (response) {
-          Object.assign(that.chartData,response.data.data);
-        })
-        .catch(function (error) {
-          console.log(error);
-        }); 
+      Object.assign(this.chartData.data,this.myMessage.data); 
     },
     computed: {
       //null值的format 为null时 处理成'-'

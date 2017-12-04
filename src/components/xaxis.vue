@@ -6,7 +6,7 @@
           <div><el-checkbox v-model="xaxis.axisLine.show">显示坐标轴</el-checkbox></div>
           <el-dropdown @command="lineType">
             <span class="el-dropdown-link">
-              {{xaxis.lineStyle.type}}<i class="el-icon-arrow-down el-icon--right"></i>
+              {{xaxis.axisLine.lineStyle.type}}<i class="el-icon-arrow-down el-icon--right"></i>
             </span>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item command="solid">solid</el-dropdown-item>
@@ -16,7 +16,7 @@
           </el-dropdown>
           <el-dropdown @command="lineWidth">
             <span class="el-dropdown-link">
-              {{xaxis.lineStyle.width}}<i class="el-icon-arrow-down el-icon--right"></i>
+              {{xaxis.axisLine.lineStyle.width}}<i class="el-icon-arrow-down el-icon--right"></i>
             </span>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item command="1">1</el-dropdown-item>
@@ -31,7 +31,7 @@
             </el-dropdown-menu>
           </el-dropdown>
           <div class="color_block">
-            <el-color-picker v-model="xaxis.lineStyle.color"></el-color-picker>
+            <el-color-picker v-model="xaxis.axisLine.lineStyle.color"></el-color-picker>
           </div>
         </div>
         <div>
@@ -54,20 +54,20 @@
               {{xaxis.axisLabel.fontSize}}<i class="el-icon-arrow-down el-icon--right"></i>
             </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item command="10px">10px</el-dropdown-item>
-              <el-dropdown-item command="11px">11px</el-dropdown-item>
-              <el-dropdown-item command="12px">12px</el-dropdown-item>
-              <el-dropdown-item command="13px">13px</el-dropdown-item>
-              <el-dropdown-item command="14px">14px</el-dropdown-item>
-              <el-dropdown-item command="15px">15px</el-dropdown-item>
-              <el-dropdown-item command="16px">16px</el-dropdown-item>
-              <el-dropdown-item command="18px">18px</el-dropdown-item>
-              <el-dropdown-item command="20px">20px</el-dropdown-item>
-              <el-dropdown-item command="24px">24px</el-dropdown-item>
-              <el-dropdown-item command="32px">32px</el-dropdown-item>
-              <el-dropdown-item command="36px">36px</el-dropdown-item>
-              <el-dropdown-item command="48px">48px</el-dropdown-item>
-              <el-dropdown-item command="64px">64px</el-dropdown-item>
+              <el-dropdown-item command="10">10px</el-dropdown-item>
+              <el-dropdown-item command="11">11px</el-dropdown-item>
+              <el-dropdown-item command="12">12px</el-dropdown-item>
+              <el-dropdown-item command="13">13px</el-dropdown-item>
+              <el-dropdown-item command="14">14px</el-dropdown-item>
+              <el-dropdown-item command="15">15px</el-dropdown-item>
+              <el-dropdown-item command="16">16px</el-dropdown-item>
+              <el-dropdown-item command="18">18px</el-dropdown-item>
+              <el-dropdown-item command="20">20px</el-dropdown-item>
+              <el-dropdown-item command="24">24px</el-dropdown-item>
+              <el-dropdown-item command="32">32px</el-dropdown-item>
+              <el-dropdown-item command="36">36px</el-dropdown-item>
+              <el-dropdown-item command="48">48px</el-dropdown-item>
+              <el-dropdown-item command="64">64px</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
           <div class="color_block">
@@ -76,7 +76,6 @@
         </div>
       </el-collapse-item>
     </el-collapse>
-    <router-view></router-view>
   </div>
 </template>
 <script type="text/babel">
@@ -84,12 +83,12 @@ export default {
   data: () => ({
     xaxis:{
       axisLine:{
-        show:''
-      },
-      lineStyle:{
-        type:'',
-        width:'',
-        color:''
+        show:'',
+        lineStyle:{
+          type:'',
+          width:'',
+          color:''
+        }
       },
       axisLabel:{
         show:'',
@@ -107,10 +106,10 @@ export default {
   },
   methods: {
     lineType(command) {
-      this.xaxis.lineStyle.type=command;
+      this.xaxis.axisLine.lineStyle.type=command;
     },
     lineWidth(command){
-      this.xaxis.lineStyle.width=command;
+      this.xaxis.axisLine.lineStyle.width=command;
     },
     linefontFamily(command){
       this.xaxis.axisLabel.fontFamily=command;

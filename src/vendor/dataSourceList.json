@@ -1,0 +1,17 @@
+ [{
+     "name": "excel",
+     "type": "upload"
+   },
+   {
+     "name": "SQLServer",
+     "type": "form"
+   },
+   {
+     "name": "MySQL",
+     "type": "form"
+   },
+   {
+     "name": "Hive2",
+     "type": "form"
+   }
+ ]

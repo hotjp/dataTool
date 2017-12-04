@@ -23,7 +23,7 @@ module.exports = (options = {}) => ({
     {
       test: /\.js$/,
       use: ['babel-loader'],
-      exclude: /node_modules/
+      exclude: [resolve(__dirname,'node_modules'),resolve(__dirname, 'src/vendor')]
     },
     {
       test: /\.less$/,

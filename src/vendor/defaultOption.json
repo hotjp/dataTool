@@ -1,0 +1,36 @@
+{
+  "option": {
+    "title": {
+      "text": "一个新图表"
+    },
+    "xAxis": {
+      "axisLine": {
+        "show": true,
+        "lineStyle": {
+          "type": "solid",
+          "width": "1",
+          "color": "#000"
+        }
+      },
+
+      "axisLabel": {
+        "show": true,
+        "fontFamily": "sans-serif",
+        "fontSize": "10px",
+        "color": "#000"
+      }
+    },
+    "yAxis":{
+      "show":true,
+      "name":"y轴",
+      "axisLine":{
+        "show":true,
+        "lineStyle":{
+          "color":"#000",
+          "width":1,
+          "type":"solid"
+        }
+      }
+    }
+  }
+}

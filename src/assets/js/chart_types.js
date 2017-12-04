@@ -1,5 +1,4 @@
 export default {
-
   bar: {
     allowUse:false,
     type: 'bar',
@@ -69,5 +68,4 @@ export default {
       }
     ]
   }
-
 };
