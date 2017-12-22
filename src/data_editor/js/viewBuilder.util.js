@@ -1,3 +1,37 @@
+if (!Array.prototype.collect) {
+  /**
+	 * 搜集数组项
+	 * @param {Function} func
+	 * @returns 与数组长度相等的func返回值列表
+	 */
+  Array.prototype.collect = function(func) {
+    var arr = [];
+    for (var i = 0, j = this.length; i < j; ++i)
+      arr.push(func.call(this[i], this, i));
+    return arr;
+  };
+}
+if (!Array.prototype.toMap) {
+  /**
+	 * 将数组转换为一个map
+	 * @param {Function} func 返回一个值，作为map的值
+	 * @param {Boolean} 
+	 */
+  Array.prototype.toMap = function(func, reverseKv) {
+    var map = {};
+    for (var i = 0, j = this.length; i < j; ++i) {
+      var k = this[i], v = func.call(k, this, i);
+      if (reverseKv) {
+        var k2 = k;
+        k = v;
+        v = k2;
+      }
+      map[k] = v;
+    }
+    return map;
+  };
+}
+
 /**
  * 加载view
  * 

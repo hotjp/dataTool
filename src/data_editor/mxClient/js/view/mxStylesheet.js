@@ -53,11 +53,11 @@
  */
 function mxStylesheet()
 {
-	this.styles = new Object();
+  this.styles = new Object();
 	
-	this.putDefaultVertexStyle(this.createDefaultVertexStyle());
-	this.putDefaultEdgeStyle(this.createDefaultEdgeStyle());
-};
+  this.putDefaultVertexStyle(this.createDefaultVertexStyle());
+  this.putDefaultEdgeStyle(this.createDefaultEdgeStyle());
+}
 
 /**
  * Function: styles
@@ -74,17 +74,17 @@ mxStylesheet.prototype.styles;
  */
 mxStylesheet.prototype.createDefaultVertexStyle = function()
 {
-	var style = new Object();
+  var style = new Object();
 	
-	style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_RECTANGLE;
-	style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
-	style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_MIDDLE;
-	style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_CENTER;
-	style[mxConstants.STYLE_FILLCOLOR] = '#C3D9FF';
-	style[mxConstants.STYLE_STROKECOLOR] = '#6482B9';
-	style[mxConstants.STYLE_FONTCOLOR] = '#774400';
+  style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_RECTANGLE;
+  style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
+  style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_MIDDLE;
+  style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_CENTER;
+  style[mxConstants.STYLE_FILLCOLOR] = '#C3D9FF';
+  style[mxConstants.STYLE_STROKECOLOR] = '#6482B9';
+  style[mxConstants.STYLE_FONTCOLOR] = '#774400';
 	
-	return style;
+  return style;
 };
 
 /**
@@ -94,16 +94,16 @@ mxStylesheet.prototype.createDefaultVertexStyle = function()
  */
 mxStylesheet.prototype.createDefaultEdgeStyle = function()
 {
-	var style = new Object();
+  var style = new Object();
 	
-	style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_CONNECTOR;
-	style[mxConstants.STYLE_ENDARROW] = mxConstants.ARROW_CLASSIC;
-	style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_MIDDLE;
-	style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_CENTER;
-	style[mxConstants.STYLE_STROKECOLOR] = '#6482B9';
-	style[mxConstants.STYLE_FONTCOLOR] = '#446299';
+  style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_CONNECTOR;
+  style[mxConstants.STYLE_ENDARROW] = mxConstants.ARROW_CLASSIC;
+  style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_MIDDLE;
+  style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_CENTER;
+  style[mxConstants.STYLE_STROKECOLOR] = '#5998e8';
+  style[mxConstants.STYLE_FONTCOLOR] = '#446299';
 	
-	return style;
+  return style;
 };
 
 /**
@@ -117,7 +117,7 @@ mxStylesheet.prototype.createDefaultEdgeStyle = function()
  */
 mxStylesheet.prototype.putDefaultVertexStyle = function(style)
 {
-	this.putCellStyle('defaultVertex', style);
+  this.putCellStyle('defaultVertex', style);
 };
 
 /**
@@ -127,7 +127,7 @@ mxStylesheet.prototype.putDefaultVertexStyle = function(style)
  */
 mxStylesheet.prototype.putDefaultEdgeStyle = function(style)
 {
-	this.putCellStyle('defaultEdge', style);
+  this.putCellStyle('defaultEdge', style);
 };
 
 /**
@@ -137,7 +137,7 @@ mxStylesheet.prototype.putDefaultEdgeStyle = function(style)
  */
 mxStylesheet.prototype.getDefaultVertexStyle = function()
 {
-	return this.styles['defaultVertex'];
+  return this.styles['defaultVertex'];
 };
 
 /**
@@ -147,7 +147,7 @@ mxStylesheet.prototype.getDefaultVertexStyle = function()
  */
 mxStylesheet.prototype.getDefaultEdgeStyle = function()
 {
-	return this.styles['defaultEdge'];
+  return this.styles['defaultEdge'];
 };
 
 /**
@@ -189,7 +189,7 @@ mxStylesheet.prototype.getDefaultEdgeStyle = function()
  */
 mxStylesheet.prototype.putCellStyle = function(name, style)
 {
-	this.styles[name] = style;
+  this.styles[name] = style;
 };
 
 /**
@@ -206,23 +206,23 @@ mxStylesheet.prototype.putCellStyle = function(name, style)
  */
 mxStylesheet.prototype.getCellStyle = function(name, defaultStyle)
 {
-	var style = defaultStyle;
+  var style = defaultStyle;
 	
-	if (name != null && name.length > 0)
-	{
-		var pairs = name.split(';');
+  if (name != null && name.length > 0)
+  {
+    var pairs = name.split(';');
 
-		if (style != null &&
-			name.charAt(0) != ';')
-		{
-			style = mxUtils.clone(style);
-		}
-		else
-		{
-			style = new Object();
-		}
+    if (style != null &&
+   name.charAt(0) != ';')
+    {
+      style = mxUtils.clone(style);
+    }
+    else
+    {
+      style = new Object();
+    }
 
-		// Parses each key, value pair into the existing style
+    // Parses each key, value pair into the existing style
 	 	for (var i = 0; i < pairs.length; i++)
 	 	{
 	 		var tmp = pairs[i];
@@ -245,22 +245,22 @@ mxStylesheet.prototype.getCellStyle = function(name, defaultStyle)
 		 		{
 			 		style[key] = value;
 		 		}
-			}
+      }
 	 		else
 	 		{
 	 			// Merges the entries from a named style
-				var tmpStyle = this.styles[tmp];
+        var tmpStyle = this.styles[tmp];
 				
-				if (tmpStyle != null)
-				{
-					for (var key in tmpStyle)
-					{
-						style[key] = tmpStyle[key];
-					}
-				}
+        if (tmpStyle != null)
+        {
+          for (var key in tmpStyle)
+          {
+            style[key] = tmpStyle[key];
+          }
+        }
 	 		}
-		}
-	}
+    }
+  }
 	
-	return style;
+  return style;
 };

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <title>dashboard展示页</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="../assets/css/gridstack.min.css" rel="stylesheet">
+    <link href="../assets/css/gridstack-extra.min.css" rel="stylesheet">
+    <link href="../assets/css/dashboard.css" rel="stylesheet">
+    <link href="./css/dashboard.css" rel="stylesheet">
+</head>
+
+<body id="dashboard" class="dashboard_viewer">
+    <div class="top fix">
+        <div class="l title">大数据</div>
+        <!-- <div class="r">返回首页</div> -->
+    </div>
+    <div id="dash" class="grid-stack grid-stack-6" data-gs-animate="yes">
+        
+    </div>
+    <!-- 单个chrats弹窗 -->
+    <div class="chart_box">
+        <div class="chart_box_top fix">
+            <div class="r close">关闭</div>
+        </div>
+        <div id="singleChart"></div>
+        <div id="singleTable"></div>
+    </div>
+
+    <script id="gridItem" type="text/html">
+        <%for(i=0;i<xData.length;i++){%>
+            <div class="grid-stack-item" id="" data-id="<%=xData[i].id%>" data-gs-auto-position="false" data-gs-x="<%=xData[i].x%>" data-gs-y="<%=xData[i].y%>" data-gs-width="<%=xData[i].width%>" data-gs-height="<%=xData[i].height%>" data-gs-min-height="2" data-gs-max-height="6">
+                <div class="_wrap">
+                    <div id="chart<%=xData[i].id%>"></div>
+                </div>
+            </div>
+        <%}%>
+    </script>
+    <script id="tableViewTpl" type="text/html">
+        <table class="chart_table">
+            <thead>
+                <tr>
+                    <%for(var i=0;i<columns.length;i++){%>
+                        <td><%=columns[i].source.text%></td>
+                    <%}%>
+                </tr>
+            </thead>
+            
+            <%for(var j=0;j<rows.length;j++){%>
+                <tr>
+                    <%for(var i=0;i<columns.length;i++){%>
+                        <%if(j>0&&rows[j][columns[i].name] == rows[j-1][columns[i].name]){%>
+                            <%continue%>
+                        <%}%>
+                            
+                        <%var rowspan = 0%>
+                        <%for(var k=0;k<rows.length;k++){%>
+                            <%if(rows[j][columns[i].name] == rows[k][columns[i].name]){%>
+                                <%rowspan++%>
+                            <%}%>
+                        <%}%>
+                        <td rowspan="<%=rowspan%>"><%=rows[j][columns[i].name]%></th>
+                        
+                    <%}%>
+                </tr>
+            <%}%>
+            
+        </table>
+    </script>
+    
+</body>
+<script src="../assets/js/jquery-1.11.0.js"></script>
+<script src="./js/urlparas.js"></script>
+<script src="./js/template-native.js"></script>
+<script src="../assets/js/jquery-ui.min.js"></script>
+<script src="./js/lodash.min.js"></script>
+<script src="./js/gridstack.js"></script>
+<script src="./js/gridstack.jQueryUI.js"></script>
+<script src="./js/echarts.js"></script>
+<script src="./js/viewer_common.js"></script>
+<script src="../vendor/seriesBar.js"></script>
+<script src="../vendor/seriesLine.js"></script>
+<script src="../vendor/seriesPie.js"></script>
+
+<script src="./js/dashboard.js"></script>
+
+</html>

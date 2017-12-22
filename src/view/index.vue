@@ -1,31 +1,25 @@
 <template>
   <div id="index">
-    demo
+    <!-- demo
     <router-link to="/demo/chart">
       图表示例
     </router-link>
     <router-link to="/demo/tpl">
       全生命周期模板
     </router-link>
-    功能
-    <router-link to="/chart_editor/1">
-      图表编辑1
-    </router-link>
-    <router-link to="/chart_editor/2">
-      图表编辑2
-    </router-link>
-    <router-link to="/chart_editor">
+    功能 -->
+    <router-link to="/chart_editor/4ac8edaed4394980ad80beb82cc237af">
       图表编辑
     </router-link>
-    <router-link to="/datebase">
+    <router-link to="/database">
       数据源列表
     </router-link>
-    <router-link to="/datebase/add">
+    <router-link to="/database/add">
       增加数据源
     </router-link>
-    <div id="graphContainer">
-
-    </div>
+    <router-link to="/dashboard/ed3f29d5db1b4cee8d6a23a83587874c">
+      仪表盘
+    </router-link>
   </div>
 
 </template>
@@ -46,7 +40,7 @@ export default {
           y: 0
         }
       },
-      datebase: [
+      database: [
         {
           name: '1',
           x: 0,
@@ -105,12 +99,12 @@ export default {
   width: 100%;
   height: 500px;
 }
-.datebase {
+.database {
   fill: #fff;
   stroke: #333;
   stroke-width: 1px;
 }
-.datebase:hover {
+.database:hover {
   stroke: #ffcc00;
   stroke-width: 3px;
 } */

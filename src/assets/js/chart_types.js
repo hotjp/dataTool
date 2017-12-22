@@ -18,6 +18,68 @@ export default {
       }
     ]
   },
+  line: {
+    allowUse:false,
+    type: 'line',
+    name: '折线图',
+    rules: [
+      {
+        columns: {
+          rule: '==',
+          num: 1,
+          text: '1个'
+        },
+        values: {
+          rule: '>=',
+          num: 1,
+          text: '1个以上'
+        }
+      },
+      {
+        columns: {
+          rule: '==',
+          num: 2,
+          text: '2个'
+        },
+        values: {
+          rule: '>=',
+          num: 1,
+          text: '1个以上'
+        }
+      }
+    ]
+  },
+  area: {
+    allowUse:false,
+    type: 'line',
+    name: '面积图',
+    rules: [
+      {
+        columns: {
+          rule: '==',
+          num: 1,
+          text: '1个'
+        },
+        values: {
+          rule: '>=',
+          num: 1,
+          text: '1个以上'
+        }
+      },
+      {
+        columns: {
+          rule: '==',
+          num: 2,
+          text: '2个'
+        },
+        values: {
+          rule: '>=',
+          num: 1,
+          text: '1个以上'
+        }
+      }
+    ]
+  },
   pie: {
     allowUse:false,
     type: 'pie',

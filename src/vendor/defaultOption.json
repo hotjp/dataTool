@@ -1,7 +1,7 @@
 {
   "option": {
     "title": {
-      "text": "一个新图表"
+      "text": "未命名图表"
     },
     "xAxis": {
       "axisLine": {
@@ -30,6 +30,12 @@
           "width":1,
           "type":"solid"
         }
+      },
+      "axisLabel": {
+        "show": true,
+        "fontFamily": "sans-serif",
+        "fontSize": "10px",
+        "color": "#000"
       }
     }
   }

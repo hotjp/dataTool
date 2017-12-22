@@ -1,17 +1,22 @@
  [{
      "name": "excel",
-     "type": "upload"
+     "type": "upload",
+     "img":"./src/assets/images/excel.png"
    },
    {
      "name": "SQLServer",
-     "type": "form"
+     "type": "form",
+     "img":"./src/assets/images/SQLServer.png"
+     
    },
    {
      "name": "MySQL",
-     "type": "form"
+     "type": "form",
+     "img":"./src/assets/images/MySQL.png"     
    },
    {
      "name": "Hive2",
-     "type": "form"
+     "type": "form",
+     "img":"./src/assets/images/Hive2.png"     
    }
  ]

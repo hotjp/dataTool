@@ -1,78 +1,108 @@
 <template>
   <div class="chartConfig">
-    <prop-title @titleText="getTitle" :setTitle="option.title"></prop-title>
-    <prop-xaxis @xaxisOptions="getOptions" :setXaxis="option.xAxis"></prop-xaxis>
+    <prop-title class="series" @titleText="getTitle" :setTitle="option.title"></prop-title>
+    <prop-xaxis v-if="charts.type!='table'"  class="series" @xaxisOptions="getOptions" :setXaxis="option.xAxis"></prop-xaxis>
+    <prop-yaxis v-if="charts.type!='table'"  class="series" @yaxisOptions="getOptions" :setYaxis="option.yAxis"></prop-yaxis>
     <!-- <prop-yaxis @yaxisOptions="getOptions" :setXaxis="option.yAxis"></prop-yaxis> -->
-    <chartTypeOption :option="option" :data="setProp" @submitOption="submitOption"></chartTypeOption>
+    <chartTypeOption  class="series" :option="option" :data="setProp" :type="charts.type" @submitOption="submitOption"></chartTypeOption>
   </div>
 </template>
 <script type="text/babel">
 import defaultData from '../../vendor/defaultOption.json';
-import title from '../../components/title.vue';
-import xaxis from '../../components/xaxis.vue';
-import yaxis from '../../components/yaxis.vue';
-import chartTypeOption from '../../components/chartTypeOption.vue';
-
+import title from '../../components/chartEditor/title.vue';
+import xaxis from '../../components/chartEditor/xaxis.vue';
+import yaxis from '../../components/chartEditor/yaxis.vue';
+import chartTypeOption from '../../components/chartEditor/chartTypeOption.vue';
 export default{
   data:()=>({
     option:{
       title:{
-        text:'一个新图表'
+        text:''
       },
-      xAxis:{
-        axisLine:{
+      xAxis: {
+        show:true,
+        axisLine: {
           show: true,
-          lineStyle:{
-            type:'solid',
-            width:'1',
-            color:'#000'
+          lineStyle: {
+            type: 'solid',
+            width: '1',
+            color: '#000'
           }
         },
-        axisLabel:{
-          show:true,
-          fontFamily:'sans-serif',
-          fontSize:'10',
-          color:'#000'
-        }
+        axisLabel: {
+          show: true,
+          fontFamily: 'sans-serif',
+          fontSize: '10',
+          color: '#000'
+        },
+        data: []
       },
-      yAxis : {}
+      yAxis: {
+        show:true,
+        axisLine: {
+          show: true,
+          lineStyle: {
+            type: 'solid',
+            width: '1',
+            color: '#000'
+          }
+        },
+        axisLabel: {
+          show: true,
+          fontFamily: 'sans-serif',
+          fontSize: '10',
+          color: '#000'
+        },
+        data: []
+      }
     },
-    graphData:{}
+    graphData: {}
   }),
-  components:{
-    'prop-title':title,
-    'prop-xaxis':xaxis,
-    'prop-yaxis':yaxis,
-    'chartTypeOption':chartTypeOption
+  components: {
+    'prop-title': title,
+    'prop-xaxis': xaxis,
+    'prop-yaxis': yaxis,
+    chartTypeOption: chartTypeOption
   },
-  props:['setProp','charts'],
-  methods:{
-    getTitle:function(data){
-      Object.assign(this.option.title,data);
+  props: ['setProp', 'charts'],
+  methods: {
+    getTitle: function(data) {
+      Object.assign(this.option.title, data);
     },
-    getOptions:function(data){
-      Object.assign(this.option.xAxis,data);    
+    getOptions: function(data) {
+      Object.assign(this.option, data.option);
     },
-    submitOption:function(data){
-      Object.assign(this.option,data); 
+    submitOption: function(data) {
+      // this.option= _.merge({},this.option, data);
+      if(data.xAxis && data.xAxis.data){
+        this.option.xAxis.data = data.xAxis.data;
+      }
+      if(data.series ){
+        this.option.series = [];
+        this.option.series=data.series;
+        // Object.assign([],this.option.series,data.series);
+      }
+
+
     }
   },
-  watch:{
-    option:{
-      handler:function(val,oldval){  
+  watch: {
+    option: {
+      handler: function(val, oldval) {
         // 发数据
-        this.$emit('getProp',this.option);
+        this.$emit('getProp', val);
       },
-      deep:true
+      deep: true
     },
-    setProp:{
-      handler:function(val,oldval){
+    'charts.type': {
+      handler: function(val, oldval) {
+        this.option = Object.assign({},this.option,defaultData.option,this.charts.option);
       },
-      deep:true
+      deep: true
     }
   },
-  mounted(){
-    Object.assign(this.option,defaultData.option,this.charts.option); 
+  beforeMount(){
+    Object.assign(this.option,defaultData.option,this.charts.option);
   }
 };
 </script>

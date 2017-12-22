@@ -1,10 +1,7 @@
 {
-    "itemStyle": {
-        "normal": {
-          "color": ""
-        }
-      },
-      "type":"bar",
-      "data":[]
-      
+  "itemStyle": {
+    "normal": {
+      "color": ""
+    }
+  }
 }

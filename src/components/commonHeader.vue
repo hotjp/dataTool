@@ -1,6 +1,9 @@
 <template>
   <div id="commonHeader">
-    <a @click="backToPrev" href="javascript:;">返回</a> 当前页：{{$attrs.name}}
+    <a @click="backToPrev" href="javascript:;">
+      <i class="back_icon"></i>
+    </a>
+    <span>{{$route.name}}</span>
   </div>
 </template>
 <script>

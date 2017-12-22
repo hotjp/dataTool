@@ -1,9 +1,8 @@
 <template>
   <div class="echarts" v-bind:class="{hideTable:hideTable}">
-    <el-switch v-model="switchNull" active-color="#13ce66" inactive-color="#888" active-text="显示空值"
-  inactive-text="不显示空值" :change="nullTest()" class="switch"></el-switch>
-    <el-table border style="width: 100%" :data="tableData.rows" :row-class-name="addClass">
-        <el-table-column v-for="(item,index) in tableData.columns" :key="index" :prop="item.name" :label="item.source.text" width="180"></el-table-column>
+    <el-switch v-model="switchNull" active-color="#13ce66" inactive-color="#888" active-text="显示空值" inactive-text="不显示空值" :change="nullTest()" class="switch"></el-switch>
+    <el-table border style="width: 100%" height="100%" :data="tableData.rows" :row-class-name="addClass" :span-method="add">
+        <el-table-column v-for="(item,index) in tableData.columns" :key="index" :prop="item.name" :label="item.source.text" ></el-table-column>
     </el-table>
   </div>
 </template>
@@ -21,12 +20,89 @@
       // switch的左右切换标识
       switchNull:true,
       // 类切换的标识
-      hideTable:false
+      hideTable:false,
+      // 合并相同数据
+      order:[]
     }),
     props:['myMessage'],
     mounted() {
       let that=this;
       Object.assign(this.chartData.data,this.myMessage.data); 
+      // 合并数据;
+      let data=this.chartData.data;
+      let length=data.columns.length;
+      let columns=[];
+      var num=[];
+      var xData=this.order;
+      var flag=[];
+      for(let i=0;i<length;i++){
+        columns.push(data.columns[i].name);
+        xData[i]=[];
+        flag[i]='a';
+        num[i]=1;
+      }
+      var tableFormat={
+        column:function(){
+          for(var i=0;i<data.rows.length;i++){
+            tableFormat.row(i);
+          }
+        },
+        row:function(i){
+          for(var j=0;j<data.columns.length;j++){
+            if(data.rows[i][data.columns[j].name]==''){
+              break;
+            }
+            if(i+1<data.rows.length){
+              if(data.rows[i][data.columns[j].name]==data.rows[i+1][data.columns[j].name]){
+                xData[j].push({});
+                let arr=xData[j][xData[j].length-1];
+                arr['spc']=i;
+                if(typeof flag[j] == 'string'){
+                  flag[j]=xData[j].length-1;
+                  let arr=xData[j][xData[j].length-1];
+                  arr['rowspan']=num[j]++;
+                  arr['spc']=i;
+                }else{
+                  xData[j][flag[j]]['rowspan']=num[j]++;
+                  let arr=xData[j][xData[j].length-1];
+                  arr['rowspan']=0;
+                }
+              }else{
+                if(typeof flag[j]!='string'){
+                  xData[j][flag[j]]['rowspan']=num[j]++;
+                  xData[j].push({});
+                  let arr=xData[j][xData[j].length-1];
+                  flag[j]='a';
+                  num[j]=1;
+                  arr['spc']=i;
+                  arr['rowspan']=0;
+                }else{
+                  break;
+                  // if(xData[j].length){
+                  //   let arr=xData[j][xData[j].length-1];
+                  //   arr['rowspan']=num[j]++;
+                  //   xData[j].push({});
+                  //   arr=xData[j][xData[j].length-1];
+                  //   arr['rowspan']=0;
+                  // }
+                }
+              }
+            }else{
+              if(typeof flag[j]!='string'){
+                xData[j][flag[j]]['rowspan']=num[j]++;
+                xData[j].push({});
+                let arr=xData[j][xData[j].length-1];
+                flag[j]='a';
+                num[j]=1;
+                arr['spc']=i;
+                arr['rowspan']=0;
+              }
+            }
+          }
+        }
+      };
+      tableFormat.column();
+      console.log(this.order);
     },
     computed: {
       //null值的format 为null时 处理成'-'
@@ -64,12 +140,36 @@
         if(row.row.null){
           return 'nullClass';
         }
+      },
+      add({row,column,rowIndex,columnIndex}){
+        for(var i=0;i<this.order.length;i++){
+          if(this.order[i].length){
+            if(columnIndex==i){
+              if(this.order[i].length){
+                for(var j=0;j<this.order[i].length;j++){
+                  if(rowIndex==this.order[i][j].spc){
+                    if(this.order[i][j].rowspan!=0){
+                      return {
+                        rowspan: this.order[i][j].rowspan,
+                        colspan: 1
+                      };
+                    }else{
+                      return {
+                        rowspan: 0,
+                        colspan: 0
+                      };
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   };
-
 </script>
-<style scoped>
+<style>
 /* .echarts{
   width:721px;
 } */
@@ -78,5 +178,8 @@
 }
 .switch{
   margin-bottom: 30px;
+}
+.el-table{
+  height: 90%;
 }
 </style>

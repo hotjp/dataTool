@@ -6,7 +6,7 @@ var VIEW_TYPE_VIEW = 'V';
 var VIEW_TYPE_TABLE = 'T';
 
 
-var SUPPRESS_ERR_DLG = true;
+var SUPPRESS_ERR_DLG = false;
 
 /**
  * view builder
@@ -24,7 +24,7 @@ var vb = {
 	 * @param viewId
 	 */
   load: function (viewId) {
-
+    // extractViewDef返回当前视图数据
     vb.showView(extractViewDef());
     getNewViewProvider(VIEW_TYPE_USER_COMPOSITE);
   },
@@ -66,180 +66,180 @@ var vb = {
       failed,
       SUPPRESS_ERR_DLG);
   },
-  validate: function (oldView, newView) {
-    // 如果查询名称更改则提示，如果没有名称则禁止提交
-    if (!newView.viewName) {
-      $('#viewName').textbox('setValue', '').textbox('validate');
-      alert('必须填写视图名');
-      return false;
-    }
-    if (newView['viewName'] != oldView['viewName'] && oldView['viewName']) {
-      if (!confirm('如果修改视图名，可能会造成已有视图和查询报表无法使用，是否继续？')) {
-        $('#viewName').textbox('setValue', oldView['viewName']);
-        return false;
-      }
-    }
-    if (!newView.dispName) {
-      $('#viewDispName').textbox('setValue', '').textbox('validate');
-      alert('必须填写视图显示名');
-      return false;
-    }
-    if (!newView.dataSrcId)
-      return !!alert('必须选择数据源');
-    if (!newView.columns || !newView.columns.length)
-      return !!alert('必须选择输出列');
+  // validate: function (oldView, newView) {
+  //   // 如果查询名称更改则提示，如果没有名称则禁止提交
+  //   if (!newView.viewName) {
+  //     $('#viewName').textbox('setValue', '').textbox('validate');
+  //     alert('必须填写视图名');
+  //     return false;
+  //   }
+  //   if (newView['viewName'] != oldView['viewName'] && oldView['viewName']) {
+  //     if (!confirm('如果修改视图名，可能会造成已有视图和查询报表无法使用，是否继续？')) {
+  //       $('#viewName').textbox('setValue', oldView['viewName']);
+  //       return false;
+  //     }
+  //   }
+  //   if (!newView.dispName) {
+  //     $('#viewDispName').textbox('setValue', '').textbox('validate');
+  //     alert('必须填写视图显示名');
+  //     return false;
+  //   }
+  //   if (!newView.dataSrcId)
+  //     return !!alert('必须选择数据源');
+  //   if (!newView.columns || !newView.columns.length)
+  //     return !!alert('必须选择输出列');
 
-    // 如果有多个子视图，则不允许存在游离视图
-    if (newView.viewRefs.length > 1) {
-      var viewRefMap = newView.viewRefs.toMap(function () { return this.viewRefId; }, true);
-      $.each(newView.viewRefRelations, function () {
-        delete viewRefMap[this.srcViewRefId];
-        delete viewRefMap[this.destViewRefId];
-      });
-      var unconnectedViews = [];
-      for (var viewRefId in viewRefMap) {
-        if (viewRefMap.hasOwnProperty(viewRefId)) {
-          var viewRef = viewRefMap[viewRefId];
-          unconnectedViews.push(viewRef.view.dispName + '(' + viewRef.viewAlias + ')');
-        }
-      }
-      if (unconnectedViews.length > 0) {
-        alert('视图之间必须建立关联关系，以下视图没有建立关联：' + unconnectedViews.join(','));
-        return false;
-      }
-    }
+  //   // 如果有多个子视图，则不允许存在游离视图
+  //   if (newView.viewRefs.length > 1) {
+  //     var viewRefMap = newView.viewRefs.toMap(function () { return this.viewRefId; }, true);
+  //     $.each(newView.viewRefRelations, function () {
+  //       delete viewRefMap[this.srcViewRefId];
+  //       delete viewRefMap[this.destViewRefId];
+  //     });
+  //     var unconnectedViews = [];
+  //     for (var viewRefId in viewRefMap) {
+  //       if (viewRefMap.hasOwnProperty(viewRefId)) {
+  //         var viewRef = viewRefMap[viewRefId];
+  //         unconnectedViews.push(viewRef.view.dispName + '(' + viewRef.viewAlias + ')');
+  //       }
+  //     }
+  //     if (unconnectedViews.length > 0) {
+  //       alert('视图之间必须建立关联关系，以下视图没有建立关联：' + unconnectedViews.join(','));
+  //       return false;
+  //     }
+  //   }
 
-    // 不可能所有的视图都是子查询，子查询之间不能互相关联
-    // 如果子查询关联了多个标准视图，则这些标准视图之间必须通过某种关系关联到一起
-    if (newView.viewRefs.length) {
-      var subQueries = newView.viewRefs.filter(function () { return this.isSubQuery; });
-      if (subQueries.length == newView.viewRefs.length)
-        return !!alert('不能将所有的视图定义为子查询');
+  //   // 不可能所有的视图都是子查询，子查询之间不能互相关联
+  //   // 如果子查询关联了多个标准视图，则这些标准视图之间必须通过某种关系关联到一起
+  //   if (newView.viewRefs.length) {
+  //     var subQueries = newView.viewRefs.filter(function () { return this.isSubQuery; });
+  //     if (subQueries.length == newView.viewRefs.length)
+  //       return !!alert('不能将所有的视图定义为子查询');
 
-      // 从子查询上连接的标准视图出发，如果标准视图之间能够互相连接，则该关联合法
-		  /**
-		   * 检查viewRefMap中的视图是否能连通，如果连通则标记_connected = 1
-		   */
-      function traverseViews(viewRefMap, viewRefRels, viewRef) {
-        if (!viewRef) {
-          // 递归入口
-          // 清除所有viewRef的_connected标记
-          for (var i in viewRefMap)
-            if (viewRefMap.hasOwnProperty(i))
-              delete viewRefMap[i]._connected;
-          // 从任意viewRef开始遍历
-          for (var viewRefId in viewRefMap) {
-            if (viewRefMap.hasOwnProperty(viewRefId)) {
-              traverseViews(viewRefMap, viewRefRels, viewRefMap[viewRefId]);
-              break;
-            }
-          }
-        } else {
-          // 从viewRefRel递归查找所有关联的viewRef
-          viewRef._connected = true;
-          for (var i = 0, j = viewRefRels.length, viewRefRel, destViewRef; i < j; ++i) {
-            viewRefRel = viewRefRels[i];
-            if (viewRefRel.srcViewRefId == viewRef.viewRefId) {
-              destViewRef = viewRefMap[viewRefRel.destViewRefId];
-            } else if (viewRefRel.destViewRefId == viewRef.viewRefId) {
-              destViewRef = viewRefMap[viewRefRel.srcViewRefId];
-            }
-            // 继续遍历标准视图
-            if (destViewRef && !destViewRef._connected) {
-              traverseViews(viewRefMap, viewRefRels, destViewRef);
-            }
-          }
-        }
-      }
+  //     // 从子查询上连接的标准视图出发，如果标准视图之间能够互相连接，则该关联合法
+  // 	  /**
+  // 	   * 检查viewRefMap中的视图是否能连通，如果连通则标记_connected = 1
+  // 	   */
+  //     function traverseViews(viewRefMap, viewRefRels, viewRef) {
+  //       if (!viewRef) {
+  //         // 递归入口
+  //         // 清除所有viewRef的_connected标记
+  //         for (var i in viewRefMap)
+  //           if (viewRefMap.hasOwnProperty(i))
+  //             delete viewRefMap[i]._connected;
+  //         // 从任意viewRef开始遍历
+  //         for (var viewRefId in viewRefMap) {
+  //           if (viewRefMap.hasOwnProperty(viewRefId)) {
+  //             traverseViews(viewRefMap, viewRefRels, viewRefMap[viewRefId]);
+  //             break;
+  //           }
+  //         }
+  //       } else {
+  //         // 从viewRefRel递归查找所有关联的viewRef
+  //         viewRef._connected = true;
+  //         for (var i = 0, j = viewRefRels.length, viewRefRel, destViewRef; i < j; ++i) {
+  //           viewRefRel = viewRefRels[i];
+  //           if (viewRefRel.srcViewRefId == viewRef.viewRefId) {
+  //             destViewRef = viewRefMap[viewRefRel.destViewRefId];
+  //           } else if (viewRefRel.destViewRefId == viewRef.viewRefId) {
+  //             destViewRef = viewRefMap[viewRefRel.srcViewRefId];
+  //           }
+  //           // 继续遍历标准视图
+  //           if (destViewRef && !destViewRef._connected) {
+  //             traverseViews(viewRefMap, viewRefRels, destViewRef);
+  //           }
+  //         }
+  //       }
+  //     }
 
-      var subQueryReferencedSubQueries = []; // 与子查询关联的子查询
-      var unconnectedStandardViewsReferencedBySubQueries = []; // 与子查询关联的，但与其他视图没有互通的视图，{ viewRef : 子查询, unconnectedViewRefs : [ 未连通的标准视图, ... ] }
-      $.each(newView.viewRefs, function () {
-        var viewRef = this;
-        if (!viewRef.isSubQuery)
-          return;
+  //     var subQueryReferencedSubQueries = []; // 与子查询关联的子查询
+  //     var unconnectedStandardViewsReferencedBySubQueries = []; // 与子查询关联的，但与其他视图没有互通的视图，{ viewRef : 子查询, unconnectedViewRefs : [ 未连通的标准视图, ... ] }
+  //     $.each(newView.viewRefs, function () {
+  //       var viewRef = this;
+  //       if (!viewRef.isSubQuery)
+  //         return;
 
-        // 当前子查询直接关联的所有标准视图，要检查视图之间的连通性
-        var standardViewRefMap = {};
-        $.each(newView.viewRefRelations, function () {
-          var viewRefRel = this,
-            targetViewRef;
-          if (viewRefRel.srcViewRefId == viewRef.viewRefId) {
-            targetViewRef = vb.findViewRef(viewRefRel.destViewRefId);
-          } else if (viewRefRel.destViewRefId == viewRef.viewRefId) {
-            targetViewRef = vb.findViewRef(viewRefRel.srcViewRefId);
-          } else {
-            return;
-          }
+  //       // 当前子查询直接关联的所有标准视图，要检查视图之间的连通性
+  //       var standardViewRefMap = {};
+  //       $.each(newView.viewRefRelations, function () {
+  //         var viewRefRel = this,
+  //           targetViewRef;
+  //         if (viewRefRel.srcViewRefId == viewRef.viewRefId) {
+  //           targetViewRef = vb.findViewRef(viewRefRel.destViewRefId);
+  //         } else if (viewRefRel.destViewRefId == viewRef.viewRefId) {
+  //           targetViewRef = vb.findViewRef(viewRefRel.srcViewRefId);
+  //         } else {
+  //           return;
+  //         }
 
-          if (targetViewRef.isSubQuery) {
-            // 检查目标视图是否子查询
-            if (!subQueryReferencedSubQueries.first(function () { return this.viewRefId == targetViewRef.viewRefId; })) {
-              // 添加源视图
-              if (!subQueryReferencedSubQueries.first(function () { return this.viewRefId == viewRef.viewRefId; }))
-                subQueryReferencedSubQueries.push(viewRef);
-              // 添加目标视图
-              subQueryReferencedSubQueries.push(targetViewRef);
-            }
-          } else {
-            // 搜集子视图所有关联的标准视图
-            standardViewRefMap[targetViewRef.viewRefId] = targetViewRef;
-          }
-        });
+  //         if (targetViewRef.isSubQuery) {
+  //           // 检查目标视图是否子查询
+  //           if (!subQueryReferencedSubQueries.first(function () { return this.viewRefId == targetViewRef.viewRefId; })) {
+  //             // 添加源视图
+  //             if (!subQueryReferencedSubQueries.first(function () { return this.viewRefId == viewRef.viewRefId; }))
+  //               subQueryReferencedSubQueries.push(viewRef);
+  //             // 添加目标视图
+  //             subQueryReferencedSubQueries.push(targetViewRef);
+  //           }
+  //         } else {
+  //           // 搜集子视图所有关联的标准视图
+  //           standardViewRefMap[targetViewRef.viewRefId] = targetViewRef;
+  //         }
+  //       });
 
-        // 如果是标准视图，则遍历所有关联视图，检查视图之间是否能够连通
-        traverseViews(standardViewRefMap, newView.viewRefRelations);
-        var unconnectedViewRefs = [];
-        for (var viewRefId in standardViewRefMap) {
-          if (standardViewRefMap.hasOwnProperty(viewRefId)) {
-            if (!standardViewRefMap[viewRefId]._connected) {
-              unconnectedViewRefs.push(standardViewRefMap[viewRefId]);
-            }
-          }
-        }
-        // 记录当前视图和未连通的标准视图
-        if (unconnectedViewRefs.length) {
-          unconnectedStandardViewsReferencedBySubQueries.push({
-            viewRef: viewRef,
-            unconnectedViewRefs: unconnectedViewRefs
-          });
-        }
-      });
+  //       // 如果是标准视图，则遍历所有关联视图，检查视图之间是否能够连通
+  //       traverseViews(standardViewRefMap, newView.viewRefRelations);
+  //       var unconnectedViewRefs = [];
+  //       for (var viewRefId in standardViewRefMap) {
+  //         if (standardViewRefMap.hasOwnProperty(viewRefId)) {
+  //           if (!standardViewRefMap[viewRefId]._connected) {
+  //             unconnectedViewRefs.push(standardViewRefMap[viewRefId]);
+  //           }
+  //         }
+  //       }
+  //       // 记录当前视图和未连通的标准视图
+  //       if (unconnectedViewRefs.length) {
+  //         unconnectedStandardViewsReferencedBySubQueries.push({
+  //           viewRef: viewRef,
+  //           unconnectedViewRefs: unconnectedViewRefs
+  //         });
+  //       }
+  //     });
 
-      if (subQueryReferencedSubQueries.length) {
-        return !!alert('子查询之间不能直接关联，以下视图之间不能建立关联:\n' + subQueryReferencedSubQueries.collect(function () {
-          return this.view.dispName + '(' + this.viewAlias + ')';
-        }).join(', '));
-      }
+  //     if (subQueryReferencedSubQueries.length) {
+  //       return !!alert('子查询之间不能直接关联，以下视图之间不能建立关联:\n' + subQueryReferencedSubQueries.collect(function () {
+  //         return this.view.dispName + '(' + this.viewAlias + ')';
+  //       }).join(', '));
+  //     }
 
-      if (unconnectedStandardViewsReferencedBySubQueries.length) {
-        var msg = '子查询关联到的标准视图之间必须互相连通，以下视图可能未连通到其他标准视图:\n' +
-          unconnectedStandardViewsReferencedBySubQueries.collect(function () {
-            return '子视图: ' + this.viewRef.view.dispName + '(' + this.viewRef.viewAlias + ')，未连通的标准视图: ' +
-              this.unconnectedViewRefs.collect(function () {
-                return this.view.dispName + '(' + this.viewAlias + ')';
-              }).join(',');
-          }).join(';\n');
-        return !!alert(msg);
-      }
+  //     if (unconnectedStandardViewsReferencedBySubQueries.length) {
+  //       var msg = '子查询关联到的标准视图之间必须互相连通，以下视图可能未连通到其他标准视图:\n' +
+  //         unconnectedStandardViewsReferencedBySubQueries.collect(function () {
+  //           return '子视图: ' + this.viewRef.view.dispName + '(' + this.viewRef.viewAlias + ')，未连通的标准视图: ' +
+  //             this.unconnectedViewRefs.collect(function () {
+  //               return this.view.dispName + '(' + this.viewAlias + ')';
+  //             }).join(',');
+  //         }).join(';\n');
+  //       return !!alert(msg);
+  //     }
 
-    }
+  //   }
 
-    return true;
-  },
+  //   return true;
+  // },
 
-  /**
-	 * 请求父页面关闭tab，如果父页面无响应则尝试关闭页面
-	 */
-  close: function () {
-    try {
-      var search = extractSearch();
-      window.opener.closeTab(search['keyId']);
-    } catch (e) {
-      console.info(e);
-      window.close();
-    }
-  },
+  // /**
+  //  * 请求父页面关闭tab，如果父页面无响应则尝试关闭页面
+  //  */
+  // close: function () {
+  //   try {
+  //     var search = extractSearch();
+  //     window.opener.closeTab(search['keyId']);
+  //   } catch (e) {
+  //     console.info(e);
+  //     window.close();
+  //   }
+  // },
 
 
 
@@ -294,14 +294,14 @@ var vb = {
     //   viewColumnMap[this['colId']] = this;
     // });
 
-    // // 映射viewRefId -> viewRef
-    // $.each(view['viewRefs'] || [], function () {
-    //   var viewRef = this,
-    //     view = vb.findView(viewRef['viewId']);
-    //   vb.registerViewRef(viewRef);
-    //   viewRef['view'] = view;
-    //   viewRef['TYPE'] = 'REFERENCE';
-
+    // 映射viewRefId -> viewRef
+    $.each(view['tables'] || [], function () {
+      var viewRef = this;
+      // view = vb.findView(viewRef['alias']);
+      vb.registerViewRef(viewRef);
+      // viewRef['view'] = view;
+      viewRef['TYPE'] = 'REFERENCE';
+    });
     //   // 添加column映射关系，映射关系与view的columns一一对应，如果不存在映射则创建虚拟映射
     //   var colMappings = [];
     //   $.each(view.columns, function () {
@@ -338,11 +338,11 @@ var vb = {
     //   viewRef['columnMappings'] = colMappings;
     // });
 
-    // // 映射viewRelId -> viewRefRel
-    // $.each(view['viewRefRelations'] || [], function () {
-    //   vb.registerViewRefRelation(this);
-    //   this['TYPE'] = 'RELATION';
-    // });
+    // 映射viewRelId -> viewRefRel
+    $.each(view['joins'] || [], function () {
+      vb.registerViewRefRelation(this);
+      this['TYPE'] = 'RELATION';
+    });
 
     this.diagram.show(view, this.opts['container']);
   },
@@ -359,23 +359,32 @@ var vb = {
   findViewRefRelation: function (viewRelId) {
     return this._viewRefRelationMap[viewRelId];
   },
-  registerView: function (view) {
-    this._viewMap[view.viewId] = view;
-  },
+  // registerView: function (view) {
+  //   this._viewMap[view.viewId] = view;
+  // },
   registerViewRef: function (viewRef) {
-    this._viewRefMap[viewRef.viewRefId] = viewRef;
+    if (this._viewRefMap[viewRef.alias]) {
+      alert('视图已存在');
+      return false;
+    } else {
+      this._viewRefMap[viewRef.alias] = viewRef;
+      return true;
+    }
   },
   registerViewRefRelation: function (viewRefRel) {
+    if (!viewRefRel.viewRelId) {
+      viewRefRel.viewRelId = vb.newId('viewRelId');
+    }
     this._viewRefRelationMap[viewRefRel.viewRelId] = viewRefRel;
   },
 
-  /**
-	 * 显示设计器说明
-	 * @param target
-	 */
-  showHelp: function (target) {
-    qutils.showHelp(target, $('#diagramHelp'));
-  },
+  // /**
+  //  * 显示设计器说明
+  //  * @param target
+  //  */
+  // showHelp: function (target) {
+  //   qutils.showHelp(target, $('#diagramHelp'));
+  // },
 
   // 生成唯一id
   newId: function (key) {
@@ -383,368 +392,369 @@ var vb = {
   }
 };
 
-/**
- * 数据源分析
- */
-vb.dataSource = {
-  newViewBuilder: function () {
-    openWindow(replaceSearch({ keyId: '' }), null, null, $(window).width(), $(window).height());
-  },
-  newSqlViewBuilder: function () {
-    openWindow(vb.opts['sqlViewBuilderUrl'], null, null, $(window).width(), $(window).height());
-  },
-  onDataSourceChanged: function (newValue, oldValue, callback) {
-    $('#vb-dataSource-viewListContainer').show();
-    vb.dataSource.showViewList(newValue, null, callback);
-  },
-  reloadViewList: function (callback) {
-    var dataSrcId = $('#dataSources').combobox('getValue');
-    delete this._dataViewListMap[dataSrcId];
-    this.onDataSourceChanged(dataSrcId, dataSrcId, callback);
-  },
-  _dataViewListMap: {}, // dataSrcId -> objList
-  /**
-	 * 显示视图定义列表
-	 */
-  showViewList: function (dataSrcId, objType, shownCallback) {
-    var list = $('#vb-dataSource-viewList').empty();
+// /**
+//  * 数据源分析
+//  */
+// vb.dataSource = {
+//   newViewBuilder: function () {
+//     openWindow(replaceSearch({ keyId: '' }), null, null, $(window).width(), $(window).height());
+//   },
+//   newSqlViewBuilder: function () {
+//     openWindow(vb.opts['sqlViewBuilderUrl'], null, null, $(window).width(), $(window).height());
+//   },
+//   onDataSourceChanged: function (newValue, oldValue, callback) {
+//     $('#vb-dataSource-viewListContainer').show();
+//     vb.dataSource.showViewList(newValue, null, callback);
+//   },
+//   reloadViewList: function (callback) {
+//     var dataSrcId = $('#dataSources').combobox('getValue');
+//     delete this._dataViewListMap[dataSrcId];
+//     this.onDataSourceChanged(dataSrcId, dataSrcId, callback);
+//   },
+// _dataViewListMap: {},
+// dataSrcId -> objList
+// /**
+//  * 显示视图定义列表
+//  */
+// showViewList: function (dataSrcId, objType, shownCallback) {
+//   var list = $('#vb-dataSource-viewList').empty();
 
-    // 加载并显示数据
-    var viewList = this._dataViewListMap[dataSrcId];
-    if (viewList) {
-      // 显示视图列表
-      // 视图versionId < 0表示不可用，通常是这些视图引用了当前视图或是当前视图本身
-      $.each(viewList, function () {
-        var viewItem = $('<li>' + this.dispName + (this.viewType == VIEW_TYPE_USER_COMPOSITE ? '' : ' *') +
-          '<br/><span class=\'note\'>' + this.viewName + '</note></li>')
-          .data('view', this)
-          .click(function () {
-            $(this).addClass('selected').siblings().removeClass('selected');
-            var editLink = $(this).children('.editLink');
-            if (!editLink.length)
-              editLink = $('<a class=\'qb-icon-edit editLink\' onclick=\'vb.dataSource.onClickView(this)\'>&nbsp;</a>').appendTo($(this));
-          })
-          .appendTo(list);
-        if (this.viewId > 0) {
-          viewItem
-            .attr('ondblclick', 'vb.dataSource.addToDiagram($(this).data(\'view\'))')
-            .attr('title', '双击以添加视图');
-        } else {
-          viewItem
-            .addClass('vb-view-unavailable')
-            .attr('title', '此视图引用了当前视图或是当前视图自身，不能添加到关系图中');
-        }
-      });
-      if (shownCallback)
-        shownCallback(viewList);
-    } else {
-      var fail = function (err) {
-        console.info(err);
-        if (window.confirm('无法获取数据源信息，是否重试？')) {
-          vb.dataSource.showViewList(dataSrcId, objType, shownCallback);
-        }
-      };
-      getAsyncJSON(vb.opts['viewListByDataSourceUrl'], {
-        keyId: dataSrcId,
-        excludeByViewId: vb._view.viewId // 结果视图列表中不能引用或包含指定的视图
-      }, function (data) {
-        vb.dataSource._dataViewListMap[dataSrcId] = data.en || [];
-        vb.dataSource.showViewList(dataSrcId, objType, shownCallback);
-      }, fail, fail, SUPPRESS_ERR_DLG);
-    }
-  },
-  onClickView: function (viewLink) {
-    var view = $(viewLink).closest('LI').data('view');
-    if (view) {
-      var url = replaceSearch({ keyId: view.viewId });
-      window.open(url);
-    } else {
-      alert('无视图数据');
-    }
-  },
+//   // 加载并显示数据
+//   var viewList = this._dataViewListMap[dataSrcId];
+//   if (viewList) {
+//     // 显示视图列表
+//     // 视图versionId < 0表示不可用，通常是这些视图引用了当前视图或是当前视图本身
+//     $.each(viewList, function () {
+//       var viewItem = $('<li>' + this.dispName + (this.viewType == VIEW_TYPE_USER_COMPOSITE ? '' : ' *') +
+//         '<br/><span class=\'note\'>' + this.viewName + '</note></li>')
+//         .data('view', this)
+//         .click(function () {
+//           $(this).addClass('selected').siblings().removeClass('selected');
+//           var editLink = $(this).children('.editLink');
+//           if (!editLink.length)
+//             editLink = $('<a class=\'qb-icon-edit editLink\' onclick=\'vb.dataSource.onClickView(this)\'>&nbsp;</a>').appendTo($(this));
+//         })
+//         .appendTo(list);
+//       if (this.viewId > 0) {
+//         viewItem
+//           .attr('ondblclick', 'vb.dataSource.addToDiagram($(this).data(\'view\'))')
+//           .attr('title', '双击以添加视图');
+//       } else {
+//         viewItem
+//           .addClass('vb-view-unavailable')
+//           .attr('title', '此视图引用了当前视图或是当前视图自身，不能添加到关系图中');
+//       }
+//     });
+//     if (shownCallback)
+//       shownCallback(viewList);
+//   } else {
+//     var fail = function (err) {
+//       console.info(err);
+//       if (window.confirm('无法获取数据源信息，是否重试？')) {
+//         vb.dataSource.showViewList(dataSrcId, objType, shownCallback);
+//       }
+//     };
+//     getAsyncJSON(vb.opts['viewListByDataSourceUrl'], {
+//       keyId: dataSrcId,
+//       excludeByViewId: vb._view.viewId // 结果视图列表中不能引用或包含指定的视图
+//     }, function (data) {
+//       vb.dataSource._dataViewListMap[dataSrcId] = data.en || [];
+//       vb.dataSource.showViewList(dataSrcId, objType, shownCallback);
+//     }, fail, fail, SUPPRESS_ERR_DLG);
+//   }
+// },
+// onClickView: function (viewLink) {
+//   var view = $(viewLink).closest('LI').data('view');
+//   if (view) {
+//     var url = replaceSearch({ keyId: view.viewId });
+//     window.open(url);
+//   } else {
+//     alert('无视图数据');
+//   }
+// },
 
-  /**
-	 * 添加视图到关系图
-	 */
-  addToDiagram: function (view) {
-    // 锁定dataSource，不支持从多个数据源添加视图
-    $('#dataSources').combobox('disable');
+// /**
+//  * 添加视图到关系图
+//  */
+// addToDiagram: function (view) {
+//   // 锁定dataSource，不支持从多个数据源添加视图
+//   $('#dataSources').combobox('disable');
 
-    // TODO 验证：禁止添加视图自身或依赖于当前视图的视图
-    // 过滤已在后台读取视图列表时实现
-    if (vb._view.viewId == view.viewId) {
-      return alert('不能添加当前视图');
-    }
-    vb.diagram.addView(view);
-  },
+//   // TODO 验证：禁止添加视图自身或依赖于当前视图的视图
+//   // 过滤已在后台读取视图列表时实现
+//   if (vb._view.viewId == view.viewId) {
+//     return alert('不能添加当前视图');
+//   }
+//   vb.diagram.addView(view);
+// },
 
-  /**
-	 * 获取当前所选数据源 { data_src_id, data_src_name, ... }
-	 */
-  getCurrentDataSource: function () {
-    var dataSrcSelect = $('#dataSources'),
-      dataSrcId = parseInt(dataSrcSelect.combobox('getValue'), 10),
-      dataSrc = dataSrcSelect.combobox('getData').first(function () { return this.data_src_id == dataSrcId; });
-    return dataSrc;
-  },
+// /**
+//  * 获取当前所选数据源 { data_src_id, data_src_name, ... }
+//  */
+// getCurrentDataSource: function () {
+//   var dataSrcSelect = $('#dataSources'),
+//     dataSrcId = parseInt(dataSrcSelect.combobox('getValue'), 10),
+//     dataSrc = dataSrcSelect.combobox('getData').first(function () { return this.data_src_id == dataSrcId; });
+//   return dataSrc;
+// },
 
-  _browserDataSrcId: null,
-  /**
-	 * 打开数据库对象选择
-	 */
-  openDatabaseBrowser: function (clearSelection) {
-    var dataSrc = this.getCurrentDataSource();
-    if (!dataSrc) {
-      return alert('未找到数据源');
-    }
-    var title = '选择要添加的对象 - ' + dataSrc.data_src_name + '(' + dataSrc.data_src_type + ')';
-    this.showDatabaseBrowser(title);
+//   _browserDataSrcId: null,
+//   /**
+// 	 * 打开数据库对象选择
+// 	 */
+//   openDatabaseBrowser: function (clearSelection) {
+//     var dataSrc = this.getCurrentDataSource();
+//     if (!dataSrc) {
+//       return alert('未找到数据源');
+//     }
+//     var title = '选择要添加的对象 - ' + dataSrc.data_src_name + '(' + dataSrc.data_src_type + ')';
+//     this.showDatabaseBrowser(title);
 
-    if (this._browserDataSrcId != dataSrc.data_src_id) {
-      // 刷新对象列表
-      $('#dataSourceSchemas').combobox({
-        url: vb.opts['dataSourceSchemaListUrl'] + '?dataSrcId=' + dataSrc.data_src_id,
-        loadFilter: function (data) {
-          return data.data.collect(function () {
-            return { text: this, value: this };
-          });
-        },
-        onChange: function (newValue) {
-          vb.dataSource.loadViewList(dataSrc, newValue);
-        }
-      });
-    }
+//     if (this._browserDataSrcId != dataSrc.data_src_id) {
+//       // 刷新对象列表
+//       $('#dataSourceSchemas').combobox({
+//         url: vb.opts['dataSourceSchemaListUrl'] + '?dataSrcId=' + dataSrc.data_src_id,
+//         loadFilter: function (data) {
+//           return data.data.collect(function () {
+//             return { text: this, value: this };
+//           });
+//         },
+//         onChange: function (newValue) {
+//           vb.dataSource.loadViewList(dataSrc, newValue);
+//         }
+//       });
+//     }
 
-    if (clearSelection)
-      $('#t-databaseObject').datagrid('unselectAll').datagrid('reload');
-    this._browserDataSrcId = dataSrc.data_src_id;
-  },
-  loadViewList: function (dataSrc, schema, callback) {
-    var dg = $('#t-databaseObject').datagrid('loadData', []);
-    var loadObjectList = function () {
-      getAsyncJSON(vb.opts['dataSourceObjectListUrl'], {
-        dataSrcId: dataSrc.data_src_id,
-        schema: schema
-      }, function (data) {
-        // 显示对象列表
-        dg.datagrid('unselectAll').datagrid('loadData', data.data);
-        if (callback)
-          callback(data.data);
-      }, fail, fail, SUPPRESS_ERR_DLG);
-    };
-    var fail = function (err) {
-      console.info(err);
-      if (window.confirm('无法加载对象列表，是否重试？')) {
-        loadObjectList(dataSrc.data_src_id);
-      }
-    };
-    loadObjectList(dataSrc.data_src_id);
-  },
-  showDatabaseBrowser: function (title) {
-    $('#vb-dataSource-browser').dialog({ closed: false, title: title });
-  },
-  closeDatabaseBrowser: function () {
-    $('#vb-dataSource-browser').dialog({ closed: true });
-  },
-  /**
-	 * 确认选择
-	 */
-  confirmSelectedDatabaseObjects: function () {
-    var selected = $('#t-databaseObject').datagrid('getSelections');
-    if (!selected.length)
-      return alert('未选择对象');
-    this.openViewInfoCollector(selected);
-  },
-  _getExistingViewNameMap: function () {
-    var dataSrc = vb.dataSource.getCurrentDataSource(),
-      viewList = vb.dataSource._dataViewListMap[dataSrc.data_src_id];
-    if (!viewList.viewNameMap) {
-      viewList.viewNameMap = viewList.toMap(function () { return this.viewName.toUpperCase(); }, true);
-    }
-    return viewList.viewNameMap;
-  },
-  _findExistingView: function (view) {
-    var viewNameMap = vb.dataSource._getExistingViewNameMap();
-    return viewNameMap[view.viewName.toUpperCase()];
-  },
-  databaseObjectStyler: function (value, row) {
-    if (vb.dataSource._findExistingView(row))
-      return 'background-color:#ddd';
-    return null;
-  },
-  databaseObjectNameFormatter: function (val) {
-    return '<span class=\'qb-icon-info\' title=\'查看对象信息\' onclick="stopEvent(event);vb.dataSource.showDatabaseObjectInfo(\'' + val + '\');">&nbsp;</span> ' + val;
-  },
+//     if (clearSelection)
+//       $('#t-databaseObject').datagrid('unselectAll').datagrid('reload');
+//     this._browserDataSrcId = dataSrc.data_src_id;
+//   },
+//   loadViewList: function (dataSrc, schema, callback) {
+//     var dg = $('#t-databaseObject').datagrid('loadData', []);
+//     var loadObjectList = function () {
+//       getAsyncJSON(vb.opts['dataSourceObjectListUrl'], {
+//         dataSrcId: dataSrc.data_src_id,
+//         schema: schema
+//       }, function (data) {
+//         // 显示对象列表
+//         dg.datagrid('unselectAll').datagrid('loadData', data.data);
+//         if (callback)
+//           callback(data.data);
+//       }, fail, fail, SUPPRESS_ERR_DLG);
+//     };
+//     var fail = function (err) {
+//       console.info(err);
+//       if (window.confirm('无法加载对象列表，是否重试？')) {
+//         loadObjectList(dataSrc.data_src_id);
+//       }
+//     };
+//     loadObjectList(dataSrc.data_src_id);
+//   },
+//   showDatabaseBrowser: function (title) {
+//     $('#vb-dataSource-browser').dialog({ closed: false, title: title });
+//   },
+//   closeDatabaseBrowser: function () {
+//     $('#vb-dataSource-browser').dialog({ closed: true });
+//   },
+//   /**
+// 	 * 确认选择
+// 	 */
+//   confirmSelectedDatabaseObjects: function () {
+//     var selected = $('#t-databaseObject').datagrid('getSelections');
+//     if (!selected.length)
+//       return alert('未选择对象');
+//     this.openViewInfoCollector(selected);
+//   },
+//   _getExistingViewNameMap: function () {
+//     var dataSrc = vb.dataSource.getCurrentDataSource(),
+//       viewList = vb.dataSource._dataViewListMap[dataSrc.data_src_id];
+//     if (!viewList.viewNameMap) {
+//       viewList.viewNameMap = viewList.toMap(function () { return this.viewName.toUpperCase(); }, true);
+//     }
+//     return viewList.viewNameMap;
+//   },
+//   _findExistingView: function (view) {
+//     var viewNameMap = vb.dataSource._getExistingViewNameMap();
+//     return viewNameMap[view.viewName.toUpperCase()];
+//   },
+//   databaseObjectStyler: function (value, row) {
+//     if (vb.dataSource._findExistingView(row))
+//       return 'background-color:#ddd';
+//     return null;
+//   },
+//   databaseObjectNameFormatter: function (val) {
+//     return '<span class=\'qb-icon-info\' title=\'查看对象信息\' onclick="stopEvent(event);vb.dataSource.showDatabaseObjectInfo(\'' + val + '\');">&nbsp;</span> ' + val;
+//   },
 
-  showDatabaseObjectInfo: function (objName) {
-    var dataSrc = vb.dataSource.getCurrentDataSource(),
-      schema = $('#dataSourceSchemas').combobox('getValue');
-    alert('对象信息:' + schema + '.' + objName);
-    // TODO
-  },
+//   showDatabaseObjectInfo: function (objName) {
+//     var dataSrc = vb.dataSource.getCurrentDataSource(),
+//       schema = $('#dataSourceSchemas').combobox('getValue');
+//     alert('对象信息:' + schema + '.' + objName);
+//     // TODO
+//   },
 
 
-  showViewInfoCollector: function () {
-    $('#vb-dataSource-viewInfoCollector').dialog({ closed: false });
-  },
-  /**
-	 * 完善要生成的视图信息
-	 */
-  openViewInfoCollector: function (dbObjectList) {
-    this.closeDatabaseBrowser();
-    this.showViewInfoCollector();
-    // 判断对象的操作类型：已经存在对应视图模型的只做更新
-    $.each(dbObjectList, function () {
-      var existingView = vb.dataSource._findExistingView(this);
-      if (existingView) {
-        this._op = 'UPDATE';
-        this.dispName = existingView.dispName;
-      } else {
-        this._op = 'CREATE';
-      }
-    });
-    $('#t-databaseObject-viewInfo').datagrid('unselectAll').datagrid('loadData', dbObjectList);
-  },
-  formatViewOperation: function (val) {
-    if (val == 'CREATE')
-      return '创建';
-    else if (val == 'UPDATE')
-      return '更新';
-    else
-      return '';
-  },
-  /**
-	 * 刷新浏览对象浏览对话框视图列表
-	 */
-  reloadDatabaseObjectList: function (callback) {
-    // 刷新视图列表
-    var dataSrc = vb.dataSource.getCurrentDataSource(),
-      schema = $('#dataSourceSchemas').combobox('getValue');
-    vb.dataSource.loadViewList(dataSrc, schema, callback);
-  },
-  /**
-	 * 完善数据库对象信息，创建视图模型
-	 */
-  buildViewForDatabaseObjects: function (closeDialogWhenGenerate) {
-    var dg = $('#t-databaseObject-viewInfo'),
-      data = dg.datagrid('getData').rows;
-    if (!data.length) {
-      return;
-    } else if (data.length > 5 && !confirm('要生成的对象如果太多，可能要等待很长时间才能完成操作，是否继续生成？')) {
-      return;
-    }
+//   showViewInfoCollector: function () {
+//     $('#vb-dataSource-viewInfoCollector').dialog({ closed: false });
+//   },
+//   /**
+// 	 * 完善要生成的视图信息
+// 	 */
+//   openViewInfoCollector: function (dbObjectList) {
+//     this.closeDatabaseBrowser();
+//     this.showViewInfoCollector();
+//     // 判断对象的操作类型：已经存在对应视图模型的只做更新
+//     $.each(dbObjectList, function () {
+//       var existingView = vb.dataSource._findExistingView(this);
+//       if (existingView) {
+//         this._op = 'UPDATE';
+//         this.dispName = existingView.dispName;
+//       } else {
+//         this._op = 'CREATE';
+//       }
+//     });
+//     $('#t-databaseObject-viewInfo').datagrid('unselectAll').datagrid('loadData', dbObjectList);
+//   },
+//   formatViewOperation: function (val) {
+//     if (val == 'CREATE')
+//       return '创建';
+//     else if (val == 'UPDATE')
+//       return '更新';
+//     else
+//       return '';
+//   },
+//   /**
+// 	 * 刷新浏览对象浏览对话框视图列表
+// 	 */
+//   reloadDatabaseObjectList: function (callback) {
+//     // 刷新视图列表
+//     var dataSrc = vb.dataSource.getCurrentDataSource(),
+//       schema = $('#dataSourceSchemas').combobox('getValue');
+//     vb.dataSource.loadViewList(dataSrc, schema, callback);
+//   },
+//   /**
+// 	 * 完善数据库对象信息，创建视图模型
+// 	 */
+//   buildViewForDatabaseObjects: function (closeDialogWhenGenerate) {
+//     var dg = $('#t-databaseObject-viewInfo'),
+//       data = dg.datagrid('getData').rows;
+//     if (!data.length) {
+//       return;
+//     } else if (data.length > 5 && !confirm('要生成的对象如果太多，可能要等待很长时间才能完成操作，是否继续生成？')) {
+//       return;
+//     }
 
-    gridHelper.applyEdit(dg);
+//     gridHelper.applyEdit(dg);
 
-    // 检查名称
-    for (var i = 0; i < data.length; ++i) {
-      var view = data[i];
-      view.dispName = $.trim(view.dispName);
-      if (!view.dispName)
-        return alert('对象\'' + view.viewName + '\'的显示名必须填写');
-      else if (view.dispName.length > 30)
-        return alert('名称\'' + view.dispName + '\'(' + view.dispName.length + '个字符)超长，最长不能超过30个字符');
-    }
+//     // 检查名称
+//     for (var i = 0; i < data.length; ++i) {
+//       var view = data[i];
+//       view.dispName = $.trim(view.dispName);
+//       if (!view.dispName)
+//         return alert('对象\'' + view.viewName + '\'的显示名必须填写');
+//       else if (view.dispName.length > 30)
+//         return alert('名称\'' + view.dispName + '\'(' + view.dispName.length + '个字符)超长，最长不能超过30个字符');
+//     }
 
-    // 生成对象
-    var viewList = [].concat(data), total = viewList.length;
-    // 记录未生成的视图，成功后移除，如果中途取消，则重新打开未生成的视图
-    var todoViewMap = viewList.toMap(function () { return this.viewName.toUpperCase(); }, true);
-    var generate = function () {
-      var view = viewList.shift();
-      if (!view) {
-        // done
-        alert('视图模型生成完毕');
-        $('body').unmask();
-        vb.dataSource.closeViewInfoCollector();
-        vb.dataSource.reloadDatabaseObjectList();
-        vb.dataSource.reloadViewList();
-        return;
-      }
-      $('body').mask('生成视图模型 ' + (total - viewList.length) + '/' + total + '...');
+//     // 生成对象
+//     var viewList = [].concat(data), total = viewList.length;
+//     // 记录未生成的视图，成功后移除，如果中途取消，则重新打开未生成的视图
+//     var todoViewMap = viewList.toMap(function () { return this.viewName.toUpperCase(); }, true);
+//     var generate = function () {
+//       var view = viewList.shift();
+//       if (!view) {
+//         // done
+//         alert('视图模型生成完毕');
+//         $('body').unmask();
+//         vb.dataSource.closeViewInfoCollector();
+//         vb.dataSource.reloadDatabaseObjectList();
+//         vb.dataSource.reloadViewList();
+//         return;
+//       }
+//       $('body').mask('生成视图模型 ' + (total - viewList.length) + '/' + total + '...');
 
-      // 生成失败处理
-      var fail = function (err) {
-        console.info(err);
-        if (err && typeof err == 'object' && err.errorMessages)
-          err = unwrapActionError(err);
-        if (confirm('生成视图模型\'' + view.dispName + '\'失败:' + (err.constructor == Error ? err.message : err.substring(0, 100)) + '，是否继续？')) {
-          generate();
-        } else {
-          viewList.length = 0;
-          $('body').unmask();
-          vb.dataSource.reloadViewList(function () {
-            vb.dataSource.reloadDatabaseObjectList(function (objectList) {
-              // 更新视图列表后，重新打开对话框
-              // 筛选出未成功和未生成的
-              var todoList = [];
-              $.each(objectList, function () {
-                if (todoViewMap[this.viewName.toUpperCase()])
-                  todoList.push(this);
-              });
-              vb.dataSource.openViewInfoCollector(todoList);
-            });
-          });
-        }
-      };
+//       // 生成失败处理
+//       var fail = function (err) {
+//         console.info(err);
+//         if (err && typeof err == 'object' && err.errorMessages)
+//           err = unwrapActionError(err);
+//         if (confirm('生成视图模型\'' + view.dispName + '\'失败:' + (err.constructor == Error ? err.message : err.substring(0, 100)) + '，是否继续？')) {
+//           generate();
+//         } else {
+//           viewList.length = 0;
+//           $('body').unmask();
+//           vb.dataSource.reloadViewList(function () {
+//             vb.dataSource.reloadDatabaseObjectList(function (objectList) {
+//               // 更新视图列表后，重新打开对话框
+//               // 筛选出未成功和未生成的
+//               var todoList = [];
+//               $.each(objectList, function () {
+//                 if (todoViewMap[this.viewName.toUpperCase()])
+//                   todoList.push(this);
+//               });
+//               vb.dataSource.openViewInfoCollector(todoList);
+//             });
+//           });
+//         }
+//       };
 
-      var dataSrc = vb.dataSource.getCurrentDataSource();
-      getAsyncJSONWithoutProgress(vb.opts['viewGenerateUrl'], {
-        'en.dataSrcId': dataSrc.data_src_id,
-        'en.viewSchema': view.viewSchema,
-        'en.viewName': view.viewName,
-        'en.dispName': view.dispName,
-        operation: view._op
-      }, function (data) {
-        // 生成成功
-        // 删除待办列表中的视图，继续生成
-        view._generated = true;
-        delete todoViewMap[view.viewName.toUpperCase()];
-        generate();
-      }, fail, fail, SUPPRESS_ERR_DLG);
-    };
+//       var dataSrc = vb.dataSource.getCurrentDataSource();
+//       getAsyncJSONWithoutProgress(vb.opts['viewGenerateUrl'], {
+//         'en.dataSrcId': dataSrc.data_src_id,
+//         'en.viewSchema': view.viewSchema,
+//         'en.viewName': view.viewName,
+//         'en.dispName': view.dispName,
+//         operation: view._op
+//       }, function (data) {
+//         // 生成成功
+//         // 删除待办列表中的视图，继续生成
+//         view._generated = true;
+//         delete todoViewMap[view.viewName.toUpperCase()];
+//         generate();
+//       }, fail, fail, SUPPRESS_ERR_DLG);
+//     };
 
-    if (closeDialogWhenGenerate)
-      this.closeViewInfoCollector();
-    generate();
-  },
-  closeViewInfoCollector: function () {
-    $('#vb-dataSource-viewInfoCollector').dialog({ closed: true });
-  },
+//     if (closeDialogWhenGenerate)
+//       this.closeViewInfoCollector();
+//     generate();
+//   },
+//   closeViewInfoCollector: function () {
+//     $('#vb-dataSource-viewInfoCollector').dialog({ closed: true });
+//   },
 
-  // 编辑
-  // 当前编辑行index
-  editIndex: -1,
-  resetEditState: function () {
-    this.editIndex = -1;
-    $('#t-databaseObject-viewInfo').datagrid('clearSelections');
-  },
-  endEditing: function () {
-    var editor = vb.dataSource,
-      editIndex = editor.editIndex,
-      dg = $(this);
-    if (editIndex == -1) {
-      return true;
-    }
-    if (!dg.datagrid('validateRow', editIndex))
-      return false;
-    dg.datagrid('endEdit', editIndex);
-    editor.editIndex = -1;
-    return true;
-  },
-  onClickInfoCollectorCell: function (index, field, value) {
-    var editor = vb.dataSource,
-      editIndex = editor.editIndex,
-      dg = $(this),
-      row = dg.datagrid('getData').rows[index];
-    if (row._op != 'UPDATE' && editor.endEditing.call(this)) {
-      dg.datagrid('selectRow', index).datagrid('beginEdit', index);
-      editor.editIndex = index;
-    } else {
-      dg.datagrid('selectRow', editIndex);
-    }
-  }
-};
+//   // 编辑
+//   // 当前编辑行index
+//   editIndex: -1,
+//   resetEditState: function () {
+//     this.editIndex = -1;
+//     $('#t-databaseObject-viewInfo').datagrid('clearSelections');
+//   },
+//   endEditing: function () {
+//     var editor = vb.dataSource,
+//       editIndex = editor.editIndex,
+//       dg = $(this);
+//     if (editIndex == -1) {
+//       return true;
+//     }
+//     if (!dg.datagrid('validateRow', editIndex))
+//       return false;
+//     dg.datagrid('endEdit', editIndex);
+//     editor.editIndex = -1;
+//     return true;
+//   },
+//   onClickInfoCollectorCell: function (index, field, value) {
+//     var editor = vb.dataSource,
+//       editIndex = editor.editIndex,
+//       dg = $(this),
+//       row = dg.datagrid('getData').rows[index];
+//     if (row._op != 'UPDATE' && editor.endEditing.call(this)) {
+//       dg.datagrid('selectRow', index).datagrid('beginEdit', index);
+//       editor.editIndex = index;
+//     } else {
+//       dg.datagrid('selectRow', editIndex);
+//     }
+//   }
+// };
 
 /**
  * 编辑关联关系
@@ -761,10 +771,10 @@ vb.viewRefRelationEditor = {
 
     this._viewRefRel = viewRefRel;
 
-    var srcViewRef = vb.findViewRef(viewRefRel.srcViewRefId),
-      destViewRef = vb.findViewRef(viewRefRel.destViewRefId);
-    var srcView = vb.findView(srcViewRef.viewId),
-      destView = vb.findView(destViewRef.viewId);
+
+    var srcViewRef = vb.findViewRef(viewRefRel.left),
+      destViewRef = vb.findViewRef(viewRefRel.right);
+
     // 表达式去掉视图别名
     // var leftExpr = viewRefRel.exprConditional.leftExpr,
     //   rightExpr = viewRefRel.exprConditional.rightExpr;
@@ -787,30 +797,57 @@ vb.viewRefRelationEditor = {
 
     var title = [
       '编辑连接 - ',
-      srcView.dispName, '(', srcViewRef.viewAlias, ')',
+      srcViewRef.name,
       ' - ',
-      destView.dispName, '(', destViewRef.viewAlias, ')'
+      destViewRef.name
     ].join('');
 
-    var dlg = $('#vb-viewRefRel-editor').dialog({
-      title: title,
-      closed: false,
-      closable: allowClose !== false
-    });
+    var dlg = $('#viewRefRelEditor').show();
+    dlg.find('.title').text(title);
+    dlg.find('.list').eq(0).empty();
+
+    this.show(viewRefRel);
     if (!availableButtons) {
-      dlg.dialog('panel').find('DIV.dialog-button>A').show();
+      dlg.find('DIV.dialog-button>A').show();
     } else {
-      var names = availableButtons.split(',').toMap(function () { return 1; });
-      dlg.dialog('panel').find('DIV.dialog-button>A').each(function () {
+      var names = availableButtons.split(',');
+      dlg.find('DIV.dialog-button>A').each(function () {
         var btn = $(this);
-        if (names[btn.text()])
+        if (-1 < names.indexOf($.trim(btn.text())))
           btn.show();
         else
           btn.hide();
       });
     }
   },
+  addItem: function () {
+    var viewRefRel = JSON.parse(JSON.stringify(this._viewRefRel));
+    viewRefRel.columns = [{
+      left: '',
+      op: '=',
+      right: ''
+    }];
+    this.show(viewRefRel);
+  },
+  show: function (rel) {
+    var viewRefRel = rel;
+    var srcViewRef = vb.findViewRef(viewRefRel.left),
+      destViewRef = vb.findViewRef(viewRefRel.right);
 
+    var data = {
+      ops: [
+        '=',
+        '>=',
+        '=<',
+        '<>'
+      ],
+      srcViewRef: srcViewRef,
+      destViewRef: destViewRef,
+      viewRefRel: viewRefRel
+    };
+    renderTmp($('#viewRefRelEditor').find('.list').get(0), 'viewRefRelListTpl', data);
+
+  },
   /**
    * 删除当前关系
    */
@@ -830,7 +867,7 @@ vb.viewRefRelationEditor = {
     }
 
     // 删除源数据
-    for (var i = 0, j = vb._view.viewRefRelations, k = j.length; i < k; ++i) {
+    for (var i = 0, j = vb._view.joins, k = j.length; i < k; ++i) {
       if (j[i].viewRelId == viewRefRel.viewRelId) {
         delete j[i];
         for (i = i; i < k - 1; ++i) {
@@ -845,39 +882,70 @@ vb.viewRefRelationEditor = {
   },
 
   confirmEdit: function () {
-    var leftExpr = $.trim($('#viewRefRelLeftExpr').textbox('getValue')),
-      rightExpr = $.trim($('#viewRefRelRightExpr').textbox('getValue')),
-      oper = $('#viewRefRelOper').combobox('getValue'),
-      allSrcRows = !!$('#viewRefRelAllSrcRows').attr('checked'),
-      allDestRows = !!$('#viewRefRelAllDestRows').attr('checked');
+    // var leftExpr = $.trim($('#viewRefRelLeftExpr').textbox('getValue')),
+    //   rightExpr = $.trim($('#viewRefRelRightExpr').textbox('getValue')),
+    //   oper = $('#viewRefRelOper').combobox('getValue'),
+    //   allSrcRows = !!$('#viewRefRelAllSrcRows').attr('checked'),
+    //   allDestRows = !!$('#viewRefRelAllDestRows').attr('checked');
 
     // TODO 验证
 
     var viewRefRel = this._viewRefRel,
       srcViewRef = vb.findViewRef(viewRefRel.srcViewRefId),
       destViewRef = vb.findViewRef(viewRefRel.destViewRefId);
-    viewRefRel.allSrcRows = allSrcRows;
-    viewRefRel.allDestRows = allDestRows;
-    viewRefRel.exprConditional.oper = oper;
-    viewRefRel.exprConditional.leftExpr = srcViewRef.viewAlias + '.' + leftExpr;
-    viewRefRel.exprConditional.rightExpr = destViewRef.viewAlias + '.' + rightExpr;
+    // viewRefRel.allSrcRows = allSrcRows;
+    // viewRefRel.allDestRows = allDestRows;
+    // viewRefRel.exprConditional.oper = oper;
+    // viewRefRel.exprConditional.leftExpr = srcViewRef.viewAlias + '.' + leftExpr;
+    // viewRefRel.exprConditional.rightExpr = destViewRef.viewAlias + '.' + rightExpr;
 
+    var columns = [], error = 0,
+      list = $('#viewRefRelEditor').find('.list>li');
+    list.each(function (i, el) {
+      var left = $(el).find('[name=left]'),
+        leftType = left.find('option:selected').data('type'),
+        leftName = left.val();
+      var right = $(el).find('[name=right]'),
+        rightType = right.find('option:selected').data('type'),
+        rightName = right.val();
+      var op = $(el).find('[name=op]').val();
+      if (leftName && rightName) {
+        // FIXME:字段验证，注释需要保留
+        // if (leftType == rightType) {
+        columns.push({
+          left: leftName,
+          right: rightName,
+          op: op
+        });
+        // } else {
+        //   error++;
+        //   $(el).addClass('error');
+        // }
+      }
+    });
+    if (!error) {
+      viewRefRel.columns = columns;
+    } else {
+      error = 0;
+      return;
+    }
+    // FIXME:字段验证，以上注释需要保留
     console.info('modifiedViewRefRelation :');
     console.info(viewRefRel);
 
     // 更新edge
-    var diagram = vb.diagram,
-      graph = diagram.getGraph(),
-      viewRefRelCellId = diagram.getViewRefRelationCellId(viewRefRel.viewRelId),
-      viewRefRelCell = graph.getModel().getCell(viewRefRelCellId),
-      edgeStyles = vb.diagram.getRelationEdgeStyles(viewRefRel);
-    graph.getModel().beginUpdate();
-    try {
-      viewRefRelCell.style = edgeStyles.edgeStyle;
-      graph.refresh(viewRefRelCell);
-    } finally {
-      graph.getModel().endUpdate();
-    }
+    // var diagram = vb.diagram,
+    //   graph = diagram.getGraph(),
+    //   viewRefRelCellId = diagram.getViewRefRelationCellId(viewRefRel.viewRelId),
+    //   viewRefRelCell = graph.getModel().getCell(viewRefRelCellId),
+    //   edgeStyles = vb.diagram.getRelationEdgeStyles(viewRefRel);
+    // graph.getModel().beginUpdate();
+    // try {
+    //   viewRefRelCell.style = edgeStyles.edgeStyle;
+    //   graph.refresh(viewRefRelCell);
+    // } finally {
+    //   graph.getModel().endUpdate();
+    // }
 
     this.closeViewRefRelationEditor();
   },
@@ -885,7 +953,7 @@ vb.viewRefRelationEditor = {
     this.closeViewRefRelationEditor();
   },
   closeViewRefRelationEditor: function () {
-    $('#vb-viewRefRel-editor').dialog({ closed: true });
+    $('#viewRefRelEditor').hide();
   }
 };
 
@@ -906,26 +974,15 @@ vb.viewRefEditor = {
     // 复制viewRef的数据，避免错误更新
     this._viewRef = JSON.parse(JSON.stringify(viewRef));
 
-    $('#viewRefViewAlias').textbox('setValue', viewRef.viewAlias);
-    $('#viewRefIsSubQuery').attr('checked', viewRef.isSubQuery ? 'checked' : null);
+    $('#viewRefViewAlias').val(viewRef.alias);
 
-    // 提取columnMapping内部数据到最外层，方便grid绑定
-    var columns = this._viewRef.columnMappings;
-    $.each(columns, function () {
-      this._output = !!this.parentCol.output;
-      this._parentColName = this.parentCol.colName;
-      this._parentColDispName = this.parentCol.dispName;
-      this._subColName = this.subCol.colName;
-      this._subColDispName = this.subCol.dispName;
-      this._subColAggr = this.subColAggr;
-      if (viewRef.isSubQuery && this._output && !this._subColAggr)
-        this.subColAggr = this._subColAggr = 'COUNT';
-    });
-    $('#t-viewRef').datagrid('loadData', columns);
-    $('#vb-viewRef-editor').dialog({
-      closed: false,
-      title: '编辑视图  - ' + this._viewRef.view.dispName + '(' + this._viewRef.view.viewName + ')'
-    });
+    // 提取columns渲染
+    var data = {
+      list: this._viewRef.columns
+    };
+    renderTmp('#t-viewRef', 'viewRefTpl', data);
+    $('#viewRefEditor').show().find('.title').text('编辑视图  - ' + this._viewRef.name + '(' + this._viewRef.alias + ')');
+
   },
   remove: function () {
     var viewRef = this._viewRef;
@@ -933,7 +990,7 @@ vb.viewRefEditor = {
     // 删除edge
     var diagram = vb.diagram,
       graph = diagram.getGraph(),
-      viewRefCellId = diagram.getViewRefCellId(viewRef.viewRefId),
+      viewRefCellId = diagram.getViewRefCellId(viewRef.alias),
       viewRefCell = graph.getModel().getCell(viewRefCellId);
     graph.getModel().beginUpdate();
     try {
@@ -943,8 +1000,8 @@ vb.viewRefEditor = {
     }
 
     // 删除源数据
-    for (var i = 0, j = vb._view.viewRefRelations, k = j.length; i < k; ++i) {
-      if (j[i].srcViewRefId == viewRef.viewRefId || j[i].destViewRefId == viewRef.viewRefId) {
+    for (var i = 0, j = vb._view.joins, k = j.length; i < k; ++i) {
+      if (j[i].left == viewRef.alias || j[i].right == viewRef.alias) {
         delete j[i];
         for (var a = i; a < k - 1; ++a) {
           j[a] = j[a + 1];
@@ -953,8 +1010,8 @@ vb.viewRefEditor = {
         continue;
       }
     }
-    for (var i = 0, j = vb._view.viewRefs, k = j.length; i < k; ++i) {
-      if (j[i].viewRefId == viewRef.viewRefId) {
+    for (var i = 0, j = vb._view.tables, k = j.length; i < k; ++i) {
+      if (j[i].alias == viewRef.alias) {
         delete j[i];
         for (var a = i; a < k - 1; ++a) {
           j[a] = j[a + 1];
@@ -967,7 +1024,7 @@ vb.viewRefEditor = {
     this.closeViewRefEditor();
   },
   closeViewRefEditor: function () {
-    $('#vb-viewRef-editor').dialog({ closed: true });
+    $('#viewRefEditor').hide();
   },
   cancelEdit: function () {
     this.closeViewRefEditor();
@@ -976,116 +1033,115 @@ vb.viewRefEditor = {
     var viewRef = vb.viewRefEditor._viewRef;
     // 验证
     // 验证别名
-    var viewAlias = $.trim($('#viewRefViewAlias').textbox('getValue')),
-      isSubQuery = !!$('#viewRefIsSubQuery').attr('checked'),
+    var viewAlias = $.trim($('#viewRefViewAlias').val()),
+      // isSubQuery = !!$('#viewRefIsSubQuery').attr('checked'),
       oldViewAlias = viewRef.viewAlias;
     if (!viewAlias)
-      return qutils.focusOnInput($('#viewRefViewAlias').textbox('setValue', ''));
-    var dupViewRef = vb._view.viewRefs.first(function () {
-      return viewRef.viewRefId != this.viewRefId && viewAlias.toUpperCase() == $.trim(this.viewAlias.toUpperCase());
-    });
-    if (dupViewRef) {
-      qutils.focusOnInput($('#viewRefViewAlias'));
-      return alert('视图别名不能与其他视图重复');
-    }
+      return console.errer('未能生成视图别名');
+    // var dupViewRef = vb._view.tables.first(function () {
+    //   return viewRef.viewRefId != this.viewRefId && viewAlias.toUpperCase() == $.trim(this.viewAlias.toUpperCase());
+    // });
+    // if (dupViewRef) {
+    //   qutils.focusOnInput($('#viewRefViewAlias'));
+    //   return alert('视图别名不能与其他视图重复');
+    // }
 
-    // 验证列
+    // 验证列,生成别名
     var grid = $('#t-viewRef');
-    gridHelper.applyEdit(grid);
-    var cols = grid.datagrid('getData'),
-      colNameMap = {};
-    for (var i = 0; i < cols.total; ++i) {
-      if (!grid.datagrid('validateRow', i)) {
-        return alert('结果列的别名和显示名必须填写');
-      }
-      var col = cols.rows[i];
-      if (colNameMap[col._parentColName]) {
-        return alert('列的别名\'' + col._parentColName + '\'存在重复');
-      }
-      colNameMap[col._parentColName] = col;
-    }
+    // gridHelper.applyEdit(grid);
+    // var cols = grid.datagrid('getData'),
+    //   colNameMap = {};
+    // for (var i = 0; i < cols.total; ++i) {
+    //   if (!grid.datagrid('validateRow', i)) {
+    //     return alert('结果列的别名和显示名必须填写');
+    //   }
+    //   var col = cols.rows[i];
+    //   if (colNameMap[col._parentColName]) {
+    //     return alert('列的别名\'' + col._parentColName + '\'存在重复');
+    //   }
+    //   colNameMap[col._parentColName] = col;
+    // }
 
     // 更新数据
-    viewRef.viewAlias = viewAlias;
-    viewRef.isSubQuery = isSubQuery;
-    $.each(cols.rows, function () {
-      this.parentCol.output = this._output = this._output === 'true' || this._output === true;
-      this.parentCol.colName = this._parentColName;
-      this.parentCol.dispName = this._parentColDispName;
-      this.subCol.colName = this._subColName;
-      this.subCol.dispName = this._subColDispName;
-      this.subColAggr = this._subColAggr;
-      if (this.parentCol.output && isSubQuery) {
-        if (!this.subColAggr)
-          this.subColAggr = this._subColAggr = 'COUNT'; // 如果是子查询则为所有未选择聚合的列指定默认聚合方式
+    // viewRef.viewAlias = viewAlias;
+    // viewRef.isSubQuery = isSubQuery;
+    var cols = [];
+    grid.find('li').each(function (i, el) {
+      var data = $(el).data(),
+        checked = $(el).find('input[type=checkbox]').prop('checked');
+      if (checked) {
+        if (!viewRef.columns[i].alias) {
+          viewRef.columns[i].alias = viewRef.name + '-' + viewRef.columns[i].name;
+        }
       } else {
-        this.subColAggr = this._subColAggr = null;
+        delete viewRef.columns[i].alias;
       }
     });
 
-    // 更新columnMaps和columns，如果有重名的话提示修改
-    // 将可用的columnMap和column加入vb._view
-    var viewColIdsToExclude = {}, // 临时用于过滤掉当前子视图的输出列
-      otherViewColumnMapByName = {}, // 记录其他视图的列映射，用于检查列别名是否重复
-      // 临时保存结果列映射，将当前子视图的输出列附加到结尾
-      viewColMaps = [].concat(vb._view.columnMaps).filter(function (item) {
-        if (item.subViewRefId != viewRef.viewRefId) {
-          var otherViewRef = vb.findViewRef(item.subViewRefId);
-          otherViewColumnMapByName[item.parentCol.colName.toUpperCase()] = { viewRef: otherViewRef, columnMap: item };
-          return true;
-        } else {
-          viewColIdsToExclude[item.parentColId] = 1;
-          return false;
-        }
-      }),
-      // 临时保存结果列，将当前子视图的输出列附加到结尾
-      viewCols = [].concat(vb._view.columns).filter(function (item) {
-        return !viewColIdsToExclude[item.colId];
-      });
-    var dupColumnMaps = [];
-    $.each(cols.rows, function () {
-      if (this._output) {
-        viewCols.push(this.parentCol);
-        viewColMaps.push(this);
-        var otherViewColMap = otherViewColumnMapByName[this.parentCol.colName.toUpperCase()];
-        if (otherViewColMap) {
-          var dupViewRef = vb.findViewRef(this.subViewRefId);
-          dupColumnMaps.push(this.parentCol.dispName + '(' + this.parentCol.colName + ') 与视图'
-            + otherViewColMap.viewRef.view.dispName + '(' + otherViewColMap.viewRef.viewAlias + ')的列'
-            + otherViewColMap.columnMap.parentCol.dispName + '(' + otherViewColMap.columnMap.parentCol.colName + ')重名');
-        }
-      }
-    });
-    if (dupColumnMaps.length) {
-      return alert('以下列的别名与其他视图重复：\n' + dupColumnMaps.join('\n'));
-    }
+
+    // // 更新columnMaps和columns，如果有重名的话提示修改
+    // // 将可用的columnMap和column加入vb._view
+    // var viewColIdsToExclude = {}, // 临时用于过滤掉当前子视图的输出列
+    //   otherViewColumnMapByName = {}, // 记录其他视图的列映射，用于检查列别名是否重复
+    //   // 临时保存结果列映射，将当前子视图的输出列附加到结尾
+    //   viewColMaps = [].concat(vb._view.columnMaps).filter(function (item) {
+    //     if (item.subViewRefId != viewRef.viewRefId) {
+    //       var otherViewRef = vb.findViewRef(item.subViewRefId);
+    //       otherViewColumnMapByName[item.parentCol.colName.toUpperCase()] = { viewRef: otherViewRef, columnMap: item };
+    //       return true;
+    //     } else {
+    //       viewColIdsToExclude[item.parentColId] = 1;
+    //       return false;
+    //     }
+    //   }),
+    //   // 临时保存结果列，将当前子视图的输出列附加到结尾
+    //   viewCols = [].concat(vb._view.columns).filter(function (item) {
+    //     return !viewColIdsToExclude[item.colId];
+    //   });
+    // var dupColumnMaps = [];
+    // $.each(cols.rows, function () {
+    //   if (this._output) {
+    //     viewCols.push(this.parentCol);
+    //     viewColMaps.push(this);
+    //     var otherViewColMap = otherViewColumnMapByName[this.parentCol.colName.toUpperCase()];
+    //     if (otherViewColMap) {
+    //       var dupViewRef = vb.findViewRef(this.subViewRefId);
+    //       dupColumnMaps.push(this.parentCol.dispName + '(' + this.parentCol.colName + ') 与视图'
+    //         + otherViewColMap.viewRef.view.dispName + '(' + otherViewColMap.viewRef.viewAlias + ')的列'
+    //         + otherViewColMap.columnMap.parentCol.dispName + '(' + otherViewColMap.columnMap.parentCol.colName + ')重名');
+    //     }
+    //   }
+    // });
+    // if (dupColumnMaps.length) {
+    //   return alert('以下列的别名与其他视图重复：\n' + dupColumnMaps.join('\n'));
+    // }
     // 合并columnMaps和columns
-    viewColMaps = viewColMaps.concat(cols.rows.filter(function () { return this._output; }));
-    viewCols = viewCols.concat(cols.rows.filter(function () { return this._output; }).collect(function () { return this.parentCol; }));
-    vb._view.columnMaps = viewColMaps;
-    vb._view.columns = viewCols;
+    // viewColMaps = viewColMaps.concat(cols.rows.filter(function () { return this._output; }));
+    // viewCols = viewCols.concat(cols.rows.filter(function () { return this._output; }).collect(function () { return this.parentCol; }));
+    // vb._view.columnMaps = viewColMaps;
+    // vb._view.columns = viewCols;
 
     // 更新所有引用该视图的viewRefRelation的表达式的表别名
-    var updateExprAlias = function (expr, exprPropName, oldAlias, newAlias) {
-      var ex = expr[exprPropName];
-      if (ex && ex.substring(0, oldAlias.length + 1).toUpperCase() == (oldAlias + '.').toUpperCase()) {
-        ex = newAlias + '.' + ex.substring(oldAlias.length + 1);
-      } else {
-        throw new Error('表达式错误，视图别名未找到，表达式：' + ex + '，正确的别名：' + oldAlias);
-      }
-      expr[exprPropName] = ex;
-    };
-    $.each(vb._view.viewRefRelations, function () {
-      if (this.srcViewRefId == viewRef.viewRefId) {
-        updateExprAlias(this.exprConditional, 'leftExpr', oldViewAlias, viewRef.viewAlias);
-      } else if (this.destViewRefId == viewRef.viewRefId) {
-        updateExprAlias(this.exprConditional, 'rightExpr', oldViewAlias, viewRef.viewAlias);
-      }
-    });
+    // var updateExprAlias = function (expr, exprPropName, oldAlias, newAlias) {
+    //   var ex = expr[exprPropName];
+    //   if (ex && ex.substring(0, oldAlias.length + 1).toUpperCase() == (oldAlias + '.').toUpperCase()) {
+    //     ex = newAlias + '.' + ex.substring(oldAlias.length + 1);
+    //   } else {
+    //     throw new Error('表达式错误，视图别名未找到，表达式：' + ex + '，正确的别名：' + oldAlias);
+    //   }
+    //   expr[exprPropName] = ex;
+    // };
+    // $.each(vb._view.viewRefRelations, function () {
+    //   if (this.srcViewRefId == viewRef.viewRefId) {
+    //     updateExprAlias(this.exprConditional, 'leftExpr', oldViewAlias, viewRef.viewAlias);
+    //   } else if (this.destViewRefId == viewRef.viewRefId) {
+    //     updateExprAlias(this.exprConditional, 'rightExpr', oldViewAlias, viewRef.viewAlias);
+    //   }
+    // });
 
     // 将复制的viewRef的数据附加到原对象上
-    for (var i = 0, j = vb._view.viewRefs; i < j.length; ++i) {
-      if (j[i].viewRefId == viewRef.viewRefId) {
+    for (var i = 0, j = vb._view.tables; i < j.length; ++i) {
+      if (j[i].alias == viewRef.alias) {
         j[i] = viewRef;
         break;
       }
@@ -1101,7 +1157,7 @@ vb.viewRefEditor = {
   editIndex: -1,
   resetEditState: function () {
     this.editIndex = -1;
-    $('#t-viewRef').datagrid('clearSelections');
+    $('#t-viewRef').empty();
   },
   endEditing: function () {
     var editor = vb.viewRefEditor,
@@ -1151,21 +1207,23 @@ vb.diagram = {
 
         // 视图编辑按钮
         // FIXME mxCellOverlay.tooltip无效
-        var overlay = new mxCellOverlay(new mxImage('images/iconPencilSmall.png', 10, 10), '编辑视图', 'right', 'top', new mxPoint(-10, 12), 'default');
-        overlay.addListener(mxEvent.CLICK, function (sender, evt) {
-          // 从cell中获取最新的值
-          vb.viewRefEditor.edit(viewRefCell.getValue().viewRef);
-        });
-        g.addCellOverlay(viewRefCell, overlay);
+        // var overlay = new mxCellOverlay(new mxImage('images/iconPencilSmall.png', 10, 10), '编辑视图', 'right', 'top', new mxPoint(-235, 12), 'default');
+        // overlay.addListener(mxEvent.CLICK, function (sender, evt) {
+        //   // 从cell中获取最新的值
+        //   vb.viewRefEditor.edit(viewRefCell.getValue().viewRef);
+        // });
+        // g.addCellOverlay(viewRefCell, overlay);
       });
-      model.endUpdate();
       // 添加关联关系
       $.each(view.joins || [], function () {
-        // var srcViewCellId = vb.diagram.getViewRefCellId(srcViewRef.viewRefId),
-        //   destViewCellId = vb.diagram.getViewRefCellId(destViewRef.viewRefId);
-        // var srcVertex = model.getCell(srcViewCellId),
-        //   destVertex = model.getCell(destViewCellId);
-        // var edge = g.insertEdge(root, null, new ViewRefRelation(this), srcVertex, destVertex, edgeStyles.edgeStyle);
+        var srcViewRef = vb.findViewRef(this['left']),
+          destViewRef = vb.findViewRef(this['right']),
+          edgeStyles = vb.diagram.getRelationEdgeStyles(this);
+        var srcViewCellId = vb.diagram.getViewRefCellId(srcViewRef.alias),
+          destViewCellId = vb.diagram.getViewRefCellId(destViewRef.alias);
+        var srcVertex = model.getCell(srcViewCellId),
+          destVertex = model.getCell(destViewCellId);
+        var edge = g.insertEdge(root, null, new ViewRefRelation(this), srcVertex, destVertex, edgeStyles.edgeStyle);
 
       });
     } finally {
@@ -1179,24 +1237,27 @@ vb.diagram = {
    */
   getRelationEdgeStyles: function (refRel) {
     var joinType, startArrow = 'none', endArrow = 'none', multiArrowStyle = mxConstants.ARROW_DIAMOND_THIN;
-    if (refRel['allSrcRows'] && refRel['allDestRows']) {
-      startArrow = endArrow = multiArrowStyle;
-    } else if (refRel['allSrcRows']) {
-      startArrow = multiArrowStyle;
-    } else if (refRel['allDestRows']) {
-      endArrow = multiArrowStyle;
-    } else {
-    }
-    // 如果viewRef是子查询，则标记端点为圆点
-    var srcViewRef = vb.findViewRef(refRel.srcViewRefId),
-      destViewRef = vb.findViewRef(refRel.destViewRefId);
-    if (srcViewRef && srcViewRef.isSubQuery)
+    // if (refRel['allSrcRows'] && refRel['allDestRows']) {
+    //   startArrow = endArrow = multiArrowStyle;
+    // } else if (refRel['allSrcRows']) {
+    //   startArrow = multiArrowStyle;
+    // } else if (refRel['allDestRows']) {
+    //   endArrow = multiArrowStyle;
+    // } else {
+    // }
+    // // 如果viewRef是子查询，则标记端点为圆点
+    // var srcViewRef = vb.findViewRef(refRel.srcViewRefId),
+    //   destViewRef = vb.findViewRef(refRel.destViewRefId);
+    // if (srcViewRef && srcViewRef.isSubQuery)
+    //   startArrow = mxConstants.ARROW_OVAL;
+    // if (destViewRef && destViewRef.isSubQuery)
+    //   endArrow = mxConstants.ARROW_OVAL;
+    if (refRel.type == 'INNER') {
       startArrow = mxConstants.ARROW_OVAL;
-    if (destViewRef && destViewRef.isSubQuery)
       endArrow = mxConstants.ARROW_OVAL;
-
+    }
     var edgeStyle = 'startArrow=' + startArrow + ';endArrow=' + endArrow;
-    var oper = '(' + (refRel.exprConditional ? refRel.exprConditional.oper : '??') + ')';
+    var oper = '(双击编辑)';
     joinType = oper; // 使用操作符替代join标识
 
     return { joinType: joinType, edgeStyle: edgeStyle };
@@ -1209,102 +1270,44 @@ vb.diagram = {
     console.info('diagram.addView :');
     console.info(view);
 
-    if (!view.columns || !view.columns.length) {
-      if (view._fetched) {
-        return alert('视图没有可用的列');
-      } else {
-        // 读取视图列
-        var fail = function (err) {
-          console.info(err);
-          if (window.confirm('无法获取视图信息，是否重试？')) {
-            vb.diagram.addView(view);
-          }
-        };
-        getAsyncJSON(vb.opts['viewLoadUrl'], {
-          keyId: view.viewId,
-          simpleDef: true
-        }, function (data) {
-          data.en._fetched = true;
-          vb.diagram.addView(data.en);
-        }, fail, fail, SUPPRESS_ERR_DLG);
-        return;
+    // 生成viewRef
+    // vb.registerView(view);
+
+    // 添加TYPE标记，将数据加入到rootView
+    var viewRef = this.newViewRef(view.metadata);
+    if (vb.registerViewRef(viewRef)) {
+      // TODO: 生成列映射关系
+
+
+      // $.each(view.columns, function () {
+      //   this.TYPE = 'COLUMN';
+      //   vb._view.subViewColumns.push(this);
+      // });
+
+      var viewRefCell = this.getViewRefCell(viewRef);
+      var g = this.getGraph(),
+        model = g.getModel();
+      model.beginUpdate();
+      try {
+        g.addCell(viewRefCell);
+      } finally {
+        model.endUpdate();
       }
     }
 
-    // 生成viewRef
-    console.info('fetech view -> ');
-    console.info(view);
-    vb.registerView(view);
 
-    // 添加TYPE标记，将数据加入到rootView
-    view.TYPE = 'VIEW';
-    var viewRef = this.newViewRef(view);
-    vb.registerViewRef(viewRef);
-
-    // 生成列映射关系
-    viewRef.columnMappings = [];
-    $.each(view.columns, function (index) {
-      var parentColId = vb.newId('colId'),
-        viewColMapId = vb.newId('viewColMapId');
-
-      viewRef.columnMappings.push({
-        TYPE: 'COLUMN_MAPPING',
-        parentCol: {
-          TYPE: 'COLUMN_MAPPING_PARENT',
-          colId: parentColId,
-          colName: this.colName,
-          dispName: this.dispName,
-          defaultVal: null,
-          expr: null,
-          isNullable: this.isNullable,
-          maxLength: this.maxLength,
-          output: false,
-          precision: this.precision,
-          remark: this.remark,
-          scale: this.scale,
-          typeName: this.typeName,
-          viewId: vb._view.viewId
-        },
-        parentColId: parentColId,
-        subCol: this,
-        subColId: this.colId,
-        subViewRefId: viewRef.viewRefId,
-        viewColMapId: viewColMapId,
-        seqId: index + 1
-      });
-    });
-
-    console.info('viewRef -> ');
-    console.info(viewRef);
-    vb._view.viewRefs.push(viewRef);
-    vb._view.subViews.push(view);
-    $.each(view.columns, function () {
-      this.TYPE = 'COLUMN';
-      vb._view.subViewColumns.push(this);
-    });
-
-    var viewRefCell = this.getViewRefCell(viewRef);
-    var g = this.getGraph(),
-      model = g.getModel();
-    model.beginUpdate();
-    try {
-      g.addCell(viewRefCell);
-    } finally {
-      model.endUpdate();
-    }
   },
   newViewRef: function (view) {
     // 生成关系数据
     var viewRefId = vb.newId('viewRefId'),
-      reservedAliases = vb._view.viewRefs.collect(function () { return this.viewAlias; }),
-      viewAlias = this.getAliasFromName(view.viewName, reservedAliases);
+      reservedAliases = vb._view.tables.collect(function () { return this.viewAlias; }),
+      viewAlias = view.name;
     var viewRef = {
       TYPE: 'REFERENCE',
-      viewRefId: viewRefId,
-      viewId: view.viewId,
-      view: view,
-      viewAlias: viewAlias,
-      parentViewId: vb._view.viewId
+      name: view.name,
+      columns: view.columns,
+      alias: viewAlias
+
     };
     return viewRef;
   },
@@ -1380,7 +1383,7 @@ vb.diagram = {
    */
   updateViewRef: function (viewRef) {
     var graph = this.getGraph(),
-      viewRefCellId = this.getViewRefCellId(viewRef.viewRefId),
+      viewRefCellId = this.getViewRefCellId(viewRef.alias),
       viewRefCell = graph.getModel().getCell(viewRefCellId);
 
     console.info('updateViewRef :');
@@ -1391,7 +1394,7 @@ vb.diagram = {
     graph.getModel().beginUpdate();
     try {
       viewRefCell.value.viewRef = viewRef;
-      for (var i = 0, j = viewRef.columnMappings; i < j.length; ++i) {
+      for (var i = 0, j = viewRef.columns; i < j.length; ++i) {
         var colCell = viewRefCell.children[i],
           colMapping = j[i];
         colCell.value.columnMapping = colMapping;
@@ -1521,8 +1524,8 @@ vb.diagram = {
           // };          
           var refRel = {
             viewRelId: vb.newId('viewRelId'),
-            left: srcViewRef.name,
-            right: destViewRef.name,
+            left: srcViewRef.alias,
+            right: destViewRef.alias,
             type: 'INNER',
             columns: [
             ]
@@ -1583,7 +1586,7 @@ vb.diagram = {
 
         var colStyle = {};
         colStyle[mxConstants.STYLE_STROKEWIDTH] = 0;
-        colStyle[mxConstants.STYLE_FONTCOLOR] = '#333';
+        colStyle[mxConstants.STYLE_FONTCOLOR] = '#8e8eaf';
         colStyle[mxConstants.STYLE_FILLCOLOR] = '#f5f5f5';
         colStyle[mxConstants.STYLE_ALIGN] = 'left';
         colStyle[mxConstants.STYLE_SPACING_LEFT] = 2;
@@ -1592,8 +1595,8 @@ vb.diagram = {
 
         var viewStyle = {};
         viewStyle[mxConstants.STYLE_STROKEWIDTH] = 0;
-        viewStyle[mxConstants.STYLE_FONTCOLOR] = '#900';
-        viewStyle[mxConstants.STYLE_FILLCOLOR] = '#dadada';
+        viewStyle[mxConstants.STYLE_FONTCOLOR] = '#000000';
+        viewStyle[mxConstants.STYLE_FILLCOLOR] = '#c8ddf7';
         viewStyle[mxConstants.STYLE_VERTICAL_ALIGN] = 'top';
         viewStyle[mxConstants.STYLE_SPACING_TOP] = 4;
         g.getStylesheet().putCellStyle('VIEW_STYLE', viewStyle);
@@ -1668,9 +1671,9 @@ vb.diagram = {
       throw new Error('cell无id');
     if (cell.value) {
       if (cell.value.type == 'VIEWREF') {
-        this._viewRefCellIdMap[cell.value.viewRef.viewRefId] = id;
+        this._viewRefCellIdMap[cell.value.viewRef.alias] = id;
       } else if (cell.value.type == 'COLUMN_MAPPING') {
-        this._viewColumnMapCellIdMap[cell.value.columnMapping.viewColMapId] = id;
+        this._viewColumnMapCellIdMap[cell.value.columnMapping.name] = id;
       } else if (cell.value.type == 'RELATION') {
         this._viewRefRelationCellIdMap[cell.value.viewRefRelation.viewRelId] = id;
       }
@@ -1741,7 +1744,7 @@ vb.diagram = {
   },
 
   _getViewRefRelationLabel: function (viewRefRel) {
-    return '(' + (viewRefRel.exprConditional ? viewRefRel.exprConditional.oper : '??') + ')';
+    return '(双击编辑)';
   },
   _getViewRefLabel: function (viewRef) {
     // return viewRef.name + ' -> ' + (viewRef.alias ? viewRef.alias : '');
@@ -1749,8 +1752,20 @@ vb.diagram = {
   },
   _getColumnMappingLabel: function (columnMapping) {
     var label = [];
-    label.push('<i>' + columnMapping['type'] + '</i>');
-    label.push(columnMapping.name);
+    if (columnMapping['alias']) {
+      label.push('<img src=\'images/iconCheckSmall.png\' style=\'width:10px;height:10px;\'/> ');
+    } else {
+      label.push('<img src=\'images/transparent.gif\' style=\'width:10px;height:10px;\'/> ');
+    }
+    if(columnMapping['javaType']=='Number'){
+      label.push('<img src=\'images/num_icon.png\' style=\'width:14px;height:16px;\'/>  ');
+    }else if(columnMapping['javaType']=='String'){
+      label.push('<img src=\'images/text_icon.png\' style=\'width:14px;height:16px;\'/>  ');
+    }else if(columnMapping['javaType']=='Date'){
+      label.push('<img src=\'images/data_icon.png\' style=\'width:14px;height:16px;\'/>  ');
+    }
+    // label.push('<i style="color:#333">' + columnMapping['javaType'] + '</i>  ');
+    label.push('('+columnMapping.name+')');
     // label.push('<span class=\'small-note\'> (');
     // label.push(columnMapping.alias);
     // label.push(')</span>');

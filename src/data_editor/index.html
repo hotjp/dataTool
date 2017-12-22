@@ -2,341 +2,464 @@
 <html lang="zh-cn">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Document</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="css/data_editor.css" />
+    <style>
+    .dialog {
+        border: solid 1px #333
+    }
+
+    .error {
+        background-color: #ff2200
+    }
+    </style>
 </head>
 
-<body>
-  <aside>
-
-  </aside>
-  <div id="content" style="background-image: url('./mxClient/images/grid.gif'); background-position: left top;">
-
-  </div>
-  <script src="https://cdn.bootcss.com/jquery/1.11.3/jquery.js"></script>
-  <script src="./js/xmlToJSON.min.js"></script>
-  <script type="text/javascript">
+<body class="data_editor">
+    <div class="data_editor_header fix">
+        <div class="l head_input_container">
+            <span class="red">*</span>视图名
+            <input class="head_input" type="text" value="V_SERV_DISPATCH">
+        </div>
+        <div class="l head_input_container">
+            <span class="red">*</span>视图显示名
+            <input class="head_input" type="text" value="服务派工信息">
+        </div>
+        <a href="javascript:;" class="block r close_container">
+          <i class="icon_btn_close"></i>
+          关闭
+        </a>
+        <a id="saveView" href="javascript:;" class="block r save_container">
+          <i class="icon_btn_save"></i>
+          保存
+        </a>
+        <!-- <a id="saveView" href="javascript:;">保存视图关系</a> -->
+    </div>
+    <div class="editor_left">
+        <aside>
+            <div class="fix editor_left_title">
+                视图模型
+                <a href="javascript:;" class="r icon_btn modify_icon block"></a>
+                <a href="javascript:;" class="r icon_btn scale_icon block"></a>
+                <a href="javascript:;" class="r icon_btn refresh_icon block"></a>
+                <a href="javascript:;" class="r icon_btn add_icon block"></a>
+            </div>
+            <ul id="tableList">
+            </ul>
+            <script id="tableListTpl" type="text/html">
+                <%if(tableList){%>
+                    <%for(i = 0; i < tableList.length; i++){%>
+                        <li>
+                            <a class="full" data-table="<%=stringify(tableList[i])%>" href="javascript:;">
+                                <%if(tableList[i].remark){%>
+                                    <%=tableList[i].remark%>*
+                                <%}else{%>    
+                                    <%=tableList[i].name%>*
+                                <%}%>    
+                                <br>
+                                <%=tableList[i].name%>
+                                <i href="javascript:;" class="r icon_btn add_icon  hide"></i>
+                            </a>
+                            
+                        </li>
+                        <%}%>
+                            <%}%>
+            </script>
+            <!-- <script id="tableListTpl" type="text/html">
+                <%if(tableList){%>
+                    <%for(i = 0; i < tableList.length; i++){%>
+                        <li>
+                            <a data-table="<%=stringify(tableList[i])%>" href="javascript:;">
+                                <%=tableList[i].name%><br>
+                                <%=tableList[i].sourceType.name%>
+                            </a>
+                            <a href="javascript:;" class="r icon_btn modify_icon  hide"></a>
+                        </li>
+                        <%}%>
+                            <%}%>
+            </script> -->
+        </aside>
+    </div>
+    <div class="editor_right">
+        <div id="content" style="background-image: url('./mxClient/images/grid.gif'); background-position: left top;height:100%;overflow-y: auto;">
+        </div>
+    </div>
+    <!-- 编辑关联关系 -->
+    <div class="dialog hide" id="viewRefRelEditor">
+        <div class="dialog_content">
+            <a href="javascript:;" class="block r dialog_close cancal">
+            </a>
+            <!-- .title 关联js -->
+            <div class="title">
+                编辑连接
+            </div>
+            <!-- .addItem 关联js -->
+            <a href="javascript:;" class="addItem">add</a>
+            <!-- .list 关联js -->
+            <div class="list"></div>
+            <!-- #viewRefRelListTpl 关联js -->
+            <script id="viewRefRelListTpl" type="text/html">
+                <%if(viewRefRel.columns){%>
+                  <%for(i = 0;i < viewRefRel.columns.length; i++){%>
+                    <%column=viewRefRel.columns[i]%>
+                    <li>
+                      <select name="left">
+                        <option value="">请选择</option>
+                          
+                        <%if(srcViewRef.columns){%>
+                          <%for(j = 0;j < srcViewRef.columns.length; j++){%>
+                            <option data-type="<%=srcViewRef.columns[j].javaType%>" value="<%=srcViewRef.columns[j].name%>" <%=srcViewRef.columns[j].name == column.left?'selected':''%>>(<%=srcViewRef.columns[j].javaType%>)<%=srcViewRef.columns[j].name%></option>
+                          <%}%>
+                        <%}%>
+                      </select>
+                      <select name="op">
+                        <option value="">请选择</option>
+                        <%for(j = 0;j < ops.length; j++){%>
+                            <option value="<%=#ops[j]%>" <%=ops[j] == column.op?'selected':''%>><%=#ops[j]%></option>
+                        <%}%>
+                      </select>
+                      <select name="right">
+                        <option value="">请选择</option>
+                          <%if(destViewRef.columns){%>
+                            <%for(j = 0; j < destViewRef.columns.length; j++){%>
+                              <option data-type="<%=destViewRef.columns[j].javaType%>" value="<%=destViewRef.columns[j].name%>" <%=destViewRef.columns[j].name == column.right?'selected':''%>>(<%=destViewRef.columns[j].javaType%>)<%=destViewRef.columns[j].name%></option>
+                            <%}%>
+                          <%}%>
+                      </select>
+                    </li>
+                  <%}%>
+                <%}%>
+              </script>
+            <!-- .dialog-button 及 >a元素 皆关联js -->
+            <div class="dialog-button">
+                <a class="confirm" href="javascript:;">确定</a>
+                <a class="delete" href="javascript:;">删除</a>
+                <a class="cancal" href="javascript:;">取消</a>
+            </div>
+        </div>
+    </div>
+    <!-- 编辑表格数据 -->
+    <div class="dialog hide" id="viewRefEditor">
+        <div class="dialog_content">
+            <a href="javascript:;" class="block r dialog_close cancal">
+              </a>
+            <!-- .title 关联js -->
+            <div class="title">编辑视图</div>
+            <input type="hidden" name="" id="viewRefViewAlias">
+            <ul id="t-viewRef">
+            </ul>
+            <script id="viewRefTpl" type="text/html">
+                <%if(list){%>
+                    <%for(i = 0;i < list.length; i++){%>
+                        <li data-alias="<%=list[i].alias||''%>" data-name="<%=list[i].name%>">
+                            <input type="checkbox" name="" <%=list[i].alias? 'checked': ''%> id="">
+                            <%=list[i].name%>
+                        </li>
+                        <%}%>
+                            <%}%>
+            </script>
+            <div class="dialog-button">
+                <a class="confirm" href="javascript:;">确定</a>
+                <a class="delete" href="javascript:;">删除</a>
+                <a class="cancal" href="javascript:;">取消</a>
+            </div>
+        </div>
+    </div>
+    <script src="./js/jquery.js"></script>
+    <script src="./js/urlparas.js"></script>
+    <script src="./js/template-native.js"></script>
+    <script type="text/javascript">
     mxBasePath = './mxClient';
-  </script>
-  <script src="./mxClient/js/mxClient.js"></script>
-  <script src="./js/viewBuilder.js"></script>
-  <script src="./js/viewBuilder.util.js"></script>
-  <script>
+    </script>
+    <script src="./mxClient/js/mxClient.js"></script>
+    <script src="./js/viewBuilder.js"></script>
+    <script src="./js/viewBuilder.util.js"></script>
+    <script>
+    template.helper('stringify', function(json) {
+        return JSON.stringify(json);
+    });
+    var page = {
+        url: urlParas(location.href)
+    };
+
+    function renderTmp(selector, tmpId, data, callback) {
+        var Tpl = template(tmpId, data),
+            el;
+        if ('object' == typeof selector) {
+            el = selector;
+        } else {
+            el = $(selector).get(0);
+        }
+        if (typeof callback == 'function') {
+            callback(el, Tpl);
+            return;
+        }
+        // el.innerHTML+= Tpl;
+        $(el).append(Tpl);
+    }
+    /**
+     * 加载数据表
+     * @param datasourceDef
+     */
+    function loadDatatables() {
+        datasourceId = page.url.get('datasource');
+        $.ajax({
+            url: 'http://119.180.98.134:8880/dataviz/api/datasource/metadata/listTables.do',
+            // url: 'http://192.168.50.200:8880/dataviz/api/dataview/list.do',
+            method: 'GET',
+            dataType: 'JSON',
+            data: {
+                datasource: page.url.get('sourceId') ? page.url.get('sourceId') : 0
+            },
+            success: function(res) {
+                var data = {
+                    tableList: res.data
+                };
+                $('#tableList').empty();
+                renderTmp('#tableList', 'tableListTpl', data);
+                // $.each(r.data, function () {
+                //   var li = $('<li></li>')
+                //     .data('table', this)
+                //     .text(this.name)
+                //     .append($(' <a href="javascript:;" title="add to graph">&gt;</a>')
+                //       .click(function () {
+                //         // 将所选table加入到关系图
+                //         addTableToGraph(datasourceId, $(this).parent().data('table'));
+                //       }));
+                //   $('#tables').append(li);
+                // });
+
+            }
+        });
+    }
+
+    function addTableToGraph(sourceId, table) {
+        var refTables = [];
+        for (var i = 0; i < vb._view.tables.length; i++) {
+            refTables.push(vb._view.tables[i].name);
+        }
+        $.ajax({
+            url: 'http://119.180.98.134:8880/dataviz/api/datasource/metadata/table.do',
+            data: {
+                datasource: sourceId,
+                table: table['name'],
+                type: table['type'],
+                refTables: refTables.join(',')
+            },
+            success: function(res) {
+                // 刷新预览
+                // previewData();
+                vb.diagram.addView(res.data);
+            }
+        });
+    }
+
     function extractViewLayout() {
-      var layout = {
-        tables: [
-          {
-            alias: 't_1',
-            x: 90,
-            y: 90,
-          },
-          {
-            alias: 't_2',
-            x: 290,
-            y: 90
-          }
-        ]
-      };
-      return layout;
+        var layout = {
+            tables: [{
+                    alias: 't_1',
+                    x: 90,
+                    y: 90,
+                },
+                {
+                    alias: 't_2',
+                    x: 290,
+                    y: 90
+                }
+            ]
+        };
+        return layout;
     }
     var viewData = {
-      tables: {},
-      joins: []
+        tables: {},
+        joins: []
     };
     /**
      * 组织视图定义
      */
     function extractViewDef() {
-      var def = {
-        // 表
-        // column如果有alias则为输出列
-        tables: [
-          {
-            name: 'bd_job',
-            alias: 't_1',
-            columns: [
-              { name: 'job_id', type: 'Number', alias: 't_1_c_1' },
-              { name: 'job_name', type: 'String', alias: 't_1_c_2' },
-              { name: 'job_def', type: 'String' },
-              { name: 'job_params', type: 'String' },
-              { name: 'job_group_name', type: 'String', alias: 't_1_c_3' },
-              { name: 'scheduled_time', type: 'Date', alias: 't_1_c_4' },
-              { name: 'job_priority', type: 'Number', alias: 't_1_c_5' },
-              { name: 'job_status', type: 'Number', alias: 't_1_c_6' },
-              { name: 'retry_count', type: 'Number' },
-              { name: 'last_run_time', type: 'Date' }
+        var def = {
+            // 表
+            // column如果有alias则为输出列
+            tables: [{
+                    name: 'bd_job',
+                    alias: 't_1',
+                    columns: [{
+                            name: 'job_id',
+                            type: 'Number',
+                            alias: 't_1_c_1'
+                        },
+                        {
+                            name: 'job_name',
+                            type: 'String',
+                            alias: 't_1_c_2'
+                        },
+                        {
+                            name: 'job_def',
+                            type: 'String'
+                        },
+                        {
+                            name: 'job_params',
+                            type: 'String'
+                        },
+                        {
+                            name: 'job_group_name',
+                            type: 'String',
+                            alias: 't_1_c_3'
+                        },
+                        {
+                            name: 'scheduled_time',
+                            type: 'Date',
+                            alias: 't_1_c_4'
+                        },
+                        {
+                            name: 'job_priority',
+                            type: 'Number',
+                            alias: 't_1_c_5'
+                        },
+                        {
+                            name: 'job_status',
+                            type: 'Number',
+                            alias: 't_1_c_6'
+                        },
+                        {
+                            name: 'retry_count',
+                            type: 'Number'
+                        },
+                        {
+                            name: 'last_run_time',
+                            type: 'Date'
+                        }
+                    ]
+                },
+                {
+                    name: 'bd_job_log',
+                    alias: 't_2',
+                    columns: [{
+                            name: 'log_id',
+                            type: 'Number',
+                            alias: 't_2_c_1'
+                        },
+                        {
+                            name: 'job_id',
+                            type: 'Number'
+                        },
+                        {
+                            name: 'run_time',
+                            type: 'Date',
+                            alias: 't_2_c_2'
+                        },
+                        {
+                            name: 'run_elapsed_ms',
+                            type: 'Number',
+                            alias: 't_2_c_3'
+                        },
+                        {
+                            name: 'run_status',
+                            type: 'Number',
+                            alias: 't_2_c_4'
+                        },
+                        {
+                            name: 'run_out_file',
+                            type: 'String'
+                        }
+                    ]
+                }
+            ],
+            // 连接关系
+            joins: [{
+                left: 't_1',
+                right: 't_2',
+                type: 'INNER',
+                columns: [{
+                    left: 'job_id',
+                    right: 'job_id',
+                    op: '='
+                }]
+            }],
+            // 筛选(必须是输出列，这样方便在预览表格附近展示，否则要将筛选条件展示在每个表上)
+            filters: [{
+                    conj: 'AND',
+                    table: 't_1',
+                    column: 't_1_c_3',
+                    op: 'LIKE',
+                    values: ['注册登录']
+                },
+                {
+                    conj: 'AND',
+                    table: 't_2',
+                    column: 't_2_c_4',
+                    op: 'IN',
+                    values: [1, 2]
+                }
+            ],
+            // 排序
+            orders: [{
+                    table: 't_2',
+                    column: 't_2_c_3',
+                    order: 'DESC'
+                },
+                {
+                    table: 't_2',
+                    column: 't_2_c_4',
+                    order: 'ASC'
+                }
             ]
-          },
-          {
-            name: 'bd_job_log',
-            alias: 't_2',
-            columns: [
-              { name: 'log_id', type: 'Number', alias: 't_2_c_1' },
-              { name: 'job_id', type: 'Number' },
-              { name: 'run_time', type: 'Date', alias: 't_2_c_2' },
-              { name: 'run_elapsed_ms', type: 'Number', alias: 't_2_c_3' },
-              { name: 'run_status', type: 'Number', alias: 't_2_c_4' },
-              { name: 'run_out_file', type: 'String' }
-            ]
-          }
-        ],
-        // 连接关系
-        joins: [
-          {
-            left: 't_1',
-            right: 't_2',
-            type: 'INNER',
-            columns: [
-              {
-                left: 'job_id',
-                right: 'job_id',
-                op: '='
-              }
-            ]
-          }
-        ],
-        // 筛选(必须是输出列，这样方便在预览表格附近展示，否则要将筛选条件展示在每个表上)
-        filters: [
-          {
-            conj: 'AND',
-            table: 't_1',
-            column: 't_1_c_3',
-            op: 'LIKE',
-            values: ['注册登录']
-          },
-          {
-            conj: 'AND',
-            table: 't_2',
-            column: 't_2_c_4',
-            op: 'IN',
-            values: [1, 2]
-          }
-        ],
-        // 排序
-        orders: [
-          {
-            table: 't_2',
-            column: 't_2_c_3',
-            order: 'DESC'
-          },
-          {
-            table: 't_2',
-            column: 't_2_c_4',
-            order: 'ASC'
-          }
-        ]
-      };
-      return def;
+        };
+        return def;
     }
-  </script>
-  <script>
+    </script>
+    <script>
     vb.init({
-      viewLoadUrl: '/dm/query/viewLoad.action',
-      viewSaveUrl: '/dm/query/viewSave.action',
-      dataSourceSchemaListUrl: '/dm/query/dataSourceSchemaList.action',
-      dataSourceObjectListUrl: '/dm/query/dataSourceObjectList.action',
-      dataSourceObjectUrl: '/dm/query/dataSourceObject.action',
-      viewGenerateUrl: '/dm/query/viewGenerate.action',
-      viewListByDataSourceUrl: '/dm/query/viewListByDataSource.action',
-      sqlViewBuilderUrl: '/dm/sqlViewBuilder.action',
-      dbViewBuilderUrl: '/dm/dbViewBuilder.action',
-      container: document.getElementById('content')
+        container: document.getElementById('content')
     }).load('100');
-  </script>
-  <!-- <script>
 
-    //---------------
-    function main(container) {
-      // Checks if the browser is supported
-      if (!mxClient.isBrowserSupported()) {
-        // Displays an error message if the browser is not supported.
-        mxUtils.error('Browser is not supported!', 200, false);
-      }
-      else {
-        // Disables the built-in context menu
-        mxEvent.disableContextMenu(container);
+    function bindEvent() {
+        // 关联关系弹窗
+        $('#viewRefRelEditor').on('click', '.confirm', function() {
+            vb.viewRefRelationEditor.confirmEdit();
+        }).on('click', '.delete', function() {
+            vb.viewRefRelationEditor.remove();
+        }).on('click', '.cancal', function() {
+            vb.viewRefRelationEditor.cancelEdit();
+        }).on('click', '.addItem', function() {
+            vb.viewRefRelationEditor.addItem();
+        });
+        // 视图弹窗
+        $('#viewRefEditor').on('click', '.confirm', function() {
+            vb.viewRefEditor.confirmEdit();
+        }).on('click', '.delete', function() {
+            vb.viewRefEditor.remove();
+        }).on('click', '.cancal', function() {
+            vb.viewRefEditor.cancelEdit();
+        });
+        // 数据表添加进视图
+        $('#tableList').on('click', 'a', function() {
+            addTableToGraph(page.url.get('sourceId'), $(this).data('table'));
+        });
+        // 保存
+        $('#saveView').on('click', function() {
+            $.ajax({
+                url: '',
+                method: 'get',
+                dataType: 'json',
+                success: function(res) {
 
-        // Creates the graph inside the given container
-        window.graph = new mxGraph(container);
-        graph.setHtmlLabels(true);
-        // graph.isCellMovable = false;
-        // graph.isCellEditable = false;
-        // graph.isCellResizable = false;
-        // graph.setResizeContainer(true);
-        // Enables rubberband selection
-        new mxRubberband(graph);
+                },
+                error: function(err) {
 
-        // Gets the default parent for inserting new cells. This
-        // is normally the first child of the root (ie. layer 0).
-        var parent = graph.getDefaultParent();
-        // Changes the default vertex style in-place
-        var style = graph.getStylesheet().getDefaultVertexStyle();
-        style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
-        style[mxConstants.STYLE_PERIMETER_SPACING] = 0;
-        style[mxConstants.STYLE_STROKECOLOR] = '#bbb';
-        style[mxConstants.STYLE_ROUNDED] = false;
-        style[mxConstants.STYLE_FOLDABLE] = false;
-
-        var edgeStyle = graph.stylesheet.getDefaultEdgeStyle();
-        edgeStyle[mxConstants.STYLE_LABEL_BACKGROUNDCOLOR] = 'white';
-        edgeStyle[mxConstants.STYLE_STROKEWIDTH] = 2;
-        edgeStyle[mxConstants.STYLE_ROUNDED] = true;
-        edgeStyle[mxConstants.STYLE_EDGE] = mxEdgeStyle.EntityRelation;
-
-        var colStyle = {};
-        colStyle[mxConstants.STYLE_STROKEWIDTH] = 0;
-        colStyle[mxConstants.STYLE_FONTCOLOR] = '#333';
-        colStyle[mxConstants.STYLE_FILLCOLOR] = '#f5f5f5';
-        colStyle[mxConstants.STYLE_ALIGN] = 'left';
-        colStyle[mxConstants.STYLE_SPACING_LEFT] = 2;
-        colStyle[mxConstants.STYLE_SPACING_RIGHT] = 2;
-        graph.getStylesheet().putCellStyle('COLUMN_STYLE', colStyle);
-
-        var viewStyle = {};
-        viewStyle[mxConstants.STYLE_STROKEWIDTH] = 0;
-        viewStyle[mxConstants.STYLE_FONTCOLOR] = '#900';
-        viewStyle[mxConstants.STYLE_FILLCOLOR] = '#dadada';
-        viewStyle[mxConstants.STYLE_VERTICAL_ALIGN] = 'top';
-        viewStyle[mxConstants.STYLE_SPACING_TOP] = 4;
-        graph.getStylesheet().putCellStyle('VIEW_STYLE', viewStyle);
-
-        style = graph.getStylesheet().getDefaultEdgeStyle();
-        style[mxConstants.STYLE_ROUNDED] = true;
-        // Adds cells to the model in a single step
-        graph.getModel().beginUpdate();
-        // Installs auto layout for all levels
-        var layout = new mxStackLayout(graph, true);
-        layout.border = graph.border;
-        var layoutMgr = new mxLayoutManager(graph);
-        // layoutMgr.getLayout = function (cell) {
-        //   if (!cell.collapsed) {
-        //     // if (cell.parent != graph.model.root) {
-        //     // layout.resizeParent = true;
-        //     layout.horizontal = true;
-        //     layout.spacing = 40;
-        //     // }
-        //     // else {
-        //     // layout.resizeParent = true;
-        //     // layout.horizontal = false;
-        //     // layout.spacing = 40;
-        //     // }
-
-        //     return layout;
-        //   }
-
-        //   return null;
-        // };
-        try {
-          var dbData = extractViewDef();
-          var i, j, h;
-          // 循环表
-          for (i = 0; i < dbData.tables.length; i++) {
-            var tableData = dbData.tables[i],
-              w = 250,
-              h = 30 + tableData.columns.length * 29;
-            // 视图
-            var viewRefObj = new ViewRef(tableData),
-              viewRefCell = new mxCell(viewRefObj, new mxGeometry(10, 10, w, h), 'VIEW_STYLE');
-            viewRefCell.setVertex(true);
-            // 添加列映射cell
-            $.each(tableData.columns, function (index) {
-              var y = index * 30 + 30,
-                columnMappingObj = new ColumnMapping(this),
-                columnMappingCell = new mxCell(columnMappingObj, new mxGeometry(0, y, w, 30), 'COLUMN_STYLE');
-              columnMappingCell.setVertex(true);
-              columnMappingCell.setConnectable(true);
-              viewRefCell.insert(columnMappingCell);
+                }
             });
-            graph.addCell(viewRefCell);
-            // viewData.tables[dbData.tables[i].alias] = graph.insertVertex(parent, null, tableData.alias, 20, 20, 140, tableData.columns.length * 29, 'column');
-            // // viewData.tables[dbData.tables[i].alias].collapsed = true;
-            // viewData.tables[dbData.tables[i].alias].data = new DbData(tableData);
-            // for (j = 0; j < tableData.columns.length; j++) {
-            //   var column = tableData.columns[i],
-            //     vertex = viewData.tables[dbData.tables[i].alias];
-            //   var col = graph.insertVertex(vertex, null, column.name, vertex.geometry.x, 30 + vertex.geometry.y + (30 * i), vertex.geometry.width, 30);
-            // }
-          }
-          // 循环关联关系
-          for (j = 0; j < dbData.joins.length; j++) {
-            var join = dbData.joins[j];
-            for (h = 0; h < dbData.joins[j].columns.length; h++) {
-              var item = dbData.joins[j].columns[h];
-              viewData.joins.push(graph.insertEdge(parent, null, '(' + item.op + ')', viewData.tables[join.left], viewData.tables[join.right]), "startArrow=diamondThin;endArrow=none");
-            }
-
-          }
-          // var v1 = graph.insertVertex(parent, null, 'Hello,', 20, 20, 80, 30);
-          // v1.data = new CustomData('v1');
-          // var v2 = graph.insertVertex(parent, null, 'World!', 200, 150, 80, 30);
-          // v2.data = new CustomData('v2');
-          // var e1 = graph.insertEdge(parent, null, '(=)', v1, v2);
-        }
-        finally {
-          // Updates the display
-          graph.getModel().endUpdate();
-        }
-      }
-
-
+        });
     }
-
-    function CustomData(value) {
-      this.value = value;
-    }
-    function DbData(value) {
-      // this.value = value;
-      this.value = value;
-
-    }
-    // 数据列
-    function ColumnMapping(colMapping) {
-      this.type = 'COLUMN_MAPPING';
-      this.columnMapping = colMapping;
-      this.isFixed = true;
-    }
-    // 视图
-    function ViewRef(viewRef) {
-      this.type = 'VIEWREF';
-      this.viewRef = viewRef;
-    }
-    var codec = new mxObjectCodec(new CustomData());
-
-    codec.encode = function (enc, obj) {
-      var node = enc.document.createElement('CustomData');
-      mxUtils.setTextContent(node, JSON.stringify(obj));
-
-      return node;
-    };
-
-    codec.decode = function (dec, node, into) {
-      var obj = JSON.parse(mxUtils.getTextContent(node));
-      obj.constructor = CustomData;
-
-      return obj;
-    };
-
-    mxCodecRegistry.register(codec);
-
-    // 初始化
-    // main(document.getElementById('content'));
-    // 获取xml字符串
-    function getMxXml() {
-      var encoder = new mxCodec();
-      var node = encoder.encode(graph.getModel());
-      // 获取xml
-      // return mxUtils.getXml(node);
-      return node;
-    }
-    // 获取json格式数据
-    function getMxJson() {
-      var result = xmlToJSON.parseString(getMxXml());   // parses to JSON object
-      return result;
-    }
-
-  </script> -->
+    $(function() {
+        loadDatatables();
+        bindEvent();
+    });
+    </script>
 </body>
 
 </html>

@@ -1,20 +1,25 @@
 <template>
-  <div id="addDataList" class="full">
-    <el-row>
-      <el-col :span="24">
+  <div class="full">
+    <el-row id="addDataList">
+      <el-col :span="18" :offset="3">
         <div class="grid-content">
-          <ul class="datebase_list">
-            <li v-for="(item,index) in list" :key="index">
-              <!-- <router-link :to="{path:'/chart_editor/'+item.id}"> -->
-              {{item.name}}
-              <a href="javascript:;" @click="addDataSource(item.type,item.name)">添加</a>
-              <!-- </router-link> -->
-            </li>
-          </ul>
+          <div class="input_wrap">
+            <el-input placeholder="请输入想要接入的数据源" prefix-icon="el-icon-search" v-model="searchContent"></el-input>
+          </div>
+          <el-row  class="database_list" :gutter="20">
+            <el-col :span="6" v-for="(item,index) in list" :key="index">
+              <div class="database_item rect-100">
+                <!-- <router-link :to="{path:'/chart_editor/'+item.id}"> -->
+                <img :src="item.img" alt="">
+                {{item.name}}
+                <a href="javascript:;" class="_full" @click="addDataSource(item.type,item.name)"></a>
+                <!-- </router-link> -->
+              </div>
+            </el-col>
+          </el-row>
         </div>
       </el-col>
     </el-row>
-
     <el-dialog title="上传excel文件" :visible.sync="dialogUploadVisible" width="30%">
       <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/" :on-preview="handlePreview" :on-remove="handleRemove" multiple :limit="3" :on-exceed="handleExceed" :file-list="fileList">
         <el-button size="small" type="primary">点击上传</el-button>
@@ -84,7 +89,8 @@ export default {
         //        id: '',
         //        dbType: 'SQLServer'
       },
-      formLabelWidth: '120px'
+      formLabelWidth: '120px',
+      searchContent:''
     };
   },
   methods: {
@@ -117,7 +123,7 @@ export default {
 };
 </script>
 <style>
-.datebase_list li {
+.database_list li {
   line-height: 26px;
 }
 </style>
