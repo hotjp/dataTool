@@ -47,7 +47,10 @@
           <div class="fix pl20">
             <el-dropdown @command="linefontFamily">
               <span class="el-dropdown-link">
-                {{yaxis.axisLabel.fontFamily}}
+                <span class="font_family_menu">
+                  {{yaxis.axisLabel.fontFamily}}
+                </span>
+
                 <i class="el-icon-arrow-down el-icon--right"></i>
               </span>
               <el-dropdown-menu slot="dropdown">
@@ -93,9 +96,9 @@
 <script type="text/babel">
 export default {
   data: () => ({
-    activeNames:['1'],
+    activeNames: ['1'],
     yaxis: {
-      show:true,
+      show: true,
       axisLine: {
         show: '',
         lineStyle: {
@@ -185,6 +188,14 @@ export default {
 .chart_right .el-checkbox__input.is-indeterminate .el-checkbox__inner {
   background-color: #3582e3;
   border: none;
+}
+.font_family_menu {
+  display: inline-block;
+  max-width: 70px;
+  overflow: hidden;
+  height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>
 

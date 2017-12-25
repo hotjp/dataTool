@@ -1,20 +1,20 @@
-;(function(factory) {
-  factory()
+(function(factory) {
+  factory();
 })(function() {
   function seriesArea(rows, queryNameKeyY, seriesDefault, series) {
     if (series) {
       // 只组织data
       for (var j = 0; j < series.length; j++) {
-        series[j].data=[]    
+        series[j].data=[];    
         for (var i = 0; i < queryNameKeyY.length; i++) {
           if (series[j].name == queryNameKeyY[i]) {
             for(var k =0;k<rows.length;k++){
-              series[j].data.push(rows[k][[queryNameKeyY[i]]])
+              series[j].data.push(rows[k][[queryNameKeyY[i]]]);
             }
           }
         }
       }
-      return series
+      return series;
     } else {
       // chart_eitor组件用
       var arr = [];
@@ -22,7 +22,7 @@
         var copy = JSON.parse(JSON.stringify(seriesDefault));
         arr.push({
           data: rows.map(function(x){
-            return x[queryNameKeyY[i]]
+            return x[queryNameKeyY[i]];
           }),
           type: 'line',
           itemStyle: copy.itemStyle,
@@ -31,9 +31,9 @@
           name: queryNameKeyY[i]
         });
       }
-      return arr
+      return arr;
     }
   }
-  window.seriesLine = seriesLine;
-  return seriesLine
-})
+  window.seriesArea = seriesArea;
+  return seriesArea;
+});

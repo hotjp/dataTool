@@ -565,7 +565,7 @@ export default {
       checkedCategoryNums: [],
       isIndeterminateCategoryNums: true,
       batchAddCategoryColumsDialogVisible: false,
-      //        批量添加数值字段批量添加数值字段
+      //        批量添加数值字段批量添加数值字段批量添加数值字段
       checkAllDates: false,
       checkedDates: [],
       dates: [{ name: 'date', text: '日期', type: 'Date' }],
@@ -667,7 +667,18 @@ export default {
         loading: false,
         resizable: true,
         option: {
-
+          color:[
+            '#d87c7c',
+            '#919e8b',
+            '#d7ab82',
+            '#6e7074',
+            '#61a0a8',
+            '#efa18d',
+            '#787464',
+            '#cc7e63',
+            '#724e58',
+            '#4b565b'
+          ]
         },
         query: {
           // 数值列
@@ -779,9 +790,18 @@ export default {
       this.$set(this.queryInfo.categoryColumns[this._index], 'selectedItemSwitch', false);
       this.$set(this.queryInfo.categoryColumns[this._index], 'selectedChildrenSwitch', false);
     }, 200);
+    this.menuChildrenStatus = _.debounce(function () {
+      // this.$set(this.queryInfo.categoryColumns[this._index], 'selectedItemSwitch', false);
+      this.$set(this.queryInfo.categoryColumns[this._index], 'selectedChildrenSwitch', -1);
+    }, 200);
     this.valMenuStatus = _.debounce(function () {
       this.$set(this.queryInfo.valueColumns[this.val_index], 'selectedItemSwitch', false);
       this.$set(this.queryInfo.valueColumns[this.val_index], 'selectedChildrenSwitch', false);
+    }, 200);
+    this.valMenuChildrenStatus = _.debounce(function () {
+      // selectedChildrenSwitch
+      // this.$set(this.queryInfo.valueColumns[this.val_index], 'selectedItemSwitch', false);
+      this.$set(this.queryInfo.valueColumns[this.val_index], 'selectedChildrenSwitch', -1);
     }, 200);
     this.getChartDataChangeView = _.debounce(function () {
       this.getChartData();
@@ -804,8 +824,6 @@ export default {
       .catch(function (res) {
         console.log(res);
       });
-
-
 
     if (that.charts.id != '') {
       axios({
@@ -832,7 +850,22 @@ export default {
             .then(function (res) {
               let resData = res.data;
               if (resData.success) {
+                that.nums=[];
+                that.dates=[];
+                that.texts=[];
                 that.columns = resData.data.columns;
+
+                for(let i = 0;i<resData.data.columns.length;i++){
+                  if(resData.data.columns[i].type=='Number'){
+                    that.nums.push(resData.data.columns[i]);
+                  }
+                  if(resData.data.columns[i].type=='Date'){
+                    that.dates.push(resData.data.columns[i]);
+                  }
+                  if(resData.data.columns[i].type=='String'){
+                    that.texts.push(resData.data.columns[i]);
+                  }
+                }
               }
             })
             .catch(function (res) {
@@ -842,6 +875,8 @@ export default {
         .catch(function (res) {
           console.log(res);
         });
+    }else{
+      that.workTableDialogVisible=true;
     }
   },
   // destroyed() {
@@ -1156,7 +1191,7 @@ export default {
     },
     closeSelectedChildren(index) {
       this._index = index;
-      vm.menuStatus();
+      vm.menuChildrenStatus();
     },
     // 维度设置字段弹窗
     Xfield: function (data) {
@@ -1193,7 +1228,7 @@ export default {
     },
     closeValueSelectedChildren(index) {
       this.val_index = index;
-      vm.valMenuStatus();
+      vm.valMenuChildrenStatus();
     },
     onClickSetValueItemSort(index, item) {
       let that = this;
@@ -1284,32 +1319,6 @@ export default {
       if (popup.name == 'summaryFilter') {
         this.ScreenOption.index = index;
       }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     },
     // 批量添加数值字段
     batchAddColums() {

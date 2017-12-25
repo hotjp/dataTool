@@ -69,31 +69,31 @@
   </div>
 </template>
 <script>
-import "../../assets/css/gridstack.min.css";
-import "../../assets/css/gridstack-extra.min.css";
-import "../../assets/js/jquery-1.11.0";
-import vars from "../../assets/js/vars";
-import axios from "axios";
-import IEcharts from "vue-echarts-v3/src/full.vue";
-import dashboardDir from "../../components/dashboardDir.vue";
-import { ajax } from "jquery";
-import Vue from "vue";
-import { Message } from "element-ui";
-import { Loading } from "element-ui";
+import '../../assets/css/gridstack.min.css';
+import '../../assets/css/gridstack-extra.min.css';
+import '../../assets/js/jquery-1.11.0';
+import vars from '../../assets/js/vars';
+import axios from 'axios';
+import IEcharts from 'vue-echarts-v3/src/full.vue';
+import dashboardDir from '../../components/dashboardDir.vue';
+import { ajax } from 'jquery';
+import Vue from 'vue';
+import { Message } from 'element-ui';
+import { Loading } from 'element-ui';
 //引入echarts皮肤
-import "../../assets/js/jquery-ui.min";
-import "../../assets/js/gridstack";
-import "../../assets/js/gridstack.jQueryUI";
-import tableView from "../demo/tableView.vue";
+import '../../assets/js/jquery-ui.min';
+import '../../assets/js/gridstack';
+import '../../assets/js/gridstack.jQueryUI';
+import tableView from '../demo/tableView.vue';
 
-import "../../vendor/seriesBar.js";
-import seriesBarDefault from "../../vendor/seriesBar.json";
-import "../../vendor/seriesLine.js";
-import seriesLineDefault from "../../vendor/seriesLine.json";
-import "../../vendor/seriesArea.js";
-import seriesAreaDefault from "../../vendor/seriesArea.json";
-import "../../vendor/seriesPie.js";
-import seriesPieDefault from "../../vendor/seriesPie.json";
+import '../../vendor/seriesBar.js';
+import seriesBarDefault from '../../vendor/seriesBar.json';
+import '../../vendor/seriesLine.js';
+import seriesLineDefault from '../../vendor/seriesLine.json';
+import '../../vendor/seriesArea.js';
+import seriesAreaDefault from '../../vendor/seriesArea.json';
+import '../../vendor/seriesPie.js';
+import seriesPieDefault from '../../vendor/seriesPie.json';
 
 
 export default {
@@ -103,10 +103,10 @@ export default {
     that.loadDashboard();
     // 加载 已有chart 列表
     axios({
-      url: "/chart/list.do",
+      url: '/chart/list.do',
       baseURL: vars.api,
       params: {
-        folder: "/"
+        folder: '/'
       }
     })
       .then(function(res) {
@@ -130,8 +130,8 @@ export default {
       // 拖拽栅格
       dash: null,
       // 仪表盘名称,id
-      dashboardName: "",
-      dashboardId: "",
+      dashboardName: '',
+      dashboardId: '',
       // 栅格配置项
       dashOptions: {
         draggable: true,
@@ -149,11 +149,11 @@ export default {
       // 已有chart,添加时用
       charts: [],
       dashboardDialogVisible: false,
-      newDashboardName: "",
+      newDashboardName: '',
       editDialogVisible: false,
-      editTitle: "",
-      editId: "",
-      editIndex: ""
+      editTitle: '',
+      editId: '',
+      editIndex: ''
     };
   },
   methods: {
@@ -162,14 +162,14 @@ export default {
       this.dash.disable();
     },
     enable() {
-      this.dash.movable(".grid-stack-item", true);
-      this.dash.resizable(".grid-stack-item", true);
+      this.dash.movable('.grid-stack-item', true);
+      this.dash.resizable('.grid-stack-item', true);
     },
     // 加载拖拽栅格
     loadGrid() {
       let that = this;
-      $("#dash").gridstack(that.dashOptions);
-      that.dash = $("#dash").data("gridstack");
+      $('#dash').gridstack(that.dashOptions);
+      that.dash = $('#dash').data('gridstack');
       that.disable();
     },
     // 加载 dashboard 列表
@@ -177,7 +177,7 @@ export default {
       let that = this,
         params = that.$route.params;
       axios({
-        url: "/dashboard/list.do",
+        url: '/dashboard/list.do',
         baseURL: vars.api,
         params: {}
       })
@@ -193,8 +193,8 @@ export default {
                 // that.dashboardId = that.dashboardList[0].id;
                 // that.dashboardList[0].active = true;
                 that.$router.replace({
-                  path: "/empty",
-                  query: { link: "/dashboard/" + that.dashboardList[0].id }
+                  path: '/empty',
+                  query: { link: '/dashboard/' + that.dashboardList[0].id }
                 });
               } else {
                 if (that.dashboardList[i].id == params.viewId) {
@@ -225,7 +225,7 @@ export default {
         loadingInstance;
       if ($event) {
         loadingInstance = Loading.service({
-          target: $($event.target).closest("._wrap")[0]
+          target: $($event.target).closest('._wrap')[0]
         });
       }
       // TODO: loading使用elementUI的，但是关闭事件用了延时
@@ -236,13 +236,13 @@ export default {
 
       // 查询图表源 数据
       ajax({
-        type: "post",
-        url: vars.api + "/chart/info.do",
+        type: 'post',
+        url: vars.api + '/chart/info.do',
         async: false, // 设为同步
         data: {
           chart: chartId
         },
-        dataType: "json",
+        dataType: 'json',
         success: function(data) {
           if (data.success && data.data) {
             that.chartList[i].option =
@@ -277,14 +277,14 @@ export default {
     getChartSeriesData(id, queryInfo, index, type) {
       let that = this;
       ajax({
-        type: "post",
-        url: vars.api + "/query.do",
+        type: 'post',
+        url: vars.api + '/query.do',
         async: false, // 设为同步
         data: {
           view: id,
           query: queryInfo
         },
-        dataType: "json",
+        dataType: 'json',
         success: function(data) {
           if (data.success) {
             if (data.data.dataError || !data.data.data) {
@@ -292,23 +292,23 @@ export default {
             }
             // 根据type选择处理方式
             switch (type) {
-              case "bar":
-                that.barHandler(data.data, index);
-                break;
-              case "line":
-                that.lineHandler(data.data, index);
-                break;
-              case "pie":
-                that.pieHandler(data.data, index);
-                break;
-              case "area":
-                that.areaHandler(data.data, index);
-                break;
-              case "table":
-                that.tableHandler(data.data, index);
-                break;
-              default:
-                console.warn("类型错误！");
+            case 'bar':
+              that.barHandler(data.data, index);
+              break;
+            case 'line':
+              that.lineHandler(data.data, index);
+              break;
+            case 'pie':
+              that.pieHandler(data.data, index);
+              break;
+            case 'area':
+              that.areaHandler(data.data, index);
+              break;
+            case 'table':
+              that.tableHandler(data.data, index);
+              break;
+            default:
+              console.warn('类型错误！');
             }
           }
         }
@@ -330,18 +330,18 @@ export default {
           layout: []
         };
       // 获取各图表x,y,w,h
-      $(".grid-stack-item").each(function(i, e) {
+      $('.grid-stack-item').each(function(i, e) {
         list.layout.push({
-          id: $(e).data("id"),
-          x: $(e).data("gs-x"),
-          y: $(e).data("gs-y"),
-          width: $(e).data("gs-width"),
-          height: $(e).data("gs-height"),
+          id: $(e).data('id'),
+          x: $(e).data('gs-x'),
+          y: $(e).data('gs-y'),
+          width: $(e).data('gs-width'),
+          height: $(e).data('gs-height'),
           isAutoPosition: false
         });
       });
       axios({
-        url: "/dashboard/save.do",
+        url: '/dashboard/save.do',
         baseURL: vars.api,
         params: {
           config: JSON.stringify(list)
@@ -350,7 +350,7 @@ export default {
         .then(function(res) {
           var resData = res.data;
           if (resData.success) {
-            Message({ message: "保存成功", type: "success" });
+            Message({ message: '保存成功', type: 'success' });
           }
         })
         .catch(function(res) {
@@ -361,16 +361,16 @@ export default {
     addDashboard() {
       let that = this;
       if (!that.newDashboardName) {
-        Message({ message: "请输入仪表名", type: "error" });
+        Message({ message: '请输入仪表名', type: 'error' });
         return;
       }
       let list = {
-        id: "",
+        id: '',
         text: that.newDashboardName,
         layout: []
       };
       axios({
-        url: "/dashboard/save.do",
+        url: '/dashboard/save.do',
         baseURL: vars.api,
         params: {
           config: JSON.stringify(list)
@@ -379,7 +379,7 @@ export default {
         .then(function(res) {
           var resData = res.data;
           if (resData.success) {
-            Message({ message: "新建成功", type: "success" });
+            Message({ message: '新建成功', type: 'success' });
             that.dashboardDialogVisible = false;
           }
         })
@@ -420,7 +420,7 @@ export default {
         }
       }
       if (!chartId) {
-        Message({ message: "没有选中的图表", type: "warning" });
+        Message({ message: '没有选中的图表', type: 'warning' });
       } else {
         that.dialogVisible = false;
         that.openFullScreen();
@@ -438,7 +438,7 @@ export default {
         }
         that.chartList = Object.assign([], that.chartList);
         that.dash.destroy(false);
-        $("#dash").data("gridstack", "");
+        $('#dash').data('gridstack', '');
         setTimeout(function() {
           that.loadGrid();
           that.closeFullScreen();
@@ -513,7 +513,7 @@ export default {
           that.chartList[index].option.series
         )
       );
-      console.log(that.chartList[index].option.series)
+      console.log(that.chartList[index].option.series);
       
     },
     areaHandler(data, index) {
@@ -606,7 +606,7 @@ export default {
         layout: this.dashboardList[that.editIndex].layout
       };
       axios({
-        url: "/dashboard/save.do",
+        url: '/dashboard/save.do',
         baseURL: vars.api,
         params: {
           config: JSON.stringify(list)
@@ -615,7 +615,7 @@ export default {
         .then(function(res) {
           var resData = res.data;
           if (resData.success) {
-            Message({ message: "保存成功", type: "success" });
+            Message({ message: '保存成功', type: 'success' });
             if (that.editId == that.$route.params.viewId) {
               list.active = true;
               that.dashboardName = that.editTitle;

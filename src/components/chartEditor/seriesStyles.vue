@@ -4,7 +4,7 @@
         <el-collapse-item title="序列风格" name="1">
           <ul>
             <li v-for="(colors,index) in seriesColors" :key="index">
-              <a @click="onClickSeriesColors(index)" href="javascript:;" class="ss_item fix">
+              <a @click="onClickSeriesColors(index)" href="javascript:;" v-bind:class="[colors.active==0?'active':'']" class="ss_item fix ">
                 <div class="l block" v-for="(color,index) in colors.value" v-bind:style="{background:color}"></div>
               </a>
             </li>
@@ -32,7 +32,8 @@ export default{
           '#cc7e63',
           '#724e58',
           '#4b565b'
-        ]
+        ],
+        active:0
       },
       {
         name: 'westeros',
@@ -43,7 +44,8 @@ export default{
           '#93b7e3',
           '#a5e7f0',
           '#cbb0e3'
-        ]
+        ],
+        active:1
       },
       {
         name: 'essos',
@@ -54,7 +56,8 @@ export default{
           '#ffb248',
           '#f2d643',
           '#ebdba4'
-        ]
+        ],
+        active:1
       }
     ]
   }),
@@ -62,6 +65,14 @@ export default{
     // 通过索引进行系列颜色赋值
     onClickSeriesColors(index) {
       this.$emit('seriesStyles',this.seriesColors[index].value);
+      for(let i = 0;i<this.seriesColors.length;i++){
+        if(i==index){
+          this.seriesColors[i]['active']=0;
+        }else{
+          this.seriesColors[i]['active']=1;
+        }
+      }
+      
     }
   },
   mounted(){
@@ -85,5 +96,9 @@ export default{
   width: 30px;
   height:30px;
   margin:0 2px 10px 2px;
+}
+.series_styles .active{
+  background: #ddd;
+  border-color: #8ea7e4;
 }
 </style>

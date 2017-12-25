@@ -82,8 +82,7 @@ export default{
         this.option.series=data.series;
         // Object.assign([],this.option.series,data.series);
       }
-
-
+      this.$emit('getProp', this.option);
     }
   },
   watch: {
