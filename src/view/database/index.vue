@@ -1,6 +1,6 @@
 <template>
-  <div class="full">
-    <el-row  id="database">
+  <div id="databaseList" class="full">
+    <el-row id="database">
       <el-col :span="5" class="database_left full">
         <div class="title">我的数据源</div>
         <ul class="database_list ">
@@ -12,8 +12,6 @@
               <a href="javascript:;" @click="onEditClick(item.id)">修改</a>
               <a href="javascript:;" @click="onCreateSourceClick(item.id)">创建</a>
             </div>
-           
-            <!-- </router-link> -->
           </li>
           <li>
             <a href="javascript:;" @click="onAddSourceClick">+ 增加数据源</a>
@@ -24,11 +22,7 @@
         <div class="grid-content database_right">
           <div class="top fix">
             <a href="javascript:;" class="database_add" @click="onAddSourceClick">添加数据源</a>
-
           </div>
-          <!-- <div v-if="pageType == 'index'"> -->
-            <!-- 在左侧列表选择对应数据源进行操作或 -->
-          <!-- </div> -->
         </div>
       </el-col>
     </el-row>
@@ -37,12 +31,8 @@
   </div>
 </template>
 <script>
-// import chartUI from '../../assets/js/chartUI';
-import vars from "../../assets/js/vars";
-import axios from "axios";
-import dataSourceDialog from "../../components/dataSource/dataSourceDialog.vue";
-
-// import IEcharts from 'vue-echarts-v3/src/full.vue';
+import { getJson } from '../../router/utils';
+import dataSourceDialog from '../../components/dataSource/dataSourceDialog.vue';
 export default {
   components: {
     dataSourceDialog
@@ -54,81 +44,54 @@ export default {
   data() {
     return {
       //是否可保存
-      //        canSave:false,
-      pageName: "数据源添加",
+      pageName: '数据源添加',
       // 数据源列表
       list: [],
-      pageType: "index",
+      pageType: 'index',
       dialogFormVisible: false,
-      form: {
-        //            name: 'test',
-        //            host: '192.168.50.200',
-        //            port: '1655',
-        //            database: 'ERP_LOCAL_TEST',
-        //            user: 'msiJava',
-        //            password: 'msiJava',
-        //            id: '',
-        //            dbType: 'SQLServer'
-      },
-      formLabelWidth: "120px",
+      form: {},
+      formLabelWidth: '120px',
       hoverIndex:null
     };
   },
   methods: {
     updateList() {
       let that = this;
-      axios({
-        url: "/datasource/list.do",
-        baseURL: vars.api,
-        params: {}
-      })
-        .then(function(res) {
-          var resData = res.data;
-          if (resData.success) {
-            console.log(resData.data);
-            that.list = resData.data;
-          }
-        })
-        .catch(function(res) {
-          console.error(res);
-        });
+      getJson('/datasource/list.do',{},function(res){
+        if (res.success) {
+          that.list = res.data;
+        }
+      });
     },
+    // 添加数据源
     onAddSourceClick() {
-      this.$router.push("/database/add");
+      this.$router.push('/database/add');
     },
     onCreateSourceClick(id) {
       // TODO: 链接不对
       // this.$router.push("/database/creatView/" + id);
     },
+    // 编辑数据源
     onEditClick(paramId) {
       let that = this;
-      axios({
-        method: "post",
-        url: "/datasource/info.do",
-        baseURL: vars.api,
-        params: {
-          datasource: paramId
+      getJson('/datasource/info.do',{
+        datasource: paramId
+      },function(res){
+        if (res.success) {
+          that.form = res.data;
+          that.dialogFormVisible = true;
         }
-      })
-        .then(function(res) {
-          var resData = res.data;
-          if (resData.success) {
-            //            console.log(resData.data);
-            that.form = resData.data;
-            that.dialogFormVisible = true;
-          }
-        })
-        .catch(function(res) {
-          console.error(res);
-        });
+      });
     },
     //显示隐藏dataSourceDialog组件
     changeFatherDialogFormVisible(value) {
       this.dialogFormVisible = value;
     },
+    // 鼠标事件 hover
     mouseenter(index){
       this.hoverIndex = index;
     },
+    // 鼠标事件 hover
     mouseleave(){
       this.hoverIndex = null;
     }

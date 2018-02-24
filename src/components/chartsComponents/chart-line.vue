@@ -1,56 +1,30 @@
 <template>
-<el-collapse @change="handleChange" id="chartsComponents">
+<el-collapse v-model="activeNames" id="chartsComponents">
+  <form action onsubmit="return false">
   <el-collapse-item title="折线图" name="1">
     <div class="comp_group fix">
       <div v-for="(item,index) in seriesOption.option.series" :key="index" class="colums_list">
-          {{item.name}}
-          <el-color-picker class="color_picker" v-model="item.itemStyle.normal.color"></el-color-picker>    
+        {{item.name}}
+        <colorPicker class="color_picker" :color.sync="item.itemStyle.normal.color" ></colorPicker>
       </div>
     </div>
-    <!-- <div class="comp_group fix">
-      <el-switch
-        v-model="smooth"
-        active-color="#5182E4"
-        @change="smoothChange"
-        inactive-color="#cccccc">
-      </el-switch> 平滑曲线
-    </div> -->
-    
-    
+    <div class="comp_group fix">
+      <el-switch v-model="smooth" active-color="#5182E4" @change="smoothChange" inactive-color="#cccccc"></el-switch> 平滑曲线
+    </div>
   </el-collapse-item>
-  
+</form>  
 </el-collapse>
 </template>
 
 <script>
-import axios from "axios";
-import seriesDefault from "../../vendor/seriesLine.json";
-import "../../vendor/seriesLine.js";
-import Vue from "vue";
+import Vue from 'vue';
+
+import seriesDefault from '../../vendor/seriesLine.json';
+import '../../vendor/jsVendor/seriesLine.js';
+
+import colorPicker from '../chartEditor/propSelect/colorPicker.vue';
 
 export default {
-  beforeMount() {
-    // 挂载前
-  },
-  mounted() {
-    let that = this;
-    // (() => Object.assign(that.seriesOption.option, that.option))();
-    (() => Object.assign(that.chartData, that.data))();
-    if ("undefined" == typeof that.seriesOption.option.series) {
-      that.seriesOption.option.series = [];
-    }
-    for (let i = 0; i < that.seriesOption.option.series.length; i++) {
-      let copy = JSON.parse(JSON.stringify(seriesDefault));
-      that.seriesOption.option.series[i] = Object.assign(
-        {},
-        copy,
-        that.seriesOption.option.series[i]
-      );
-    }
-  },
-  created() {
-    this.dataChange();
-  },
   data() {
     return {
       // 返回父级的数据，包括series和xAxis与yAxis的data部分
@@ -61,26 +35,43 @@ export default {
       },
       // 数据
       chartData: {},
-      activeNames: [], // 展开的组
-      type: "line",
-      smooth:false // TODO: 取值
+      // 默认配置项展开
+      activeNames: ['1'],
+      // 图表类型
+      type: 'line',
+      pageName: '折线图',
+      // 是否平滑曲线
+      smooth: false,
+      // 第一次进入页面
+      firstFlag: true
     };
   },
-  props: ["option", "data"],
-  computed: {
-    // 计算
-  },
-  methods: {
-    // TODO 数据操作
-    handleChange() {
-      // this.$emit("getSeries", this.seriesOption.option);
-    },
-    smoothChange(data) {
-      for(let i=0;i<this.seriesOption.option.series.length;i++){
-        this.seriesOption.option.series[i].smooth = data
+  mounted() {
+    let that = this;
+    (() => Object.assign(that.chartData, that.data))();
+    if (that.option.series) {
+      if (that.option.series[0] && that.option.series[0].smooth) {
+        that.smooth = that.option.series[0].smooth;
       }
-      this.seriesOption.option = Object.assign({},this.seriesOption.option);
+    }
+  },
+  created() {
+    this.dataChange();
+  },
+  components: {
+    colorPicker
+  },
+  props: ['option', 'data'],
+  methods: {
+    // 平滑曲线
+    smoothChange(data) {
+      for (let i = 0; i < this.seriesOption.option.series.length; i++) {
+        this.seriesOption.option.series[i].smooth = data;
+      }
+      this.seriesOption.option = Object.assign({}, this.seriesOption.option);
+      this.$emit('getSeries', this.seriesOption.option);
     },
+    // 数据处理
     dataChange() {
       let that = this;
       let newData = {};
@@ -122,21 +113,40 @@ export default {
           arr.push(rows[j][queryNameKeyX[i]]);
         }
         newData.xAxis.data = arr;
-        // that.seriesOption.option.xAxis.data = arr;
       }
       // series.data的数据
-      newData.series = seriesLine(rows, queryNameKeyY, seriesDefault);
+      if (that.firstFlag) {
+        // 第一次进入页面        
+        newData.series = seriesLine(
+          columns,
+          rows,
+          queryNameKeyX,
+          queryNameKeyY,
+          seriesDefault,
+          that.option.series,
+          true
+        );
+      } else {
+        newData.series = seriesLine(
+          columns,
+          rows,
+          queryNameKeyX,
+          queryNameKeyY,
+          seriesDefault
+        );
+      }
 
-      // that.$set(this.seriesOption, "option", newData);
-      Vue.set(this.seriesOption.option, "xAxis", newData.xAxis);
-      Vue.set(this.seriesOption.option, "series", newData.series);
-      that.$emit("getSeries", that.seriesOption.option);
+      that.firstFlag = false;
+      Vue.set(this.seriesOption.option, 'grid', seriesDefault.grid);
+      Vue.set(this.seriesOption.option, 'xAxis', newData.xAxis);
+      Vue.set(this.seriesOption.option, 'series', newData.series);
+      that.$emit('getSeries', that.seriesOption.option);
     }
   },
   watch: {
     seriesOption: {
       handler: function(newVal, oldVal) {
-        this.$emit("getSeries", this.seriesOption.option);
+        this.$emit('getSeries', this.seriesOption.option);
       },
       deep: true
     },

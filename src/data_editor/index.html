@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-cn">
-
+`
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,31 +19,44 @@
 </head>
 
 <body class="data_editor">
-    <div class="data_editor_header fix">
-        <div class="l head_input_container">
-            <span class="red">*</span>视图名
-            <input class="head_input" type="text" value="V_SERV_DISPATCH">
-        </div>
-        <div class="l head_input_container">
-            <span class="red">*</span>视图显示名
-            <input class="head_input" type="text" value="服务派工信息">
-        </div>
-        <a href="javascript:;" class="block r close_container">
-          <i class="icon_btn_close"></i>
-          关闭
-        </a>
-        <a id="saveView" href="javascript:;" class="block r save_container">
-          <i class="icon_btn_save"></i>
-          保存
-        </a>
-        <!-- <a id="saveView" href="javascript:;">保存视图关系</a> -->
-    </div>
+    <!-- <div class="data_editor_header fix">
+        
+        
+
+    </div> -->
     <div class="editor_left">
         <aside>
+            <div class="fix massage_btn">
+                <!-- <a href="javascript:;" class="block l close_container">
+                    <i class="icon_btn_close"></i>
+                    关闭
+                </a> -->
+                <a id="saveView" href="javascript:;" class="block l save_container">
+                    <i class="icon_btn_save"></i>
+                    <!-- <i class="el-icon-circle-check-outline"></i> -->
+                    保存
+                </a>
+                <a id="advView" href="javascript:;" class="block r adv_container">
+                    <i class="icon_btn_adv"></i>
+                    <!-- <i class="el-icon-circle-check-outline"></i> -->
+                    预览
+                </a>
+            </div>
+            
+            <div class="head_input_container">
+                <span class="red">*</span>视图名
+                <form action onsubmit="return false">
+                    <input class="head_input" type="text" id="viewName">
+                </form>
+            </div>
+            <!-- <div class="head_input_container">
+                <span class="red">*</span>视图显示名
+                <input class="head_input" type="text" value="服务派工信息">
+            </div> -->
             <div class="fix editor_left_title">
                 视图模型
-                <a href="javascript:;" class="r icon_btn modify_icon block"></a>
-                <a href="javascript:;" class="r icon_btn scale_icon block"></a>
+                <!-- <a href="javascript:;" class="r icon_btn modify_icon block"></a>
+                <a href="javascript:;" class="r icon_btn scale_icon block"></a> -->
                 <a href="javascript:;" class="r icon_btn refresh_icon block"></a>
                 <a href="javascript:;" class="r icon_btn add_icon block"></a>
             </div>
@@ -53,15 +66,18 @@
                 <%if(tableList){%>
                     <%for(i = 0; i < tableList.length; i++){%>
                         <li>
-                            <a class="full" data-table="<%=stringify(tableList[i])%>" href="javascript:;">
-                                <%if(tableList[i].remark){%>
-                                    <%=tableList[i].remark%>*
-                                <%}else{%>    
-                                    <%=tableList[i].name%>*
-                                <%}%>    
+                            <a class="full" href="javascript:;">
+                                <span class="tableList_text">
+                                    <%if(tableList[i].text){%>
+                                        <%=tableList[i].text%>*
+                                    <%}else{%>    
+                                        <%=tableList[i].name%>*
+                                    <%}%> 
+                                </span>   
                                 <br>
                                 <%=tableList[i].name%>
-                                <i href="javascript:;" class="r icon_btn add_icon  hide"></i>
+                                <i class="r icon_btn modify_icon hide" data-table="<%=stringify(tableList[i])%>"></i>
+                                <i class="r icon_btn add_icon  hide" data-table="<%=stringify(tableList[i])%>"></i>
                             </a>
                             
                         </li>
@@ -97,7 +113,7 @@
                 编辑连接
             </div>
             <!-- .addItem 关联js -->
-            <a href="javascript:;" class="addItem">add</a>
+            <a href="javascript:;" class="addItem">添加关联关系</a>
             <!-- .list 关联js -->
             <div class="list"></div>
             <!-- #viewRefRelListTpl 关联js -->
@@ -105,7 +121,7 @@
                 <%if(viewRefRel.columns){%>
                   <%for(i = 0;i < viewRefRel.columns.length; i++){%>
                     <%column=viewRefRel.columns[i]%>
-                    <li>
+                    <li data-idx="<%=i%>">
                       <select name="left">
                         <option value="">请选择</option>
                           
@@ -129,6 +145,7 @@
                             <%}%>
                           <%}%>
                       </select>
+                      <span class="refDel">删除</span>
                     </li>
                   <%}%>
                 <%}%>
@@ -144,27 +161,123 @@
     <!-- 编辑表格数据 -->
     <div class="dialog hide" id="viewRefEditor">
         <div class="dialog_content">
-            <a href="javascript:;" class="block r dialog_close cancal">
-              </a>
-            <!-- .title 关联js -->
-            <div class="title">编辑视图</div>
-            <input type="hidden" name="" id="viewRefViewAlias">
-            <ul id="t-viewRef">
-            </ul>
-            <script id="viewRefTpl" type="text/html">
-                <%if(list){%>
-                    <%for(i = 0;i < list.length; i++){%>
-                        <li data-alias="<%=list[i].alias||''%>" data-name="<%=list[i].name%>">
-                            <input type="checkbox" name="" <%=list[i].alias? 'checked': ''%> id="">
-                            <%=list[i].name%>
-                        </li>
+            <form onsubmit="return false">
+                <a href="javascript:;" class="block r dialog_close cancal"></a>
+                <!-- .title 关联js -->
+                <div class="title">编辑视图</div>
+                <input type="hidden" name="" id="viewRefViewAlias">
+                <div class="fix">
+                    <div class="l left">
+                        <ul id="t-viewRef">
+                        </ul>
+                    </div>
+                    <div class="l right hide">
+                        <div class="use">
+                            <input type="checkbox" class="checkUse">是否使用   
+                            <input type="text" class="text" placeholder="请填写备注名称">                   
+                        </div>
+                        <div class="filters" data-filters="">
+                            <input type="checkbox" class="checkFilters">是否筛选<div class="help">*在数据视图中提前过滤数据可以有效增加最终图表准确度</div>
+                            <div class="filters_inner">
+                                <select name="" id="">
+                                    <option value="eq">等于</option>
+                                    <option value="ne">不等于</option>
+                                    <option value="lt">小于</option>
+                                    <option value="le">小于等于</option>
+                                    <option value="gt">大于</option>
+                                    <option value="between">区间</option>
+                                    <option value="in">包含</option>
+                                    <option value="like">相似</option>
+
+                                </select>
+                                <div class="values">
+                                    <input type="text" class="min" placeholder="请输入数值">
+                                    <span class="between hide">－<input type="text" class="max" placeholder="最大值"></span>
+                                </div>
+                                <div class="in hide">
+                                    <!-- <div class="tip">
+                                        1
+                                        <span>x</span>
+                                    </div>
+                                    <div class="tip">
+                                        2
+                                        <span>x</span>
+                                    </div> -->
+                                    <div class="in_inner">
+                                        <div class="in_ipt"><input type="text" class="add" placeholder="请输入数值"></div>
+                                        <div class="in_add">添加</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="orders" data-orders="">
+                            <input type="checkbox" class="checkOrders">是否排序
+                            <div class="orders_inner">
+                                <input type="radio" value="asc" checked name="order" class="asc" id="asc"><label for="asc">正序</label>
+                                <input type="radio" value="desc" name="order" class="dese" id="dese"><label for="dese">倒序</label>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+                <script id="viewRefTpl" type="text/html">
+                    <%if(list){%>
+                        <%for(i = 0;i < list.length; i++){%>
+                            <li data-alias="<%=list[i].alias||''%>" data-name="<%=list[i].name%>" data-list="<%=stringify(list[i])%>">
+                                <input type="checkbox" class="check" name="" <%=list[i].alias? 'checked': ''%>>
+                                <span class="name"><%=list[i].name%></span>
+                            </li>
                         <%}%>
-                            <%}%>
-            </script>
+                    <%}%>
+                </script>
+                <div class="dialog-button">
+                    <a class="confirm" href="javascript:;">确定</a>
+                    <a class="delete" href="javascript:;">删除</a>
+                    <a class="cancal" href="javascript:;">取消</a>
+                </div>
+        </form>
+        </div>
+    </div>
+    <!-- 编辑数据表别名 -->
+    <div class="dialog hide" id="viewNameLog">
+        <div class="dialog_content">
+            <a href="javascript:;" class="block r dialog_close cancal"></a>
+            <div class="title">编辑数据表别名</div>
+            <form onsubmit="return false">
+                <input type="text" id="viewNameIpt" placeholder="请输入备注名">
+            </form>
             <div class="dialog-button">
                 <a class="confirm" href="javascript:;">确定</a>
-                <a class="delete" href="javascript:;">删除</a>
                 <a class="cancal" href="javascript:;">取消</a>
+            </div>
+        </div>
+    </div>
+    <!-- 预览功能 -->
+    <div class="dialog hide" id="advViewShow">
+        <div class="dialog_content">
+            <a href="javascript:;" class="block r dialog_close cancal"></a>
+            <div class="title">预览数据</div>
+            <script type="text/html" id="tableViewTpl">
+                <table border="1">
+                    <thead>
+                        <tr>
+                            <%for(i=0;i<xData.columns.length;i++){%>
+                                <td><%=xData.columns[i].source.text%></td>
+                            <%}%>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <%for(var j=0;j<xData.rows.length;j++){%>
+                            <tr>
+                                <%for(var k in xData.rows[j]){%>
+                                    <td><%=xData.rows[j][k]%></td>
+                                <%}%>
+                            </tr>
+                        <%}%>
+                    </tbody>
+                </table>
+            </script>
+            <div id="tableView">
+
             </div>
         </div>
     </div>
@@ -234,10 +347,15 @@
 
             }
         });
+
+
+    
+
     }
 
     function addTableToGraph(sourceId, table) {
         var refTables = [];
+        table=JSON.parse(table);
         for (var i = 0; i < vb._view.tables.length; i++) {
             refTables.push(vb._view.tables[i].name);
         }
@@ -427,7 +545,9 @@
             vb.viewRefRelationEditor.cancelEdit();
         }).on('click', '.addItem', function() {
             vb.viewRefRelationEditor.addItem();
-        });
+        }).on('click','.refDel',function(){
+            $(this).closest('li').remove();
+        })
         // 视图弹窗
         $('#viewRefEditor').on('click', '.confirm', function() {
             vb.viewRefEditor.confirmEdit();
@@ -435,25 +555,298 @@
             vb.viewRefEditor.remove();
         }).on('click', '.cancal', function() {
             vb.viewRefEditor.cancelEdit();
+        }).on('click','#t-viewRef .check',function(){
+            var checked=$(this)[0].check;
+            var idx=$(this).closest('li').index();
+            // vb.viewRefEditor.onClickCheck(checked,idx);
+        }).on('change','.filters_inner select',function(){
+            if( $('#viewRefEditor').find('.checkFilters')[0].checked){
+                if($(this)[0].value=='between'){
+                    $('.filters_inner .values .min').attr('placeholder','最小值');
+                    $('.filters_inner .between').show();
+                }else{
+                    $('.filters_inner .values .min').attr('placeholder','请输入数值');
+                    $('.filters_inner .between').hide();
+                }
+                if($(this)[0].value=='in'){
+                    $('.filters_inner .values').hide();
+                    $('.filters_inner .in').show();
+                }else{
+                    $('.filters_inner .values').show();
+                    $('.filters_inner .in').hide();
+                }
+                vb._filters[$('#viewRefEditor').find('.filters').attr('data-filters')]['op']=$(this)[0].value;
+            }
         });
         // 数据表添加进视图
-        $('#tableList').on('click', 'a', function() {
-            addTableToGraph(page.url.get('sourceId'), $(this).data('table'));
+        $('#tableList').on('click', '.add_icon', function() {
+            addTableToGraph(page.url.get('sourceId'), $(this).attr('data-table')); 
         });
-        // 保存
+        // 编辑数据表别名
+        $('#tableList').on('click', '.modify_icon', function() {
+            $('#viewNameLog').show();
+            $('#viewNameIpt').attr({
+                'data-data':JSON.stringify($(this).attr('data-table')),
+                'data-idx':$(this).closest('li').index()
+            }).val($(this).attr('data-table')['text']);
+        });
+
+        $('#viewNameLog').on('click', '.confirm',function(){
+            var data=$('#viewNameIpt').attr('data-data');
+            var idx=$('#viewNameIpt').attr('data-idx');
+            data['text']=$.trim($('#viewNameIpt').val());
+            $('#tableList').find('li').eq(idx).find('.tableList_text').text(data['text']).find('.modify_icon,.add_icon').attr('data-table',JSON.stringify(data));
+            $('#viewNameLog').hide();
+        }).on('click', '.cancal,.dialog_close',function(){
+            $('#viewNameLog').hide();
+        })
+        // 视图模型刷新
+        $('.refresh_icon').on('click',function(){
+            loadDatatables();
+        });
+        // 保存保存
         $('#saveView').on('click', function() {
+            if($.trim($('#viewName').val())==''){
+                alert('请填写视图名称');
+                return false
+            }
+            var data={
+                id:getUrl(location.href,'view'),
+                name:$.trim($('#viewName').val()),
+                datasourceId:page.url.get('sourceId'),
+                structure:vb._view,
+                layout:vb._layout
+            };
             $.ajax({
-                url: '',
+                url: 'http://119.180.98.134:8880/dataviz/api/dataview/design/save.do',
                 method: 'get',
                 dataType: 'json',
+                data:{
+                    folder:'',
+                    config:JSON.stringify(data)
+                },
                 success: function(res) {
-
+                    // 替换url
+                    if(!getUrl(location.href,'view')){
+                        var url=page.url.url+'&view='+res.data.id;
+                        var title=document.title;
+                        history.replaceState(null, title, url);
+                    }
                 },
                 error: function(err) {
 
                 }
             });
         });
+        // 弹窗里的事件
+        $('#viewRefEditor').find('.right').on('keyup','.text',function(){
+            var idx=$('#viewRefEditor').find('.right').attr('data-idx');
+            var data=JSON.parse($('#t-viewRef').find('li').eq(idx).attr('data-list'));
+            data['text']=$.trim($(this).val());
+            $('#t-viewRef').find('li').eq(idx).attr('data-list',JSON.stringify(data));
+        });
+        $('#viewRefEditor').find('.checkUse').on('click',function(){
+            var idx=$('#viewRefEditor').find('.right').attr('data-idx');
+            $('#t-viewRef').find('li').eq(idx).find('.check').prop('checked',$(this)[0].checked);
+        })
+        $('body').on('click','#viewRefEditor .check',function(){
+            var idx=$(this).closest('li').index();
+            if(idx==$('#viewRefEditor').find('.right').attr('data-idx')){
+                $('#viewRefEditor').find('.checkUse').prop('checked',$(this)[0].checked);
+            }
+        })
+        $('body').on('click','#t-viewRef li',function(){
+            $('#viewRefEditor').find('.right').show();
+            $('#viewRefEditor').find('.right').attr('data-idx',$(this).index());
+            var data=JSON.parse($(this).attr('data-list'));
+            $('#viewRefEditor').find('.checkUse').prop('checked',$(this).find('.check')[0].checked);
+            $('#viewRefEditor').find('.right .text').val(data.text);
+            var aliasTable=$('#viewRefViewAlias').val();
+            // 筛选
+            for(var i=0;i<vb._filters.length;i++){
+                if(vb._filters[i]['table']==aliasTable && vb._filters[i]['column']==data.alias){
+                    $('#viewRefEditor').find('.checkFilters').prop('checked',true);
+                    $('#viewRefEditor').find('.filters_inner').addClass('on');
+                    $('#viewRefEditor').find('.filters_inner').find('select').val(vb._filters[i]['op'].toLowerCase());
+                    if(vb._filters[i]['op'].toLowerCase()=='in'){
+                        $('.filters_inner .in .tip').remove();
+                        $('.filters_inner .values').hide();
+                        $('.filters_inner .in').show();
+                        for(var j=0;j<vb._filters[i]['values'].length;j++){
+                            $('.filters_inner .in').append('<div class="tip">'+vb._filters[i]['values'][j]+'<span>x</span></div>')
+                        }
+                    }else if(vb._filters[i]['op'].toLowerCase()=='between'){
+                        if(vb._filters[i]['values']){
+                            $('#viewRefEditor').find('.min').val(vb._filters[i]['values'][0]);                        
+                            $('#viewRefEditor').find('.max').val(vb._filters[i]['values'][1]);   
+                        }
+                    }else{
+                        if(vb._filters[i]['values']){
+                            $('#viewRefEditor').find('.min').val(vb._filters[i]['values'][0]);                        
+                        }
+                    }
+                    $('#viewRefEditor').find('.filters').attr('data-filters',i);
+                    break
+                }else{
+                    $('#viewRefEditor').find('.checkFilters').prop('checked',false);
+                    $('#viewRefEditor').find('.filters_inner').removeClass('on');
+                    $('.filters_inner .values').show();
+                    $('.filters_inner .in').hide();
+                    $('#viewRefEditor').find('.filters').attr('data-filters','');
+                }
+            }
+            // 排序
+            for(var k=0;k<vb._orders.length;k++){
+                if(vb._orders[k]['table']==aliasTable && vb._orders[k]['column']==data.alias){
+                    $('#viewRefEditor').find('.checkOrders').prop('checked',true);
+                    $('#viewRefEditor').find('.orders_inner').addClass('on');
+                    if(vb._orders[k]['order'].toLowerCase()=='asc'){
+                        $('#asc').prop('checked',true)
+                    }
+                    if(vb._orders[k]['order'].toLowerCase()=='desc'){
+                        $('#dese').prop('checked',true)
+                    }
+                    $('#viewRefEditor').find('.orders').attr('data-orders',k);
+                    break;
+                }else{
+                    $('#viewRefEditor').find('.checkOrders').prop('checked',false);
+                    $('#viewRefEditor').find('.orders_inner').removeClass('on');
+                    $('#viewRefEditor').find('.orders').attr('data-orders','');
+                    $('#asc').prop('checked',true)
+                }
+            }
+            $('#t-viewRef li').removeClass('on');
+            $(this).addClass('on')
+        })
+        // in删除
+        $('body').on('click','#viewRefEditor .in .tip span',function(){
+            if($('#viewRefEditor').find('.checkUse')[0].checked){
+                if( $('#viewRefEditor').find('.checkFilters')[0].checked){
+                    var idx=$(this).closest('.tip').index();
+                    vb._filters[$('#viewRefEditor').find('.filters').attr('data-filters')]['values'].splice(idx,1);
+                    $(this).closest('.tip').remove();  
+                }
+            }
+        })
+        // in添加
+        $('body').on('click','#viewRefEditor .in_inner .in_add',function(){
+            if($('#viewRefEditor').find('.checkUse')[0].checked){
+                if( $('#viewRefEditor').find('.checkFilters')[0].checked){
+                    if($.trim($('#viewRefEditor .in_inner .add').val())!=''){
+                        $('.filters_inner .in').append('<div class="tip">'+$.trim($('#viewRefEditor .in_inner .add').val())+'<span>x</span></div>')
+                    } 
+                    vb._filters[$('#viewRefEditor').find('.filters').attr('data-filters')]['values'].push(parseFloat($.trim($('#viewRefEditor .in_inner .add').val())));
+                }
+            }
+        })
+        // 区间取值
+        $('body').on('keyup','#viewRefEditor .values .min',function(){
+            if(isNaN($.trim($(this).val()))){
+                vb._filters[$('#viewRefEditor').find('.filters').attr('data-filters')]['values'][0]=$.trim($(this).val())
+            }else{
+                vb._filters[$('#viewRefEditor').find('.filters').attr('data-filters')]['values'][0]=parseFloat($.trim($(this).val()))                
+            }
+        })
+        $('body').on('keyup','#viewRefEditor .values .max',function(){
+            vb._filters[$('#viewRefEditor').find('.filters').attr('data-filters')]['values'][1]=parseFloat($.trim($(this).val()))
+        })
+
+        // 是否筛选选中
+        $('#viewRefEditor').find('.right .checkFilters').on('change',function(){
+            if($('#viewRefEditor').find('.checkUse')[0].checked){
+                var data=JSON.parse($('#t-viewRef').find('li').eq($(this).closest('.right').attr('data-idx')).attr('data-list'));
+                if($(this)[0].checked){
+                    if($('#viewRefEditor').find('.filters').attr('data-filters')===undefined || $('#viewRefEditor').find('.filters').attr('data-filters')==''){
+                        var filters={};
+                        filters['column']=data.alias?data.alias:$('#viewRefViewAlias').attr('data-name')+'_'+data.name;
+                        filters['conj']='and';
+                        filters['values']=[];
+                        filters['op']=$('.filters_inner select')[0].value;
+                        filters['table']=$('#viewRefViewAlias').val();
+                        vb._filters.push(filters)
+                        $('#viewRefEditor').find('.filters').attr('data-filters',vb._filters.length-1);
+                        data['alias']=filters['column'];
+                        $('#t-viewRef').find('li').eq($(this).closest('.right').attr('data-idx')).attr('data-list',JSON.stringify(data))
+                    }
+                    $('#viewRefEditor').find('.filters_inner').addClass('on');
+                }else{
+                    if($('#viewRefEditor').find('.filters').attr('data-filters')!=''){
+                        vb._filters.splice($('#viewRefEditor').find('.filters').attr('data-filters'),1);
+                        $('#viewRefEditor').find('.filters').attr('data-filters','');
+                    }
+                    $('#viewRefEditor').find('.filters_inner').removeClass('on');
+                }
+            }
+        })
+
+        // 排序
+        $('#viewRefEditor').find('.right .checkOrders').on('change',function(){
+            if($('#viewRefEditor').find('.checkUse')[0].checked){
+                var data=JSON.parse($('#t-viewRef').find('li').eq($(this).closest('.right').attr('data-idx')).attr('data-list'));
+                if($(this)[0].checked){
+                    if($('#viewRefEditor').find('.orders').attr('data-orders')===undefined || $('#viewRefEditor').find('.orders').attr('data-orders')==''){
+                        var orders={};
+                        orders['column']=data.alias?data.alias:$('#viewRefViewAlias').attr('data-name')+'_'+data.name;
+                        orders['order']=$('[name="order"]:checked').val();
+                        orders['table']=$('#viewRefViewAlias').val();
+                        vb._orders.push(orders)
+                        $('#viewRefEditor').find('.orders').attr('data-orders',vb._orders.length-1);
+                        data['alias']=orders['column'];
+                        $('#t-viewRef').find('li').eq($(this).closest('.right').attr('data-idx')).attr('data-list',JSON.stringify(data))
+                    }
+                    $('#viewRefEditor').find('.orders_inner').addClass('on');
+                }else{
+                    if($('#viewRefEditor').find('.orders').attr('data-orders')!=''){
+                        vb._orders.splice($('#viewRefEditor').find('.orders').attr('data-orders'),1);
+                        $('#viewRefEditor').find('.orders').attr('data-orders','');
+                    }
+                    $('#viewRefEditor').find('.orders_inner').removeClass('on');
+                }
+            }
+        })
+        // 正序倒序选择
+        $('[name="order"]').on('change',function(){
+            vb._orders[$('#viewRefEditor').find('.orders').attr('data-orders')]['order']=$(this).val();
+        })
+        $('#advViewShow').on('click','.dialog_close',function(){
+            $('#advViewShow').hide();
+        })
+        $('#advView').on('click',function(){
+            $('#tableView').html('')
+            $('#advViewShow').show();
+            $.ajax({
+            type: 'POST',
+            url: 'http://119.180.98.134:8880/dataviz/api/preview.do',
+            data: {
+                // datasource: 'mysql2',
+                // view: '{"tables":[{"name":"bd_job","alias":"t_1","columns":[{"name":"job_id","text":"任务ID","type":"Number","alias":"t_1_c_1"},{"name":"job_name","text":"任务名称","type":"String","alias":"t_1_c_2"},{"name":"job_def","type":"String"},{"name":"job_params","type":"String"},{"name":"job_group_name","text":"任务分组","type":"String","alias":"t_1_c_3"},{"name":"scheduled_time","text":"计划时间","type":"Date","alias":"t_1_c_4"},{"name":"job_priority","text":"优先级","type":"Number","alias":"t_1_c_5"},{"name":"job_status","text":"状态","type":"Number","alias":"t_1_c_6"},{"name":"retry_count","type":"Number"},{"name":"last_run_time","type":"Date"}]},{"name":"bd_job_log","alias":"t_2","columns":[{"name":"log_id","text":"日志ID","type":"Number","alias":"t_2_c_1"},{"name":"job_id","type":"Number"},{"name":"run_time","text":"上次运行","type":"Date","alias":"t_2_c_2"},{"name":"run_elapsed_ms","text":"运行耗时","type":"Number","alias":"t_2_c_3"},{"name":"run_status","text":"运行状态","type":"Number","alias":"t_2_c_4"},{"name":"run_out_file","type":"String"}]}],"joins":[{"left":"t_1","right":"t_2","type":"INNER","columns":[{"left":"job_id","right":"job_id","op":"="}]}],"filters":[{"conj":"AND","table":"t_1","column":"t_1_c_3","op":"LIKE","values":["注册登录"]},{"conj":"AND","table":"t_2","column":"t_2_c_4","op":"IN","values":[1,2]}],"orders":[{"table":"t_2","column":"t_2_c_3","order":"DESC"},{"table":"t_2","column":"t_2_c_4","order":"ASC"}]}'
+                datasource: page.url.get('sourceId'),
+                view: JSON.stringify(vb._view)
+            },
+            dataType: 'json',
+            success: function(res) {
+                console.log(res)
+                var data={
+                    xData:res.data.data
+                }
+                renderTmp('#tableView', 'tableViewTpl', data);
+                
+            },
+            error:function(data){
+                console.log(data);
+            }
+        });
+      });
+
+
+
+
+
+
+
+
+
+
     }
     $(function() {
         loadDatatables();

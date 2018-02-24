@@ -1,12 +1,14 @@
 const resolve = require('path').resolve;
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+
 const url = require('url');
 const publicPath = '';
 
 module.exports = (options = {}) => ({
   entry: {
-    vendor: './src/vendor',
+    // vendor: './src/vendor',
     index: './src/main.js'
   },
   output: {
@@ -41,6 +43,10 @@ module.exports = (options = {}) => ({
           limit: 10000
         }
       }]
+    },
+    {
+      test: /\.html$/,
+      use: ['html-loader']
     }
     ]
   },
@@ -50,7 +56,21 @@ module.exports = (options = {}) => ({
     }),
     new HtmlWebpackPlugin({
       template: 'src/index.html'
-    })
+    }),
+    new CopyWebpackPlugin([{
+      from: 'src/assets',
+      to:'assets'
+    },
+    {
+      from: 'src/viewer',
+      to:'viewer'
+    },{
+      from: 'src/data_editor',
+      to:'data_editor'
+    },{
+      from: 'src/vendor',
+      to:'vendor'
+    }])
   ],
   resolve: {
     alias: {

@@ -1,6 +1,6 @@
 var id = typeof page.url.get('id') == 'string' ? page.url.get('id') : '';
 if (!id.length) {
-  alert('缺少ID！')
+  alert('缺少ID！');
 }
 
 // 预留lesson
@@ -17,79 +17,145 @@ var dash, dashOptions = {
 };
 
 getChartList(id);
-// TODO: 根据仪表盘id取charts列表,生成dom结构，实例栅格
+
 function getChartList(chartId) {
-  $.ajax({
-    type: "post",
-    url: "http://192.168.50.200:8880/dataviz/api/dashboard/info.do",
-    // async: false, // 设为同步
-    data: {
+  getJson('/dashboard/info.do',{
       dashboard: chartId
-    },
-    dataType: "json",
-    success: function(res) {
+    }, function(res) {
       if (res.success) {
-        $('.top .title').text(res.data.text)
+        $('.top .title').text(res.data.text);
         var data = {
           xData: res.data.layout
-        }
-        renderTmp('#dash', 'gridItem', data)
+        };
+        renderTmp('#dash', 'gridItem', data);
         loadGrid();
+        var chartIdArr = []
         $('.grid-stack-item').each(function() {
           var chartId = $(this).data('id');
+          chartIdArr.push(chartId)
           getChartData(chartId)
         });
 
-      }
-    }
-  });
 
+      }
+    })
 }
 
 // 获取单一图表数据
 function getChartData(chartId) {
   // 查询图表源 数据
-  getJson('http://192.168.50.200:8880/dataviz/api/chart/info.do', {
-    chart: chartId,
+  getJson('/chart/info.do', {
+    chart: chartId
   }, function(res) {
     if (res.data.option) {
-      // 手动清空series里数据
+      //TODO: 手动清空series里数据，后期不存在
       if (res.data.option && res.data.option.series) {
         for (var j = 0; j < res.data.option.series.length; j++) {
           res.data.option.series[j].data = [];
         }
       }
       var queryInfo = JSON.stringify(res.data.query),
-        viewId = res.data.tableName.sql
-
-      $.ajax({
-        type: "post",
-        url: "http://192.168.50.200:8880/dataviz/api/query.do",
-        async: false, // 设为同步
-        data: {
+        viewId = res.data.tableName.sql;
+        getJson('/query.do',{
           view: viewId,
           query: queryInfo
-        },
-        dataType: "json",
-        success: function(data) {
+        }, function(data) {
           if (res.data.type == 'table') {
-            res.data.chartData = dataHandler(data.data, res.data.option.series, res.data.type)
+            res.data.chartData = dataHandler(data.data, res.data.option.series, res.data.type);
+            // 处理表格数据
+            var chartData = res.data.chartData;
+            var rows = chartData.rows;
+            var columns = chartData.columns;
+            // 最多显示500条
+            if (rows.length > 500) {
+              rows.length = 500
+            }
+            var html = '';
+            html += '<table class="chart_table">'
+            html += '<thead>'
+            html += '<tr>'
+            for (var i = 0; i < columns.length; i++) {
+              html += '<td>' + columns[i].source.text + '</td>'
+            }
+            html += '</tr>'
+            html += '</thead>'
+            // 以下为两种处理方式，是否合并相同数值
+            // 合并
+            var num = [];
+            for (var j = 0; j < columns.length; j++) {
+              num[j] = 0
+            }
+
+            function comp(rows1, rows2, index) {
+              // 循环对比
+              var ind = index
+              if (ind > 0) {
+                if (rows1[columns[ind - 1].name] == rows2[columns[ind - 1].name]) {
+                  comp(rows1, rows2, ind - 1)
+                  if (ind - 1 == 0) {
+                    return true
+                  }
+                } else {
+                  return false
+                }
+              }
+            }
+            for (var i = 0; i < rows.length; i++) {
+              html += '<tr>';
+              for (var j = 0; j < columns.length; j++) {
+                if (i < num[j]) {
+                  continue
+                } else {
+                  var rowspan = 1;
+                  if (i + 1 < rows.length) {
+                    for (var k = i + 1; k < rows.length; k++) {
+                      if (rows[i][columns[j].name] == rows[k][columns[j].name]) {
+                        if (j == 0) {
+                          rowspan++;
+                          num[j]++;
+                        } else if (rows[i][columns[j].name] == rows[k][columns[j].name] && comp(rows[i], rows[k], j)) {
+                          rowspan++;
+                          num[j]++;
+                        }
+                      } else {
+                        num[j]++;
+                        break
+                      }
+
+                    }
+                    html += '<td rowspan="' + rowspan + '">' + rows[i][columns[j].name] + '</td>'
+                  } else {
+                    // 最后一个
+                    if (rows[i][columns[j].name] != rows[i - 1][columns[j].name]) {
+                      html += '<td rowspan="' + rowspan + '">' + rows[i][columns[j].name] + '</td>'
+
+                    }
+
+                  }
+                }
+              }
+              html += '</tr>'
+            }
+            // 不合并
+            // for (var j = 0; j < rows.length; j++) {
+            //   html+='<tr>'
+            //   for(var i=0;i<columns.length;i++){
+            //       html+='<td rowspan="">'+rows[j][columns[i].name]+'</td>'
+            //   }
+            //   html+='</tr>'
+            // }
+            $('#chart' + chartId).append(html).addClass('ova')
+
           } else {
-            res.data.option.series = dataHandler(data.data, res.data.option.series, res.data.type)
+            res.data.option.series = dataHandler(data.data, res.data.option.series, res.data.type);
+            res.data.option.title.text = ''
+            var myChart = echarts.init(document.getElementById('chart' + chartId));
+            myChart.setOption(res.data.option);
+            myChart.resize();
           }
-        }
-      })
-      if (res.data.type == 'table') {
-        // 处理数据
-        var chartData = res.data.chartData;
-        renderTmp('#chart' + chartId, 'tableViewTpl', chartData)
-
-      } else {
-        var myChart = echarts.init(document.getElementById('chart' + chartId));
-        myChart.setOption(res.data.option);
-        myChart.resize();
-      }
-
+          $('#chart' + chartId).closest('.grid-stack-item').find('.chart_tit').text(res.data.text)
+          
+        })
     }
 
   })
@@ -104,76 +170,105 @@ function dataHandler(data, series, type) {
   var query = data.query;
   var columns = data.data.columns;
   var rows = data.data.rows;
+  // 获取维度和数值的name
+  var queryNameX = query.categoryColumns.map(x => x.name);
+  var queryNameY = query.valueColumns.map(x => x.name);
+  // 根据name获取对应的key
+  var queryNameKeyX = queryNameX.map(function(x) {
+    for (var i = 0; i < columns.length; i++) {
+      if (columns[i].source.name == x) {
+        return columns[i].name;
+      }
+    }
+  });
+  var queryNameKeyY = queryNameY.map(function(x) {
+    for (var i = 0; i < columns.length; i++) {
+      if (columns[i].source.name == x) {
+        return columns[i].name;
+      }
+    }
+  });
   if (type == 'bar') {
-    var queryNameY = query.valueColumns.map(x => x.name);
-    var queryNameKeyY = queryNameY.map(function(x) {
-      for (var i = 0; i < columns.length; i++) {
-        if (columns[i].source.name == x) {
-          return columns[i].name;
-        }
-      }
-    });
     series = Object.assign(
       [],
-      seriesBar(rows, queryNameKeyY, {}, series)
+      seriesBar(columns, rows, queryNameKeyX, queryNameKeyY, {}, series)
     );
-    return series
+    return series;
   } else if (type == 'line') {
-    var queryNameY = query.valueColumns.map(x => x.name);
-    var queryNameKeyY = queryNameY.map(function(x) {
-      for (var i = 0; i < columns.length; i++) {
-        if (columns[i].source.name == x) {
-          return columns[i].name;
-        }
-      }
-    });
     series = Object.assign(
       [],
-      seriesLine(rows, queryNameKeyY, {}, series)
+      seriesLine(columns, rows, queryNameKeyX, queryNameKeyY, {}, series)
     );
-    return series
+    return series;
   } else if (type == 'pie') {
-    // 获取维度和数值的name
-    let queryNameX = query.categoryColumns.map(x => x.name);
-    let queryNameY = query.valueColumns.map(x => x.name);
-    // 根据name获取对应的key
-    let queryNameKeyX = queryNameX.map(function(x) {
-      for (let i = 0; i < columns.length; i++) {
-        if (columns[i].source.name == x) {
-          return columns[i].name;
-        }
-      }
-    });
-    let queryNameKeyY = queryNameY.map(function(x) {
-      for (let i = 0; i < columns.length; i++) {
-        if (columns[i].source.name == x) {
-          return columns[i].name;
-        }
-      }
-    });
-
     series = Object.assign(
       [],
-      seriesPie(rows, queryNameKeyX, queryNameKeyY, {}, series)
+      seriesPie(columns, rows, queryNameKeyX, queryNameKeyY, {}, series)
     );
-    return series
+    return series;
   } else if (type == 'table') {
-    var chartData = replaceNull(data.data)
-    return chartData
+    var chartData = replaceNull(data.data);
+    return chartData;
+  } else if (type == 'area') {
+    series = Object.assign(
+      [],
+      seriesArea(columns, rows, queryNameKeyX, queryNameKeyY, {}, series)
+    );
+    return series;
+  } else if (type == 'funnel') {
+    series = Object.assign(
+      [],
+      seriesFunnel(columns, rows, queryNameKeyX, queryNameKeyY, {}, series)
+    );
+    return series;
+  } else if (type == 'rosePie') {
+    series = Object.assign(
+      [],
+      seriesRosePie(columns, rows, queryNameKeyX, queryNameKeyY, {}, series)
+    );
+    return series;
+  } else if (type == 'radar') {
+    series = Object.assign(
+      [],
+      seriesRadar(columns, rows, queryNameKeyX, queryNameKeyY, {}, series)
+    );
+    return series;
+  } else if (type == 'treemap') {
+    series = Object.assign(
+      [],
+      seriesTreemap(columns, rows, queryNameKeyX, queryNameKeyY, {}, series)
+    );
+    return series;
+  } else if (type == 'waterfall') {
+    series = Object.assign(
+      [],
+      seriesWaterfall(columns, rows, queryNameKeyX, queryNameKeyY, {}, series)
+    );
+    return series;
+  } else if (type == 'stackbar') {
+    series = Object.assign(
+      [],
+      seriesStackbar(columns, rows, queryNameKeyY, {}, series)
+    );
+    return series;
+  }else if (type == 'gauge') {
+    series = Object.assign(
+      [],
+      seriesGauge(columns, rows, queryNameKeyX, queryNameKeyY, {}, series)
+    );
+    return series;
   }
-
 }
-
 
 // 禁用栅格
 function disable() {
   dash.disable();
-};
+}
 // 启用栅格
 function enable() {
   dash.movable('.grid-stack-item', true);
   dash.resizable('.grid-stack-item', true);
-};
+}
 // 加载拖拽栅格
 function loadGrid() {
   $('#dash').gridstack(dashOptions);
@@ -184,69 +279,57 @@ function loadGrid() {
 // 点击展示单个图表
 var singleChart = echarts.init(document.getElementById('singleChart'));
 
-$('body').on('click', '.grid-stack-item', function() {
+// 双击打开单图表弹窗
+$('body').on('dblclick', '.grid-stack-item', function() {
   $('.chart_box').show();
-  $('body').addClass('ovh')
+  $('body').addClass('ovh');
   var chartId = $(this).attr('data-id');
-  getJson('http://192.168.50.200:8880/dataviz/api/chart/info.do', {
-    chart: chartId,
+  getJson('/chart/info.do', {
+    chart: chartId
   }, function(res) {
     if (res.data.option) {
       var viewId = res.data.tableName.sql,
         queryInfo = JSON.stringify(res.data.query);
-      $.ajax({
-        type: "post",
-        url: "http://192.168.50.200:8880/dataviz/api/query.do",
-        async: false, // 设为同步
-        data: {
+      getJson('/query.do',{
           view: viewId,
           query: queryInfo
-        },
-        dataType: "json",
-        success: function(data) {
-
+        }, function(data) {
           if (res.data.type == 'table') {
-            res.data.chartData = dataHandler(data.data, res.data.option.series, res.data.type)
+            res.data.chartData = dataHandler(data.data, res.data.option.series, res.data.type);
+            $('#singleChart').hide();
+            $('#singleTable').show();
+            singleChart.clear()
+            var chartData = res.data.chartData;
+            $('#singleTable').html('');
+            renderTmp('#singleTable', 'tableViewTpl', chartData)
           } else {
-            res.data.option.series = dataHandler(data.data, res.data.option.series, res.data.type)
+            res.data.option.series = dataHandler(data.data, res.data.option.series, res.data.type);
+            $('#singleChart').show();
+            $('#singleTable').hide();
+            singleChart.clear()
+            singleChart.setOption(res.data.option);
+            singleChart.resize();
           }
-        }
-      });
-      if (res.data.type == 'table') {
-        $('#singleChart').hide();
-        $('#singleTable').show();
-        singleChart.clear()
-        var chartData = res.data.chartData;
-        $('#singleTable').html('');
-        renderTmp('#singleTable', 'tableViewTpl', chartData)
-      } else {
-        $('#singleChart').show();
-        $('#singleTable').hide();
-        singleChart.clear()
-        singleChart.setOption(res.data.option);
-        singleChart.resize();
-      }
-
-
+        })
     }
-
   })
-
 });
 
+// 关闭单图表弹窗
 $('body').on('click', '.close', function() {
   $('.chart_box').hide();
-  $('body').removeClass('ovh')
+  $('body').removeClass('ovh');
 
 });
-function replaceNull(chartData){
-  // 空值替换为 '-'
-  for(var i=0;i<chartData.rows.length;i++){
-    for(var key in chartData.rows[i]){
-      if(chartData.rows[i][key] === null){
-        chartData.rows[i][key] = '-'
+
+// 空值替换为 '-'
+function replaceNull(chartData) {
+  for (var i = 0; i < chartData.rows.length; i++) {
+    for (var key in chartData.rows[i]) {
+      if (chartData.rows[i][key] === null) {
+        chartData.rows[i][key] = '-';
       }
     }
   }
-  return chartData
+  return chartData;
 }

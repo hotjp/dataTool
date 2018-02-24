@@ -1,0 +1,15 @@
+{
+  "axisLine": {
+    "lineStyle": {
+        "color": [[0.2, "#91c7ae"], [0.8, "#63869e"], [1, "#c23531"]]
+    }
+},
+  "grid":{
+    "top":"20%",
+    "right":"10px",
+    "bottom":"5%",
+    "left":"10px",
+    "containLabel":true 
+  },
+  "max":100
+}

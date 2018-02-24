@@ -1,20 +1,22 @@
 <template>
   <el-dialog class="summary_filter" title="汇总数值筛选器" :visible.sync="option.summaryFilter" width="30%">
-    <el-checkbox v-model="option.useFilter">使用下方筛选条件</el-checkbox>
-    <br>
-    <el-select class="l filter_select" v-model="option.filter.op" placeholder="请选择">
-      <el-option v-for="item in filterOptions" :key="item.value" :label="item.label" :value="item.value">
-      </el-option>
-    </el-select>
-    <input v-if="filterValueFlag==1" type="number" class="filter_value" @input="input(0,$event)" placeholder="请输入数值">
-    <div class="l fix interval_input_div" v-if="filterValueFlag==2">
-      <input class="interval_input" type="number" @input="input(0,$event)" placeholder="请输入数值">~
-      <input class="interval_input" type="number" @input="input(1,$event)" placeholder="请输入数值">
-    </div>
-    <span slot="footer" class="dialog-footer">
-      <el-button @click="summaryFilter(0)">取 消</el-button>
-      <el-button type="primary" @click="summaryFilter(1)">确 定</el-button>
-    </span>
+    <form action onsubmit="return false">
+      <el-checkbox v-model="option.useFilter">使用下方筛选条件</el-checkbox>
+      <br>
+      <el-select class="l filter_select" v-model="option.filter.op" placeholder="请选择">
+        <el-option v-for="item in filterOptions" :key="item.value" :label="item.label" :value="item.value">
+        </el-option>
+      </el-select>
+      <input v-if="filterValueFlag==1" type="number" class="filter_value" @input="input(0,$event)" placeholder="请输入数值">
+      <div class="l fix interval_input_div" v-if="filterValueFlag==2">
+        <input class="interval_input" type="number" @input="input(0,$event)" placeholder="请输入数值">~
+        <input class="interval_input" type="number" @input="input(1,$event)" placeholder="请输入数值">
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="summaryFilter(0)">取 消</el-button>
+        <el-button type="primary" @click="summaryFilter(1)">确 定</el-button>
+      </span>
+    </form>
   </el-dialog>
 </template>
 <script type="text/babel">
@@ -38,10 +40,6 @@ export default {
       value: 'gt',
       label: '大于'
     },
-    //  {
-    //   value: 'ge,in,not_in',
-    //   label: '大于等于'
-    // }, 
     {
       value: 'between',
       label: '区间'
@@ -72,13 +70,9 @@ export default {
   }),
   props: ['ScreenOption','queryInfo'],
   methods: {
+    // 筛选主函数
     summaryFilter(e){
       if(e){
-        // for(var i=0;i<this.resultColumns.length;i++){
-        //   if(this.resultColumns[this.option.index].name==this.resultColumns[i].name){
-        //     this.resultColumns[i].filter;
-        //   }
-        // }
         this.option.filter.name=this.getqueryInfo.valueColumns[this.option.index].name;
         let res=Object.assign({},this.option.filter);
         for(var i=0;i<this.getqueryInfo.filters.length;i++){
@@ -103,16 +97,12 @@ export default {
       }
       this.option.summaryFilter=false;
     },
+    // 输入input绑定
     input:function(e,val){
-      // console.log(val);
       this.option.filter.values[e]=val.target.value;
     }
   },
   mounted() {
-    // this.getqueryInfo=Object.assign({},this.getqueryInfo,this.queryInfo);
-    // this.option=Object.assign({}, this.option, this.ScreenOption);
-    // this.resultColumns=this.valueColumns;
-    // console.log(this.option);
   },
   watch: {
     'option.filter.op': function (val) {

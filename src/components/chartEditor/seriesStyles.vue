@@ -16,8 +16,9 @@
 <script type="text/babel">
 export default{
   data:()=>({
-    // 系列风格
+    // 默认配置项展开
     activeNames:['1'],
+    // 系列风格    
     seriesColors: [
       {
         name: 'vintage',
@@ -58,13 +59,26 @@ export default{
           '#ebdba4'
         ],
         active:1
+      },
+      {
+        name: 'walden',
+        value: [
+          '#3fb1e3',
+          '#6be6c1',
+          '#626c91',
+          '#a0a7e6',
+          '#c4ebad',
+          '#96dee8'
+        ],
+        active:1
       }
     ]
   }),
+  props: ['charts'],
   methods:{
     // 通过索引进行系列颜色赋值
     onClickSeriesColors(index) {
-      this.$emit('seriesStyles',this.seriesColors[index].value);
+      this.$emit('seriesStyles',this.seriesColors[index]);
       for(let i = 0;i<this.seriesColors.length;i++){
         if(i==index){
           this.seriesColors[i]['active']=0;
@@ -75,8 +89,33 @@ export default{
       
     }
   },
-  mounted(){
-
+  watch:{
+    charts: {
+      handler: function (val, oldval) {
+        let that = this;
+        // 匹配系列风格
+        // 应用name匹配，但旧数据没有保存，添加对比value
+        if(that.charts.option.colorName){
+          for(let i=0;i<that.seriesColors.length;i++){
+            if(that.charts.option.colorName == that.seriesColors[i].name){
+              that.seriesColors[i].active = 0;
+            }else{
+              that.seriesColors[i].active = 1;
+            }
+          }
+        }else{
+          let optionColor = JSON.stringify(that.charts.option.color);
+          for(let i=0;i<that.seriesColors.length;i++){
+            if(optionColor == JSON.stringify(that.seriesColors[i].value)){
+              that.seriesColors[i].active = 0;
+            }else{
+              that.seriesColors[i].active = 1;
+            }
+          }
+        }
+      },
+      deep: true
+    }
   }
 };
 </script>

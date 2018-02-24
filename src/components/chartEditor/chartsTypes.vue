@@ -3,32 +3,21 @@
     <el-collapse v-model="activeNames">
       <el-collapse-item title="图表类型" name="1">
         <div class="box">
-          <el-tooltip placement="bottom" transition="0s" effect="light" v-for="(type,key) in option.chartTypes" :key="key">
+          <el-tooltip placement="bottom" transition="0s" effect="light" v-for="(type,key) in sortArr" :key="type">
             <div slot="content">
-              <span class="chart_type_tit">{{type.name}}</span><br>
-              <div class="chart_type_btn" v-for="(rule,index) in type.rules" :key="index">
+              <span class="chart_type_tit">{{option.chartTypes[type].name}}</span><br>
+              <div class="chart_type_btn" v-for="(rule,index) in option.chartTypes[type].rules" :key="index">
                 <span>维度 {{rule.columns.text}}</span><br>
                 <span>数值 {{rule.values.text}}</span>
               </div>
             </div>
-            <el-button class="chart_type" @click="onClickType(key,type.allowUse)" :class="[type.allowUse? 'isAllow':'',key]">
+            <el-button class="chart_type" @click="onClickType(type,option.chartTypes[type].allowUse)" :class="[option.chartTypes[type].allowUse? 'isAllow':'',type]">
               <i class="chart_type_icon"></i>
             </el-button>
           </el-tooltip>
         </div>
       </el-collapse-item>
     </el-collapse>
-<!--<ul>
-      <li v-for="(type,key) in option.chartTypes" :key="key" :class="type.allowUse? 'isAllow':''">
-        <a @click="onClickType(key,type.allowUse)" href="javascript:;">
-          {{type.name}} ({{type.allowUse?'可用':'不可用'}})
-        </a>
-        <div v-for="(rule,index) in type.rules" :key="index">
-          <i>维度 {{rule.columns.text}}</i><br>
-          <i>数值 {{rule.values.text}}</i>
-        </div>
-      </li>
-    </ul> -->
   </div>
 </template>
 <script type="text/babel">
@@ -108,7 +97,10 @@ export default{
       }
     },
     chart:{},
-    chartsTypes:[]
+    chartsTypes:[],
+    thisChartsTypes:'',
+    sortArr:[],
+    weightArr:[]
   }),
   props:['charts','tableShow','echartsShow','setqueryInfo'],
   methods:{
@@ -135,38 +127,48 @@ export default{
               type.allowUse = true;
             }
           }
-          // for(let i=0;i<that.option)
-          
         }
       }
       that.chartsTypes=[];
-      for(var j in that.option.chartTypes){
+      for(let j in that.option.chartTypes){
         if(that.option.chartTypes[j].allowUse){
           that.chartsTypes.push(j);
         }
       }
-      if(this.init){
-        that.chartsTypes.unshift(that.charts.type);
-        that.init=0;
+      // 权重高的图表类型
+      let firstType='';
+      for(var m=0;m<that.weightArr.length;m++){
+        for(var n=0;n<that.chartsTypes.length;n++){
+          if(that.weightArr[m]==that.chartsTypes[n] && firstType==''){
+            firstType=that.weightArr[m];
+          }
+        }
       }
+      for(let i=0;i<that.chartsTypes.length;i++){
+        if(that.chartsTypes[i]==that.chart.type){
+          that.thisChartsTypes=that.chartsTypes[i];
+          break;
+        }else{
+          that.thisChartsTypes=firstType?firstType:that.chartsTypes[0];
+        }
+      }
+      
+      if(this.init&&that.charts.type){
+        that.chartsTypes.unshift(that.charts.type);
+        that.thisChartsTypes=that.charts.type;
+      }
+      
+      that.init=0;
+      that.chart.type=that.thisChartsTypes;
       if(that.chartsTypes.length){
-        if(that.chartsTypes[0]=='table'){
+        if(that.chart.type=='table'){
           that.option.tableShow=true;
           that.option.echartsShow=false;
         }else{
           that.option.tableShow=false;
           that.option.echartsShow=true;
         }
-      }
-      // if (that.chartsTypes[0] === 'table') {
-      //   this.option.echartsShow = false;
-      //   this.option.tableShow = true;
-      // } else{
-      //   this.option.echartsShow = true;
-      //   this.option.tableShow = false;
-      // }
-
-      that.chart.type=that.chartsTypes[0];
+      }      
       that.$emit('getCharts',this.chart);      
       that.$emit('gettableShow',this.option.tableShow);
       that.$emit('getechartsShow',this.option.echartsShow);
@@ -178,8 +180,8 @@ export default{
     // 点击切换图表
     onClickType(typeName, typeAllowUse) {
       // TODO:图表的点击切换
+      this.thisChartsTypes=typeName;
       Object.assign(this.chart,this.charts);
-      // console.log(typeName + '被点击');
       if (typeName === 'table') {
         if (!typeAllowUse) return;
         this.option.echartsShow = false;
@@ -188,11 +190,15 @@ export default{
         if (!typeAllowUse) return;
         this.option.echartsShow = true;
         this.option.tableShow = false;
-        // for (let i = 0; i < this.chart.option.series.length; i++) {
-        //   this.chart.option.series[i].type = typeName;
-        // }
       }
       this.chart.type=typeName;
+      if(typeName=='pie'||typeName=='area'||typeName=='funnel'||typeName=='rosePie'||typeName=='radar'||typeName=='treemap'){
+        this.chart.option.xAxis.show = false;
+        this.chart.option.yAxis.show = false;
+      }else{
+        this.chart.option.xAxis.show = true;
+        this.chart.option.yAxis.show = true;
+      }
       this.$emit('getCharts',this.chart);
       this.$emit('gettableShow',this.option.tableShow);
       this.$emit('getechartsShow',this.option.echartsShow);
@@ -204,6 +210,12 @@ export default{
     Object.assign(that.chart,that.charts);
     this.option.echartsShow=this.echartsShow;
     this.option.tableShow=this.tableShow;
+    this.sortArr=Object.keys(chartTypes).sort(function(a,b){
+      return chartTypes[a].sort - chartTypes[b].sort;
+    });
+    this.weightArr=Object.keys(chartTypes).sort(function(a,b){
+      return chartTypes[a].weight - chartTypes[b].weight;
+    });
   }
 };
 </script>
@@ -251,6 +263,27 @@ export default{
 }
 .area{
   background: url('../../assets/images/icon.png') -162px -42px no-repeat;
+}
+.stackbar{
+  background: url('../../assets/images/icon.png') -202px -42px no-repeat;
+}
+.funnel{
+  background: url('../../assets/images/icon.png') -242px -42px no-repeat;
+}
+.rosePie{
+  background: url('../../assets/images/icon.png') -282px -42px no-repeat;
+}
+.radar{
+  background: url('../../assets/images/icon.png') -322px -42px no-repeat;
+}
+.treemap{
+  background: url('../../assets/images/icon.png') -362px -42px no-repeat;
+}
+.waterfall{
+  background: url('../../assets/images/icon.png') -402px -42px no-repeat;
+}
+.gauge{
+  background: url('../../assets/images/icon.png') -442px -42px no-repeat;
 }
 .isAllow{
   background-position-y:-2px; 

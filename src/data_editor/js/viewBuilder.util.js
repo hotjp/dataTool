@@ -103,3 +103,13 @@ function newId(key) {
   var id = ___id_counters[key] || 0;
   return ___id_counters[key] = (--id);
 }
+function initviewRelId(){
+  if(vb._view.joins.length){
+    ___id_counters['viewRelId']=vb._view.joins[0].viewRelId;    
+    for(var i = 0;i<vb._view.joins.length;i++){
+      if(vb._view.joins[i].viewRelId<___id_counters['viewRelId']){
+        ___id_counters['viewRelId']=vb._view.joins[i].viewRelId;
+      }
+    }
+  }
+}

@@ -5,11 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>单图表</title>
+    <style>
+    *{
+        margin: 0;
+        padding: 0;
+    }
+    html,body{
+        width:100%;
+        height:100%;
+    }
+    table{
+        width: 95%;
+        border-collapse: collapse;
+        margin: 10px auto;
+    }
+    td{
+        padding: 10px;
+        border: 1px solid #e6ebf5;
+    }
+    .table_title{
+        font-size: 14px;
+        font-family: '微软雅黑', sans-serif;
+        height: 20px;
+        line-height: 20px;
+        padding-top: 10px;
+        width: 95%;
+        margin: 0 auto;
+    }
+    </style>
     <script src="../assets/js/jquery-1.11.0.js"></script>
     <script src="./js/echarts.js"></script>
     
 </head>
-<body style="height:400px">
-    <script src="./js/chart.js?id=c02&width=100%&height=100%"/></script>
+<body>
+    <script src="./js/viewer_common.js"/></script>    
+    <script src="./js/chart.js"/></script>
 </body>
 </html>

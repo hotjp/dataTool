@@ -1,14 +1,9 @@
 <template>
-  <!-- <div @click="clickEvent">{{seriesOption}},{{data}}</div> -->
 <el-collapse v-model="activeNames" id="chartsComponents">
-  <el-collapse-item title="饼图" name="pie">
+  <el-collapse-item title="饼图" name="1">
     <div class="comp_group fix">
-      <!-- <el-input class="input" v-model="color1" placeholder=""></el-input> -->
-      <!-- <div v-for="(item,index) in seriesOption.option.series" :key="index" class="colums_list">
-          折线的颜色{{index}}
-          <el-color-picker class="color_picker"   v-model="item.itemStyle.normal.color"></el-color-picker>    
-      </div> -->
-      
+      半径：
+      <el-slider v-model="radius" @change="radiusChange"></el-slider>
     </div>
   </el-collapse-item>
   
@@ -16,31 +11,12 @@
 </template>
 
 <script>
-import axios from 'axios';
+import Vue from 'vue';
+
 import seriesDefault from '../../vendor/seriesPie.json';
-import "../../vendor/seriesPie.js";
+import '../../vendor/jsVendor/seriesPie.js';
 
 export default {
-  beforeMount() {},
-  mounted() {
-    let that = this;
-    // (() => Object.assign(that.seriesOption.option, that.option))();
-    (() => Object.assign(that.chartData, that.data))();
-    if ('undefined' == typeof that.seriesOption.option.series) {
-      that.seriesOption.option.series = [];
-    }
-    for (let i = 0; i < that.seriesOption.option.series.length; i++) {
-      let copy = JSON.parse(JSON.stringify(seriesDefault));
-      that.seriesOption.option.series[i] = Object.assign(
-        {},
-        copy,
-        that.seriesOption.option.series[i]
-      );
-    }
-  },
-  created() {
-    this.dataChange();
-  },
   data() {
     return {
       // 返回父级的数据，包括series和xAxis与yAxis的data部分
@@ -55,20 +31,37 @@ export default {
       seriesItem: seriesDefault,
       // 数据
       chartData: {},
-      // 柱状图
-      pageName: '柱状图',
-      color1: '',
-      activeNames: [], // 展开的组,
-      type: 'pie'
+      // 默认配置项展开
+      activeNames: ['1'],
+      // 图表类型
+      type: 'pie',
+      pageName: '饼图',
+      // 第一次进入页面
+      firstFlag:true,
+      // 半径
+      radius: null
     };
   },
-  props: ['option', 'data'],
-  computed: {
-    // 计算
+  mounted() {
+    let that = this;
+    (() => Object.assign(that.chartData, that.data))();
+    if(that.option.series){
+      if (that.option.series[0].radius && 'string' == typeof that.option.series[0].radius) {
+        that.radius = parseInt(that.option.series[0].radius.split('%')[0]);
+      }else{
+        that.radius = parseInt(seriesDefault.radius.split('%')[0]);
+      }
+    }
   },
+  created() {
+    this.dataChange();
+  },
+  props: ['option', 'data'],
   methods: {
+    // 数据处理    
     dataChange() {
       let that = this;
+      let newData = {};
       if (that.data.dataError || !that.data.data) {
         return;
       }
@@ -93,46 +86,51 @@ export default {
           }
         }
       });
-      // 清空series
-      that.seriesOption.option.series = seriesPie(rows,queryNameKeyX, queryNameKeyY, seriesDefault);
-      // // if (query.categoryColumns.length) {
-      // if (queryNameKeyX.length) {
-      //   // 一个维度一个数值
-      //   let copy = JSON.parse(JSON.stringify(seriesDefault));
-      //   let data = [];
-      //   for (let i = 0; i < rows.length; i++) {
-      //     data.push({
-      //       name: rows[i][queryNameKeyX[0]],
-      //       value: rows[i][queryNameKeyY[0]]
-      //     });
-      //   }
-      //   that.seriesOption.option.series.push({
-      //     data: data,
-      //     type: that.type,
-      //     itemStyle: copy.itemStyle,
-      //     radius: copy.radius
-      //   });
-      // } else {
-      //   // 0个维度多个数值，，，多个数值相加
-      //   if (queryNameKeyY.length > 1) {
-      //     // 多个数值
-      //     let copy = JSON.parse(JSON.stringify(seriesDefault));
-      //     let data = [];
-      //     for (let i = 0; i < queryNameKeyY.length; i++) {
-      //       data.push({
-      //         value: rows[0][queryNameKeyY[i]],
-      //         name: queryNameKeyY[i]
-      //       });
-      //     }
-      //     that.seriesOption.option.series.push({
-      //       data: data,
-      //       type: that.type,
-      //       itemStyle: copy.itemStyle,
-      //       radius: copy.radius
-      //     });
-      //   }
-      // }
+      newData.xAxis = that.seriesOption.option.xAxis;
+      if (queryNameKeyX.length) {
+        for (let i = 0; i < queryNameKeyX.length; i++) {
+          let arr = [];
+          for (let j = 0; j < rows.length; j++) {
+            arr.push(rows[j][queryNameKeyX[i]]);
+          }
+          newData.xAxis.data = arr;
+        }
+      } else {
+        let arr = queryNameY.map(function(x) {
+          for (let i = 0; i < columns.length; i++) {
+            if (columns[i].source.name == x) {
+              return columns[i].source.text;
+            }
+          }
+        });
+        newData.xAxis.data = arr;
+      }
+      // series.data的数据
+      if(that.firstFlag){
+        // 第一次进入页面        
+        if(this.option.series){
+          for (let i = 0; i < this.option.series.length; i++) {
+            this.option.series[i].radius = this.radius?this.radius+'%' : seriesDefault.radius;
+          }
+        }
+        that.seriesOption.option.series = seriesPie(columns,rows,queryNameKeyX,queryNameKeyY,seriesDefault,that.option.series,true);
+      }else{
+        that.seriesOption.option.series = seriesPie(columns,rows,queryNameKeyX,queryNameKeyY,seriesDefault);
+      }
+
+      that.firstFlag = false;
+      Vue.set(this.seriesOption.option, 'grid', seriesDefault.grid);
+      Vue.set(this.seriesOption.option, 'xAxis', newData.xAxis);
       this.$emit('getSeries', that.seriesOption.option);
+    },
+    // 半径调整
+    radiusChange(data){
+      this.radius = data;
+      for (let i = 0; i < this.seriesOption.option.series.length; i++) {
+        this.seriesOption.option.series[i].radius = this.radius+'%';
+      }
+      this.seriesOption.option = Object.assign({}, this.seriesOption.option);
+      this.$emit('getSeries', this.seriesOption.option);
     }
   },
   watch: {

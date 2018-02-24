@@ -1,30 +1,33 @@
 <template>
   <div class="title">
-    <el-collapse v-model="activeNames">
-        <el-collapse-item title="图表标题" name="1">
-          <el-input v-model="title.text" @input="titleText()" placeholder="请输入内容"></el-input>       
-        </el-collapse-item>
-    </el-collapse>
+    <form onsubmit="return false">
+      <el-collapse v-model="activeNames">
+          <el-collapse-item title="图表标题" name="1">
+            <el-input v-model="title.text" @input="titleText()" placeholder="请输入内容"></el-input>       
+          </el-collapse-item>
+      </el-collapse>
+    </form>
   </div>
 </template>
 <script type="text/babel">
 export default {
   data: () => ({
+    // 标题，字号
     title: {
-      text: ''
+      text: '',
+      textStyle:{
+        fontSize:14
+      }
     },
+    // 默认配置项展开
     activeNames:['1']
   }),
   props: ['setTitle'],
   methods: {
+    // 更新标题
     titleText() {
       this.$emit('titleText', this.title);
     }
-  },
-  mounted() {
-    let that = this;
-    // 初始化页面数据
-
   },
   watch:{
     setTitle: {
@@ -37,6 +40,3 @@ export default {
   }
 };
 </script>
-<style scoped>
-
-</style>

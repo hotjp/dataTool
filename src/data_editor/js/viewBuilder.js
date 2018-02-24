@@ -12,6 +12,12 @@ var SUPPRESS_ERR_DLG = false;
  * view builder
  */
 var vb = {
+  _view:{
+    filters:[],
+    joins:[],
+    orders:[],
+    tables:[]
+  },
   opts: {},
   init: function (opts) {
     $.extend(this.opts, opts || {});
@@ -25,8 +31,28 @@ var vb = {
 	 */
   load: function (viewId) {
     // extractViewDef返回当前视图数据
-    vb.showView(extractViewDef());
-    getNewViewProvider(VIEW_TYPE_USER_COMPOSITE);
+    var view=page.url.get('view') ? page.url.get('view') : 0;
+    if(view){
+      $.ajax({
+        url: 'http://119.180.98.134:8880/dataviz/api/dataview/design/info.do',
+        method: 'GET',
+        dataType: 'JSON',
+        data: {
+          view: view
+        },
+        success: function(res) {
+          if(res.success){
+            vb.showView(res.data.structure);
+            getNewViewProvider(VIEW_TYPE_USER_COMPOSITE);
+            $('#viewName').val(res.data.name);
+            vb._layout=res.data.layout;
+            // vb._folder=res.data.folder;
+          }
+        }
+      });
+    }else{
+      vb.showView(vb._view);
+    }
   },
 
   /**
@@ -65,6 +91,21 @@ var vb = {
       failed,
       failed,
       SUPPRESS_ERR_DLG);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   },
   // validate: function (oldView, newView) {
   //   // 如果查询名称更改则提示，如果没有名称则禁止提交
@@ -244,13 +285,15 @@ var vb = {
 
 
 
-  _view: null,
+  // _view: null,
   /**
 	 * 显示视图
 	 * @param view
 	 */
   showView: function (view) {
     this._view = view;
+    // 初始化关联关系id
+    initviewRelId();
     // if (view.dataSrcId) {
     //   // 锁定dataSource，更新视图列表
     //   $('#dataSources').combobox('setValue', view.dataSrcId).combobox('disable');
@@ -901,28 +944,33 @@ vb.viewRefRelationEditor = {
 
     var columns = [], error = 0,
       list = $('#viewRefRelEditor').find('.list>li');
-    list.each(function (i, el) {
-      var left = $(el).find('[name=left]'),
-        leftType = left.find('option:selected').data('type'),
-        leftName = left.val();
-      var right = $(el).find('[name=right]'),
-        rightType = right.find('option:selected').data('type'),
-        rightName = right.val();
-      var op = $(el).find('[name=op]').val();
-      if (leftName && rightName) {
-        // FIXME:字段验证，注释需要保留
-        // if (leftType == rightType) {
-        columns.push({
-          left: leftName,
-          right: rightName,
-          op: op
-        });
-        // } else {
-        //   error++;
-        //   $(el).addClass('error');
-        // }
-      }
-    });
+    if(list.length){
+      list.each(function (i, el) {
+        var left = $(el).find('[name=left]'),
+          leftType = left.find('option:selected').data('type'),
+          leftName = left.val();
+        var right = $(el).find('[name=right]'),
+          rightType = right.find('option:selected').data('type'),
+          rightName = right.val();
+        var op = $(el).find('[name=op]').val();
+        if (leftName && rightName) {
+          // FIXME:字段验证，注释需要保留
+          // if (leftType == rightType) {
+          columns.push({
+            left: leftName,
+            right: rightName,
+            op: op
+          });
+          // } else {
+          //   error++;
+          //   $(el).addClass('error');
+          // }
+        }
+      });        
+    }else{
+      $('#viewRefRelEditor').find('.delete').trigger('click');
+    }
+    
     if (!error) {
       viewRefRel.columns = columns;
     } else {
@@ -967,6 +1015,9 @@ vb.viewRefEditor = {
 	 * @param viewRef
 	 */
   edit: function (viewRef) {
+
+    vb._filters=vb._view.filters.concat();
+    vb._orders=vb._view.orders.concat();
     this.resetEditState();
 
     console.info('editViewRef :');
@@ -975,13 +1026,33 @@ vb.viewRefEditor = {
     this._viewRef = JSON.parse(JSON.stringify(viewRef));
 
     $('#viewRefViewAlias').val(viewRef.alias);
-
+    $('#viewRefViewAlias').attr('data-name',viewRef.name);
     // 提取columns渲染
     var data = {
       list: this._viewRef.columns
     };
     renderTmp('#t-viewRef', 'viewRefTpl', data);
+    // 刚进来初始化右侧
+    if(data.list.length){
+      for(var i=0;i<data.list.length;i++){
+        if(data.list[i]['alias']){
+          $('#viewRefEditor').find('.right').attr('data-idx',i).show();
+          $('#viewRefEditor').find('.right .checkUse').prop('checked',true);
+          $('#viewRefEditor').find('.right .text').val(data.list[i]['text']);
+          $('#viewRefEditor').find('#t-viewRef li').eq(i).trigger('click');
+          break;
+        }else{
+          $('#viewRefEditor').find('.right').attr('data-idx',i).hide();
+          $('#viewRefEditor').find('.right .checkUse').prop('checked',false);
+          $('#viewRefEditor').find('.right .text').val('');
+        }
+      }
+    }
     $('#viewRefEditor').show().find('.title').text('编辑视图  - ' + this._viewRef.name + '(' + this._viewRef.alias + ')');
+  
+
+
+
 
   },
   remove: function () {
@@ -1068,15 +1139,28 @@ vb.viewRefEditor = {
     var cols = [];
     grid.find('li').each(function (i, el) {
       var data = $(el).data(),
-        checked = $(el).find('input[type=checkbox]').prop('checked');
+        checked = $(el).find('input[type=checkbox]').prop('checked'),
+        text=data.list.text;
       if (checked) {
+        if(!text){
+          alert('请填写'+data.name+'的备注名称');
+          return false;
+        }else{
+          viewRef.columns[i]['text']=text;
+        }
         if (!viewRef.columns[i].alias) {
-          viewRef.columns[i].alias = viewRef.name + '-' + viewRef.columns[i].name;
+          viewRef.columns[i].alias = viewRef.name + '_' + viewRef.columns[i].name;
         }
       } else {
         delete viewRef.columns[i].alias;
+        delete viewRef.columns[i].text;
       }
     });
+
+    // 复制筛选和排序
+
+    vb._view['filters']=vb._filters;
+    vb._view['orders']=vb._orders;
 
 
     // // 更新columnMaps和columns，如果有重名的话提示修改
@@ -1148,7 +1232,6 @@ vb.viewRefEditor = {
     }
     // 刷新diagram
     vb.diagram.updateViewRef(viewRef);
-
     this.closeViewRefEditor();
   },
 
@@ -1207,12 +1290,12 @@ vb.diagram = {
 
         // 视图编辑按钮
         // FIXME mxCellOverlay.tooltip无效
-        // var overlay = new mxCellOverlay(new mxImage('images/iconPencilSmall.png', 10, 10), '编辑视图', 'right', 'top', new mxPoint(-235, 12), 'default');
-        // overlay.addListener(mxEvent.CLICK, function (sender, evt) {
-        //   // 从cell中获取最新的值
-        //   vb.viewRefEditor.edit(viewRefCell.getValue().viewRef);
-        // });
-        // g.addCellOverlay(viewRefCell, overlay);
+        var overlay = new mxCellOverlay(new mxImage('images/iconPencilSmall.png', 10, 10), '编辑视图', 'right', 'top', new mxPoint(-235, 12), 'default');
+        overlay.addListener(mxEvent.CLICK, function (sender, evt) {
+          // 从cell中获取最新的值
+          vb.viewRefEditor.edit(viewRefCell.getValue().viewRef);
+        });
+        g.addCellOverlay(viewRefCell, overlay);
       });
       // 添加关联关系
       $.each(view.joins || [], function () {
@@ -1309,6 +1392,7 @@ vb.diagram = {
       alias: viewAlias
 
     };
+    vb._view.tables.push(viewRef);
     return viewRef;
   },
   /**
@@ -1764,6 +1848,9 @@ vb.diagram = {
     }else if(columnMapping['javaType']=='Date'){
       label.push('<img src=\'images/data_icon.png\' style=\'width:14px;height:16px;\'/>  ');
     }
+    if(columnMapping['text']){
+      label.push(columnMapping['text']);
+    }
     // label.push('<i style="color:#333">' + columnMapping['javaType'] + '</i>  ');
     label.push('('+columnMapping.name+')');
     // label.push('<span class=\'small-note\'> (');
@@ -1774,6 +1861,33 @@ vb.diagram = {
   }
 };
 
+function getUrl(url,option) {
+  var paraStr, paras;
+  if (url) {
+    paraStr = (function(url){
+      if(url.indexOf('#') > 0){
+        url = url.split('#')[0];
+      }
+      return url.split('?')[1];
+    })(url);
+    if (paraStr) {
+      paras = {};
+      paraStr = paraStr.split('&');
+      for (var n = 0; n < paraStr.length; n++) {
+        var name = paraStr[n].split('=')[0];
+        var value = paraStr[n].split('=')[1];
+        paras[name] = value;
+      }
+    } else {
+      return {};
+    }
+    if (!option) {
+      return paras;
+    } else {
+      return paras[option] ? paras[option] : '';
+    }
+  }
+}
 
 
 function ViewRef(viewRef) {
@@ -1801,4 +1915,7 @@ mxCell.prototype.setId = function (id) {
   // 映射对象到id
   vb.diagram.registerCell(this);
 };
+
+
+
 

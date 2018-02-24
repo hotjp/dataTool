@@ -31,57 +31,35 @@
     <script id="gridItem" type="text/html">
         <%for(i=0;i<xData.length;i++){%>
             <div class="grid-stack-item" id="" data-id="<%=xData[i].id%>" data-gs-auto-position="false" data-gs-x="<%=xData[i].x%>" data-gs-y="<%=xData[i].y%>" data-gs-width="<%=xData[i].width%>" data-gs-height="<%=xData[i].height%>" data-gs-min-height="2" data-gs-max-height="6">
+                <div class="chart_tit"><%=xData[i].title%></div>
                 <div class="_wrap">
                     <div id="chart<%=xData[i].id%>"></div>
                 </div>
             </div>
         <%}%>
     </script>
-    <script id="tableViewTpl" type="text/html">
-        <table class="chart_table">
-            <thead>
-                <tr>
-                    <%for(var i=0;i<columns.length;i++){%>
-                        <td><%=columns[i].source.text%></td>
-                    <%}%>
-                </tr>
-            </thead>
-            
-            <%for(var j=0;j<rows.length;j++){%>
-                <tr>
-                    <%for(var i=0;i<columns.length;i++){%>
-                        <%if(j>0&&rows[j][columns[i].name] == rows[j-1][columns[i].name]){%>
-                            <%continue%>
-                        <%}%>
-                            
-                        <%var rowspan = 0%>
-                        <%for(var k=0;k<rows.length;k++){%>
-                            <%if(rows[j][columns[i].name] == rows[k][columns[i].name]){%>
-                                <%rowspan++%>
-                            <%}%>
-                        <%}%>
-                        <td rowspan="<%=rowspan%>"><%=rows[j][columns[i].name]%></th>
-                        
-                    <%}%>
-                </tr>
-            <%}%>
-            
-        </table>
-    </script>
-    
 </body>
 <script src="../assets/js/jquery-1.11.0.js"></script>
+<script src="../assets/js/jquery-ui.min.js"></script>
 <script src="./js/urlparas.js"></script>
 <script src="./js/template-native.js"></script>
-<script src="../assets/js/jquery-ui.min.js"></script>
 <script src="./js/lodash.min.js"></script>
 <script src="./js/gridstack.js"></script>
 <script src="./js/gridstack.jQueryUI.js"></script>
 <script src="./js/echarts.js"></script>
+
 <script src="./js/viewer_common.js"></script>
-<script src="../vendor/seriesBar.js"></script>
-<script src="../vendor/seriesLine.js"></script>
-<script src="../vendor/seriesPie.js"></script>
+<script src="../vendor/jsVendor/seriesBar.js"></script>
+<script src="../vendor/jsVendor/seriesLine.js"></script>
+<script src="../vendor/jsVendor/seriesPie.js"></script>
+<script src="../vendor/jsVendor/seriesArea.js"></script>
+<script src="../vendor/jsVendor/seriesFunnel.js"></script>
+<script src="../vendor/jsVendor/seriesRosePie.js"></script>
+<script src="../vendor/jsVendor/seriesRadar.js"></script>
+<script src="../vendor/jsVendor/seriesTreemap.js"></script>
+<script src="../vendor/jsVendor/seriesWaterfall.js"></script>
+<script src="../vendor/jsVendor/seriesStackbar.js"></script>
+<script src="../vendor/jsVendor/seriesGauge.js"></script>
 
 <script src="./js/dashboard.js"></script>
 

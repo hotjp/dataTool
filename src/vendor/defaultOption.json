@@ -1,7 +1,10 @@
 {
   "option": {
     "title": {
-      "text": "未命名图表"
+      "text": "未命名图表",
+      "textStyle":{
+        "fontSize":14
+      }
     },
     "xAxis": {
       "axisLine": {
@@ -16,26 +19,82 @@
       "axisLabel": {
         "show": true,
         "fontFamily": "sans-serif",
-        "fontSize": "10px",
+        "fontSize": "10",
         "color": "#000"
+      },
+      "splitLine": {
+        "show": true,
+        "interval": "auto",
+        "lineStyle": {
+          "color": "#ccc",
+          "width": 1,
+          "type": "solid",
+          "shadowBlur": 0,
+          "shadowColor": "rgba(0, 0, 0, 0.5)",
+          "shadowOffsetX": 0,
+          "shadowOffsetY": 0,
+          "opacity": 0.8
+        }
       }
     },
-    "yAxis":{
-      "show":true,
-      "name":"y轴",
-      "axisLine":{
-        "show":true,
-        "lineStyle":{
-          "color":"#000",
-          "width":1,
-          "type":"solid"
+    "yAxis": {
+      "show": true,
+      "name": "y轴",
+      "axisLine": {
+        "show": true,
+        "lineStyle": {
+          "color": "#000",
+          "width": 1,
+          "type": "solid"
         }
       },
       "axisLabel": {
         "show": true,
         "fontFamily": "sans-serif",
-        "fontSize": "10px",
+        "fontSize": "10",
         "color": "#000"
+      },
+      "splitLine": {
+        "show": true,
+        "interval": "auto",
+        "lineStyle": {
+          "color": "#ccc",
+          "width": 1,
+          "type": "solid",
+          "shadowBlur": 0,
+          "shadowColor": "rgba(0, 0, 0, 0.5)",
+          "shadowOffsetX": 0,
+          "shadowOffsetY": 0,
+          "opacity": 0.8
+        }
+      }
+    },
+    "legend": {
+      "type": "plain",
+      "show": true,
+      "zlevel": 0,
+      "z": 2,
+      "top": "0",
+      "right": "0",
+      "bottom": "auto",
+      "width": "auto",
+      "height": "auto",
+      "orient": "horizontal",
+      "align": "auto",
+      "padding": 5,
+      "itemGap": 10,
+      "itemWidth": 25,
+      "itemHeight": 14,
+      "formatter": null,
+      "selectedMode": true,
+      "inactiveColor": "#ccc",
+      "data": [],
+      "textStyle": {
+        "color": "#333",
+        "fontStyle": "normal",
+        "fontWeight": "normal",
+        "fontFamily": "sans-serif",
+        "fontSize": "12"
       }
     }
   }

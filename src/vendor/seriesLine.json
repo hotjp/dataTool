@@ -4,5 +4,12 @@
       "color": ""
     }
   },
+  "grid":{
+    "top":"20%",
+    "right":"10px",
+    "bottom":"5%",
+    "left":"10px",
+    "containLabel":true 
+  },
   "smooth": false 
 }

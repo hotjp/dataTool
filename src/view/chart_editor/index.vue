@@ -22,9 +22,11 @@
 
             <!--<p>日期单独做</p>-->
           </div>
-          <input type="text" class="searchColumns">
-          <br>
-          <el-button class="width_full" size="mini" @click="saveChartData">保存图表信息</el-button>
+          <form onsubmit="return false">
+            <input type="text" class="searchColumns">
+            <br>
+            <el-button class="width_full" size="mini" @click="saveChartData">保存图表信息</el-button>
+          </form>
           <br>
           <ul v-for="(item,index) in columns" :key="index" class="colums_list">
             <li class="colums_item fix " draggable="true" @dragstart="itemOnDragstart(item,$event)" @selectstart="itemOnSelectstart">
@@ -59,14 +61,6 @@
                       <i class="el-icon-arrow-down"></i>
                       {{column.text}}
                     </a>
-                    <!--<el-select v-model="column.sort" placeholder="请选择">-->
-                    <!--<el-option-->
-                    <!--v-for="item in options"-->
-                    <!--:key="item.value"-->
-                    <!--:label="item.label"-->
-                    <!--:value="item.value">-->
-                    <!--</el-option>-->
-                    <!--</el-select>-->
 
                     <span v-if="column.sort">{{column.sort}}</span>
                     <a @click="onDeleteColumnClick(column)" href="javascript:;">
@@ -167,7 +161,7 @@
           <!-- 图表类型 -->
           <chartsTypes ref="chartsTypes" :charts="charts" :echartsShow="echartsShow" :tableShow="tableShow" @gettableShow="gettableShow" @getechartsShow="getechartsShow" @getCharts="getCharts" :setqueryInfo="queryInfo"></chartsTypes>
           <!-- 序列风格 -->
-          <seriesStyles @seriesStyles="seriesStyles"></seriesStyles>
+          <seriesStyles :charts="charts" @seriesStyles="seriesStyles"></seriesStyles>
           <!-- 面板属性 -->
           <chartConfig @getProp="getProp" :setProp="graphData" :charts="charts"></chartConfig>
 
@@ -177,23 +171,25 @@
 
     <!--选择工作表弹出框-->
     <el-dialog class="workTableDialog" title="选择工作表" :visible.sync="workTableDialogVisible" width="30%" center>
-      <input type="text" class="workTableSearch" />
-      <br>
-      <!-- <div>
-        <i class="el-icon-tickets"></i>
-        <span>仪表盘示例</span>
-      </div> -->
-      <el-tree :data="listFolders.list" :props="listFolders.defaultProps" accordion @node-click="handleNodeClick"></el-tree>
+      <form onsubmit="return false">
+        <input type="text" class="workTableSearch" />
+        <br>
+        <!-- <div>
+          <i class="el-icon-tickets"></i>
+          <span>仪表盘示例</span>
+        </div> -->
+        <el-tree :data="listFolders.list" :props="listFolders.defaultProps" accordion @node-click="handleNodeClick"></el-tree>
 
-      <!-- <div>
-        <i class="el-icon-tickets"></i>
-        <span>仪表盘示例</span>
-      </div> -->
-      <!--<span>需要注意的是内容是默认不居中的</span>-->
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="workTableDialog(0)">取 消</el-button>
-        <el-button type="primary" @click="workTableDialog(1)">确 定</el-button>
-      </span>
+        <!-- <div>
+          <i class="el-icon-tickets"></i>
+          <span>仪表盘示例</span>
+        </div> -->
+        <!--<span>需要注意的是内容是默认不居中的</span>-->
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="workTableDialog(0)">取 消</el-button>
+          <el-button type="primary" @click="workTableDialog(1)">确 定</el-button>
+        </span>
+      </form>
     </el-dialog>
     <!--排序弹出框-->
     <el-dialog class="sort_select_dialog" title="文本排序" :visible.sync="sortDialogVisible" width="30%">
@@ -223,105 +219,111 @@
 
     <!--批量添加维度字段-->
     <el-dialog class="batchAddColumsDialog" title="批量添加维度字段" :visible.sync="batchAddCategoryColumsDialogVisible" width="70%">
-      <div class="fix">
-        <div class="r" style="width: 200px">
-          <input type="text" class="workTableSearch" />
+      <form onsubmit="return false">
+        <div class="fix">
+          <div class="r" style="width: 200px">
+            <input type="text" class="workTableSearch" />
+          </div>
         </div>
-      </div>
 
-      <!--日期-->
-      <div>
-        <el-checkbox :indeterminate="isIndeterminateCategoryDates" v-model="checkAllCategoryDates" @change="handleCheckAllCategoryChangeDates">
-          <i class="el-icon-date"></i>日期</el-checkbox>
-        <el-checkbox-group v-model="checkedCategoryDates" @change="handleCheckedCategoryDatesChange">
-          <el-checkbox v-for="date in dates" :label="date" :key="date.text">{{date.text}}</el-checkbox>
-        </el-checkbox-group>
-      </div>
-      <!--文本-->
-      <div>
-        <el-checkbox :indeterminate="isIndeterminateCategoryTexts" v-model="checkAllCategoryTexts" @change="handleCheckAllCategoryChangeTexts">
-          <i class="el-icon-tickets"></i>文本</el-checkbox>
-        <el-checkbox-group v-model="checkedCategoryTexts" @change="handleCheckedCategoryTextsChange">
-          <el-checkbox v-for="text in texts" :label="text" :key="text.text">{{text.text}}</el-checkbox>
-        </el-checkbox-group>
-      </div>
-      <!--数值-->
-      <div>
-        <el-checkbox :indeterminate="isIndeterminateCategoryNums" v-model="checkAllCategoryNums" @change="handleCheckAllCategoryChangeNums">
-          <i class="el-icon-more"></i>数值</el-checkbox>
-        <el-checkbox-group v-model="checkedCategoryNums" @change="handleCheckedCategoryNumsChange">
-          <el-checkbox v-for="num in nums" :label="num" :key="num.text">{{num.text}}</el-checkbox>
-        </el-checkbox-group>
-      </div>
+        <!--日期-->
+        <div>
+          <el-checkbox :indeterminate="isIndeterminateCategoryDates" v-model="checkAllCategoryDates" @change="handleCheckAllCategoryChangeDates">
+            <i class="el-icon-date"></i>日期</el-checkbox>
+          <el-checkbox-group v-model="checkedCategoryDates" @change="handleCheckedCategoryDatesChange">
+            <el-checkbox v-for="date in dates" :label="date" :key="date.text">{{date.text}}</el-checkbox>
+          </el-checkbox-group>
+        </div>
+        <!--文本-->
+        <div>
+          <el-checkbox :indeterminate="isIndeterminateCategoryTexts" v-model="checkAllCategoryTexts" @change="handleCheckAllCategoryChangeTexts">
+            <i class="el-icon-tickets"></i>文本</el-checkbox>
+          <el-checkbox-group v-model="checkedCategoryTexts" @change="handleCheckedCategoryTextsChange">
+            <el-checkbox v-for="text in texts" :label="text" :key="text.text">{{text.text}}</el-checkbox>
+          </el-checkbox-group>
+        </div>
+        <!--数值-->
+        <div>
+          <el-checkbox :indeterminate="isIndeterminateCategoryNums" v-model="checkAllCategoryNums" @change="handleCheckAllCategoryChangeNums">
+            <i class="el-icon-more"></i>数值</el-checkbox>
+          <el-checkbox-group v-model="checkedCategoryNums" @change="handleCheckedCategoryNumsChange">
+            <el-checkbox v-for="num in nums" :label="num" :key="num.text">{{num.text}}</el-checkbox>
+          </el-checkbox-group>
+        </div>
 
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="batchAddCategoryColumsDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="batchAddCategoryColums">确 定</el-button>
-      </span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="batchAddCategoryColumsDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="batchAddCategoryColums">确 定</el-button>
+        </span>
+      </form>
     </el-dialog>
 
     <!--批量添加数值字段-->
     <el-dialog class="batchAddColumsDialog" title="批量添加数值字段" :visible.sync="batchAddColumsDialogVisible" width="70%">
-      <div class="fix">
-        <div class="r" style="width: 200px">
-          <input type="text" class="workTableSearch" />
+      <form onsubmit="return false">
+        <div class="fix">
+          <div class="r" style="width: 200px">
+            <input type="text" class="workTableSearch" />
+          </div>
         </div>
-      </div>
 
-      <!--日期-->
-      <div>
-        <el-checkbox :indeterminate="isIndeterminateDates" v-model="checkAllDates" @change="handleCheckAllChangeDates">
-          <i class="el-icon-date"></i>日期</el-checkbox>
-        <el-checkbox-group v-model="checkedDates" @change="handleCheckedDatesChange">
-          <el-checkbox v-for="date in dates" :label="date" :key="date.text">{{date.text}}</el-checkbox>
-        </el-checkbox-group>
-      </div>
-      <!--文本-->
-      <div>
-        <el-checkbox :indeterminate="isIndeterminateTexts" v-model="checkAllTexts" @change="handleCheckAllChangeTexts">
-          <i class="el-icon-tickets"></i>文本</el-checkbox>
-        <el-checkbox-group v-model="checkedTexts" @change="handleCheckedTextsChange">
-          <el-checkbox v-for="text in texts" :label="text" :key="text.text">{{text.text}}</el-checkbox>
-        </el-checkbox-group>
-      </div>
-      <!--数值-->
-      <div>
-        <el-checkbox :indeterminate="isIndeterminateNums" v-model="checkAllNums" @change="handleCheckAllChangeNums">
-          <i class="el-icon-more"></i>数值</el-checkbox>
-        <el-checkbox-group v-model="checkedNums" @change="handleCheckedNumsChange">
-          <el-checkbox v-for="num in nums" :label="num" :key="num.text">{{num.text}}</el-checkbox>
-        </el-checkbox-group>
-      </div>
+        <!--日期-->
+        <div>
+          <el-checkbox :indeterminate="isIndeterminateDates" v-model="checkAllDates" @change="handleCheckAllChangeDates">
+            <i class="el-icon-date"></i>日期</el-checkbox>
+          <el-checkbox-group v-model="checkedDates" @change="handleCheckedDatesChange">
+            <el-checkbox v-for="date in dates" :label="date" :key="date.text">{{date.text}}</el-checkbox>
+          </el-checkbox-group>
+        </div>
+        <!--文本-->
+        <div>
+          <el-checkbox :indeterminate="isIndeterminateTexts" v-model="checkAllTexts" @change="handleCheckAllChangeTexts">
+            <i class="el-icon-tickets"></i>文本</el-checkbox>
+          <el-checkbox-group v-model="checkedTexts" @change="handleCheckedTextsChange">
+            <el-checkbox v-for="text in texts" :label="text" :key="text.text">{{text.text}}</el-checkbox>
+          </el-checkbox-group>
+        </div>
+        <!--数值-->
+        <div>
+          <el-checkbox :indeterminate="isIndeterminateNums" v-model="checkAllNums" @change="handleCheckAllChangeNums">
+            <i class="el-icon-more"></i>数值</el-checkbox>
+          <el-checkbox-group v-model="checkedNums" @change="handleCheckedNumsChange">
+            <el-checkbox v-for="num in nums" :label="num" :key="num.text">{{num.text}}</el-checkbox>
+          </el-checkbox-group>
+        </div>
 
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="batchAddColumsDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="batchAddColums">确 定</el-button>
-      </span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="batchAddColumsDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="batchAddColums">确 定</el-button>
+        </span>
+      </form>
     </el-dialog>
 
     <!--添加计算字段弹出框-->
     <el-dialog class="addComputedColumsDialog" title="添加计算字段" :visible.sync="addComputedColumsDialogVisible" width="50%">
-      <input class="colums_name" type="text" placeholder="字段名称">
-      <br>
-      <el-select v-model="value" placeholder="请选择字段类型">
-        <el-option v-for="item in addComputedColumnsOptions" :key="item.value" :label="item.label" :value="item.value">
-        </el-option>
-      </el-select>
-      <el-input type="textarea" :rows="4" placeholder="SUM([A]) + SUM([B])" v-model="addComputedColumsTextarea">
-      </el-input>
-      <div class="addComputedColumsList">
-        <div class="listLeft">
+      <form onsubmit="return false">
+        <input class="colums_name" type="text" placeholder="字段名称">
+        <br>
+        <el-select v-model="value" placeholder="请选择字段类型">
+          <el-option v-for="item in addComputedColumnsOptions" :key="item.value" :label="item.label" :value="item.value">
+          </el-option>
+        </el-select>
+        <el-input type="textarea" :rows="4" placeholder="SUM([A]) + SUM([B])" v-model="addComputedColumsTextarea">
+        </el-input>
+        <div class="addComputedColumsList">
+          <div class="listLeft">
+
+          </div>
+          <div class="listRight">
+
+          </div>
 
         </div>
-        <div class="listRight">
-
-        </div>
-
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="addComputedColumsDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addComputedColumsDialogVisible = false">确 定</el-button>
-      </span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="addComputedColumsDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="addComputedColumsDialogVisible = false">确 定</el-button>
+        </span>
+      </form>
     </el-dialog>
 
     <!-- 维度 设置字段弹窗 -->
@@ -335,23 +337,18 @@
   </div>
 </template>
 <script>
-// import chartUI from '../../assets/js/chartUI';
-import chartTypes from '../../assets/js/chart_types';
-import vars from '../../assets/js/vars';
-import axios from 'axios';
+import { getJson } from '../../router/utils';
 import _ from 'lodash';
 import IEcharts from 'vue-echarts-v3/src/full.vue';
-import tableView from '../demo/tableView.vue';
+import tableView from '../../components/chartEditor/tableView.vue';
 import chartTypeOption from '../../components/chartEditor/chartTypeOption.vue';
 // 属性面板
-import chartConfig from '../demo/chartConfig.vue';
+import chartConfig from '../../components/chartEditor/chartConfig.vue';
 // 序列风格
 import seriesStyles from '../../components/chartEditor/seriesStyles.vue';
 // 图表类型
 import chartsTypes from '../../components/chartEditor/chartsTypes.vue';
 //引入echarts皮肤
-import { ajax } from 'jquery';
-
 import { Message } from 'element-ui';
 //import 'echarts/theme/dark.js'
 //import 'echarts/theme/infographic.js'
@@ -370,6 +367,9 @@ import settingYfield from '../../components/chartEditor/yAxis/settingYField.vue'
 import resultScreen from '../../components/chartEditor/yAxis/resultScreen.vue';
 // 数值 数值显示弹窗
 import numShow from '../../components/chartEditor/yAxis/numShow.vue';
+
+// 历史记录工具
+import TimeLine from '../../assets/js/objectTimeLine';
 
 export default {
   data() {
@@ -459,24 +459,6 @@ export default {
             name: 'summaryFilter'
           }
         }
-        // {
-        //   value: '排序',
-        //   label: '排序',
-        //   children: [
-        //     {
-        //       value: '默认',
-        //       label: '默认'
-        //     },
-        //     {
-        //       value: '升序',
-        //       label: '升序'
-        //     },
-        //     {
-        //       value: '降序',
-        //       label: '降序'
-        //     }
-        //   ]
-        // }
       ],
       //        维度下拉菜单索引
       _index: '',
@@ -614,44 +596,7 @@ export default {
 
         ],
         filters: [
-          // {
-          //   conj: 'and',
-          //   name: 'price',
-          //   op: 'gt',
-          //   values: [
-          //     1
-          //   ]
-          // },
-          // {
-          //   conj: 'and',
-          //   name: 'qty',
-          //   op: 'lt',
-          //   values: [
-          //     99999
-          //   ]
-          // }
-          // {
-          //   conj: 'and',
-          //   exprs: [
-          //     {
-          //       conj: 'or',
-          //       name: 'type',
-          //       op: 'eq',
-          //       values: [
-          //         'requirement'
-          //       ]
-          //     },
-          //     {
-          //       conj: 'or',
-          //       name: 'status',
-          //       op: 'in',
-          //       values: [
-          //         'closed',
-          //         'done'
-          //       ]
-          //     }
-          //   ]
-          // }
+
         ]
       },
       // 当前报表数据列
@@ -663,11 +608,11 @@ export default {
           name: '',
           sql: ''
         },
-        type: 'bar',
+        type: '',
         loading: false,
         resizable: true,
         option: {
-          color:[
+          color: [
             '#d87c7c',
             '#919e8b',
             '#d7ab82',
@@ -678,7 +623,13 @@ export default {
             '#cc7e63',
             '#724e58',
             '#4b565b'
-          ]
+          ],
+          title: {
+            text: '未命名图表',
+            textStyle: {
+              fontSize: 14
+            }
+          }
         },
         query: {
           // 数值列
@@ -768,24 +719,33 @@ export default {
       }
     };
   },
+  watch: {
+    // 如果 `question` 发生改变，这个函数就会运行
+    charts: {
+      handler: function (newCharts) {
+        this.timeLine.snapshoot(newCharts);
+      },
+      deep: true
+    }
+  },
   mounted() {
     let that = window.vm = this,
       params = that.$route.params;
+    // TODO: 完成历史记录工具
+    window.timeLines = this.timeLine = new TimeLine({
+      treasures: this.chats,
+      backupOpt: {
+        backupCallback: function () { console.log(arguments); }
+      }
+    });
+
     if (Object.keys(params).length) {
       that.charts.id = params.viewId;
     }
     window.onresize = function () {
-      _.debounce(function () {
-        window.screenWidth = document.body.clientWidth;
-        that.screenWidth = window.screenWidth;
-        window.chartsHeight = document.body.clientHeight;
-        let nowTopHeight = document.getElementsByClassName('query')[0].offsetHeight;
-        let Dvalue = nowTopHeight - 67;
-
-        that.chartsHeight = window.chartsHeight - 150 - Dvalue;
-      }, 500)();
-
+      that.onresizeWindow();
     };
+
     this.menuStatus = _.debounce(function () {
       this.$set(this.queryInfo.categoryColumns[this._index], 'selectedItemSwitch', false);
       this.$set(this.queryInfo.categoryColumns[this._index], 'selectedChildrenSwitch', false);
@@ -809,79 +769,54 @@ export default {
     }, 500);
 
     // 选择表
-    axios({
-      url: '/dataview/list.do',
-      baseURL: vars.api,
+    getJson('/dataview/list.do', {
       params: {
         folder: '',
         dataview: true
       }
-    })
-      .then(function (res) {
-        var resData = res.data;
-        that.listFolders.list = resData.data;
-      })
-      .catch(function (res) {
-        console.log(res);
-      });
-
+    }, function (res) {
+      if (res.success) {
+        that.listFolders.list = res.data;
+      }
+    });
     if (that.charts.id != '') {
-      axios({
-        url: '/chart/info.do',
-        baseURL: vars.api,
-        params: {
-          chart: that.charts.id
-        }
-      })
-        .then(function (res) {
-          that.charts = Object.assign({}, that.charts, res.data.data);
-          that.queryInfo = Object.assign({}, that.queryInfo, res.data.data.query);
+      getJson('/chart/info.do', {
+        chart: that.charts.id
+      }, function (res) {
+        if (res.success) {
+          that.charts = Object.assign({}, that.charts, res.data);
+          that.queryInfo = Object.assign({}, that.queryInfo, res.data.query);
           that.$nextTick(function () {
             that.getTopHeight();
             vm.getChartDataChangeView();
           });
-          axios({
-            url: '/dataview/info.do',
-            baseURL: vars.api,
-            params: {
-              view: that.charts.tableName.sql
-            }
-          })
-            .then(function (res) {
-              let resData = res.data;
-              if (resData.success) {
-                that.nums=[];
-                that.dates=[];
-                that.texts=[];
-                that.columns = resData.data.columns;
-
-                for(let i = 0;i<resData.data.columns.length;i++){
-                  if(resData.data.columns[i].type=='Number'){
-                    that.nums.push(resData.data.columns[i]);
-                  }
-                  if(resData.data.columns[i].type=='Date'){
-                    that.dates.push(resData.data.columns[i]);
-                  }
-                  if(resData.data.columns[i].type=='String'){
-                    that.texts.push(resData.data.columns[i]);
-                  }
-                }
+        }
+        getJson('/dataview/info.do', {
+          view: that.charts.tableName.sql
+        }, function (res) {
+          if (res.success) {
+            that.nums = [];
+            that.dates = [];
+            that.texts = [];
+            that.columns = res.data.columns;
+            for (let i = 0; i < res.data.columns.length; i++) {
+              if (res.data.columns[i].type == 'Number') {
+                that.nums.push(res.data.columns[i]);
               }
-            })
-            .catch(function (res) {
-              console.log(res);
-            });
-        })
-        .catch(function (res) {
-          console.log(res);
+              if (res.data.columns[i].type == 'Date') {
+                that.dates.push(res.data.columns[i]);
+              }
+              if (res.data.columns[i].type == 'String') {
+                that.texts.push(res.data.columns[i]);
+              }
+            }
+          }
         });
-    }else{
-      that.workTableDialogVisible=true;
+      });
+    } else {
+      that.workTableDialogVisible = true;
     }
   },
-  // destroyed() {
-  //   this.init.run=0;
-  // },
   components: {
     IEcharts,
     tableView,
@@ -896,17 +831,10 @@ export default {
   },
 
   methods: {
-    //      test(){
-    //          let a = this.charts.option.series[0].data[0]+1;
-    //          this.$set(this.charts.option.series[0].data, 0, a);
-    //      },
     // IEcharts组件会返回实例
     onChartReady(instance) {
-      //      let that = this;
+
       this.charts.loading = false;
-      //      setTimeout(function () {
-      //          that.charts.loading = false;
-      //      },500)
     },
     // 删除某一维度,操作queryInfo.categoryColumns
     // TODO:考虑和删除数值是否需要合并
@@ -937,58 +865,28 @@ export default {
       let that = this,
         params = that.$route.params;
       // 查询图表源 数据
-      axios({
-        url: '/query.do',
-        baseURL: vars.api,
-        params: {
-          view: that.charts.tableName.sql,
-          query: JSON.stringify(that.queryInfo)
-        },
-        data: {}
-      })
-        .then(function (res) {
-          that.charts.loading = false;
-          let resData = res.data;
-          if (resData.success) {
-            that.chartData = Object.assign({}, resData.data);
-            that.graphData = Object.assign({}, resData.data);
-            that.$refs.chartsTypes.checkChartType();
-            // that.checkChartType();
-            if (Object.keys(that.charts.option).length) {
-              // that.echartsShow = true;
-            }
-            if (!Object.keys(resData.data.data).length) {
-              that.echartsShow = false;
-              that.tableShow = false;
-            }
-
-
+      getJson('/query.do', {
+        view: that.charts.tableName.sql,
+        query: JSON.stringify(that.queryInfo)
+      }, function (res) {
+        if (res.success) {
+          that.chartData = Object.assign({}, res.data);
+          that.graphData = Object.assign({}, res.data);
+          that.$refs.chartsTypes.checkChartType();
+          // that.checkChartType();
+          if (Object.keys(that.charts.option).length) {
+            // that.echartsShow = true;
           }
-        })
-        .catch(function (res) {
-          that.charts.loading = false;
-          console.log(res);
-        });
+          if (!Object.keys(res.data.data).length) {
+            that.echartsShow = false;
+            that.tableShow = false;
+          }
+        }
+      });
     },
     //通用填值
     fetchVal(item, type) {
       let temVal = {};
-      // if (item.type === 'String') {
-      //   temVal['text'] = item.text;
-      //   temVal['name'] = item.name;
-      // } else if (item.type === 'Date') {
-      //   temVal['text'] = item.text;
-      //   temVal['name'] = item.name;
-      //   temVal['gran'] = item.gran ? item.gran : 'trunc_quarter';
-      //   temVal['sort'] = item.sort ? item.sort : 'asc';
-      // } else if (item.type === 'Number') {
-      //   temVal['text'] = item.text;
-      //   temVal['name'] = item.name;
-      //   // temVal['aggr'] = item.aggr ? item.aggr : 'sum';
-      //   temVal['aggr']='count';
-      // } else {
-      //   return false;
-      // }
       if (type == 'category') {
         if (item.type == 'Date') {
           temVal['gran'] = 'trunc_quarter';
@@ -1059,19 +957,13 @@ export default {
       that.charts.query = that.queryInfo;
       that.charts.text = that.charts.option.title.text;
       that.charts.layout.type = that.charts.type;
-      ajax({
-        type: 'post',
-        url: vars.api + '/chart/save.do',
-        data: {
-          folder: '/',
-          config: JSON.stringify(that.charts)
-        },
-        dataType: 'json',
-        success: function (data) {
-          if (data.success) {
-            that.charts.id = data.data.id;
-            Message({ message: '保存成功', type: 'success' });
-          }
+      getJson('/chart/save.do', {
+        folder: '/',
+        config: JSON.stringify(that.charts)
+      }, function (data) {
+        if (data.success) {
+          that.charts.id = data.data.id;
+          Message({ message: '保存成功', type: 'success' });
         }
       });
     },
@@ -1080,24 +972,6 @@ export default {
     // 属性面板数据
     getProp: function (data) {
       this.charts.option = Object.assign({}, this.charts.option, data);
-      console.log(data);
-      // if(this.init.run){
-      //   if(this.init.type=='table'){
-      //     this.echartsShow = false;
-      //     this.tableShow = true;
-      //     this.init.run=0;
-
-      //   }
-      //   this.charts.type=this.init.type;
-      // }
-
-      // this.$nextTick(function(){
-      // });
-
-
-
-
-
     },
     //      弹出框选择日期型
     handleCheckAllChangeDates(val) {
@@ -1129,12 +1003,12 @@ export default {
       this.checkAllNums = checkedCount === this.nums.length;
       this.isIndeterminateNums = checkedCount > 0 && checkedCount < this.nums.length;
     },
-    //      添加计算字段
+    //      添加计算字段 TODO:以后会用到 18-2-12 hahage
     // onClickAddComputedColumsDialog() {
     //   this.addColFlag = false;
     //   this.addComputedColumsDialogVisible = true;
     // },
-    // //      添加分组字段
+    // //      添加分组字段 TODO:以后会用到 18-2-12 hahage
     // onAddGroupColumsDialog() {
     //   this.addColFlag = false;
     //   this.addGroupColumsDialogVisible = true;
@@ -1142,20 +1016,13 @@ export default {
     // },
     // 序列风格
     seriesStyles: function (data) {
-      this.charts.option = Object.assign({}, this.charts.option, { color: data });
+      this.charts.option = Object.assign({}, this.charts.option, { color: data.value, colorName: data.name });
     },
     // 图表类型
     chartsShape: function (data) {
-      // Object.assign(this.chartsTypes,data);
-      // Object.assign(this.charts.option, data);
-      // this.charts.option.color=data;
-      // console.log(data);
+
     },
     getCharts: function (data) {
-      // Object.assign(this.charts, data);
-      // for (var i = 0; i < this.charts.option.series.length; i++) {
-      //   this.charts.option.series[i].type = data.type;
-      // }
       this.charts.type = data.type;
       this.charts.option = Object.assign({}, this.charts.option, data.option);
     },
@@ -1246,19 +1113,12 @@ export default {
           }
         }
       }
-
       this.$set(this.queryInfo.valueColumns[index], 'sort', item.value);
       this.toggleValueSelectedItem(index);
 
       this.$nextTick(function () {
         vm.getChartDataChangeView();
       });
-
-
-
-
-
-
     },
     itemOnSelectstart() {
       //禁止被选中  拖拽元素
@@ -1366,32 +1226,38 @@ export default {
       });
       that.charts.query = Object.assign({}, that.queryInfo);
     },
+    // 选择全部日期维度
     handleCheckAllCategoryChangeDates(val) {
       this.checkedCategoryDates = val ? this.dates : [];
       this.isIndeterminateCategoryDates = false;
 
     },
+    // 选择单个日期维度
     handleCheckedCategoryDatesChange(value) {
       let checkedCount = value.length;
       this.checkAllCategoryDates = checkedCount === this.dates.length;
       this.isIndeterminateCategoryDates = checkedCount > 0 && checkedCount < this.dates.length;
 
     },
+    // 选择全部文本维度
     handleCheckAllCategoryChangeTexts(val) {
       this.checkedCategoryTexts = val ? this.texts : [];
       this.isIndeterminateCategoryTexts = false;
 
     },
+    // 选择单个文本维度
     handleCheckedCategoryTextsChange(value) {
       let checkedCount = value.length;
       this.checkAllCategoryTexts = checkedCount === this.texts.length;
       this.isIndeterminateCategoryTexts = checkedCount > 0 && checkedCount < this.texts.length;
 
     },
+    // 选择全部数值维度
     handleCheckAllCategoryChangeNums(val) {
       this.checkedNums = val ? this.nums : [];
       this.isIndeterminateNums = false;
     },
+    // 选择单个数值维度
     handleCheckedCategoryNumsChange(value) {
       let checkedCount = value.length;
       this.checkAllCategoryNums = checkedCount === this.nums.length;
@@ -1405,41 +1271,26 @@ export default {
       let that = this;
       if (e) {
         if (that.charts.tableName.sql != '') {
-          axios({
-            url: '/dataview/info.do',
-            baseURL: vars.api,
-            params: {
-              view: that.charts.tableName.sql
-            }
-          })
-            .then(function (res) {
-              let resData = res.data;
-              if (resData.success) {
-                that.columns = resData.data.columns;
-              }
+          getJson('/dataview/info.do', {
+            view: that.charts.tableName.sql
+          }, function (res) {
+            if (res.success) {
+              that.columns = res.data.columns;
               that.workTableDialogVisible = false;
-            })
-            .catch(function (res) {
-              console.log(res);
-            });
+            }
+          });
         }
         if (that.charts.id == '') {
           that.charts.query = that.queryInfo;
           that.charts.text = that.charts.option.title.text;
           that.charts.layout.type = that.charts.type;
-          ajax({
-            type: 'post',
-            url: vars.api + '/chart/save.do',
-            data: {
-              folder: '/',
-              config: JSON.stringify(that.charts)
-            },
-            dataType: 'json',
-            success: function (data) {
-              if (data.success) {
-                that.charts.id = data.data.id;
-                that.$router.push('/chart_editor/' + data.data.id);
-              }
+          getJson('/chart/save.do', {
+            folder: '/',
+            config: JSON.stringify(that.charts)
+          }, function (data) {
+            if (data.success) {
+              that.charts.id = data.data.id;
+              that.$router.push('/chart_editor/' + data.data.id);
             }
           });
         }
@@ -1462,6 +1313,29 @@ export default {
     },
     summaryFilter: function (data) {
       this.ScreenOption.summaryFilter = data;
+    },
+    onresizeWindow: function () {
+      let that = this;
+      let pathStr = that.$route.path;
+      let pathArr = pathStr.split('/');
+      // console.log(pathArr);
+
+      if (pathArr[1] === 'chart_editor') {
+        _.debounce(function () {
+          window.screenWidth = document.body.clientWidth;
+          that.screenWidth = window.screenWidth;
+          window.chartsHeight = document.body.clientHeight;
+          // console.log('---------tip-------------');
+          // console.log(document.getElementsByClassName('query')[0]);
+          // if(document.getElementsByClassName('query')[0]!=undefined){
+          let nowTopHeight = document.getElementsByClassName('query')[0].offsetHeight;
+          let Dvalue = nowTopHeight - 67;
+          // }
+          that.chartsHeight = window.chartsHeight - 150 - Dvalue;
+        }, 500)();
+      } else {
+        return false;
+      }
     }
   }
 };

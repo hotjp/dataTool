@@ -1,77 +1,60 @@
 <template>
-<el-collapse @change="handleChange" id="chartsComponents">
+<el-collapse  v-model="activeNames" id="chartsComponents">
   <el-collapse-item title="柱状图" name="1">
     <div class="comp_group fix">
       <div v-for="(item,index) in seriesOption.option.series" :key="index" class="colums_list">
-          <el-color-picker class="color_picker" @change="colorChange" v-model="item.itemStyle.normal.color"></el-color-picker>    
+          <colorPicker class="color_picker" :color.sync="item.itemStyle.normal.color" ></colorPicker>
           <p class="l item_name">{{item.name}}</p>
       </div>
     </div>
   </el-collapse-item>
-  
 </el-collapse>
 </template>
 
 <script>
-import axios from "axios";
-import seriesDefault from "../../vendor/seriesBar.json";
-import "../../vendor/seriesBar.js";
-import Vue from "vue";
+import Vue from 'vue';
+
+import seriesDefault from '../../vendor/seriesBar.json';
+import '../../vendor/jsVendor/seriesBar.js';
+
+import colorPicker from '../chartEditor/propSelect/colorPicker.vue';
 
 export default {
-  beforeMount() {
-    // 挂载前
-  },
-  mounted() {
-    let that = this;
-    // (() => Object.assign(that.seriesOption.option, that.option))();
-    (() => Object.assign(that.chartData, that.data))();
-    if ("undefined" == typeof that.seriesOption.option.series) {
-      that.seriesOption.option.series = [];
-    }
-    for (let i = 0; i < that.seriesOption.option.series.length; i++) {
-      let copy = JSON.parse(JSON.stringify(seriesDefault));
-      that.seriesOption.option.series[i] = Object.assign(
-        {},
-        copy,
-        that.seriesOption.option.series[i]
-      );
-    }
-  },
-  created() {
-    this.dataChange();
-  },
   data() {
     return {
       // 返回父级的数据，包括series和xAxis与yAxis的data部分
       seriesOption: {
         option: {
           series: [],
-          xAxis:{}
+          xAxis: {}
         }
       },
       //默认series数据
       seriesItem: seriesDefault,
       // 数据
       chartData: {},
-      // 柱状图
-      pageName: "柱状图",
-      activeNames: [], // 展开的组
-      type: "bar"
+      // 默认配置项展开
+      activeNames: ['1'], 
+      // 图表类型
+      type: 'bar',
+      pageName: '柱状图',
+      // 第一次进入页面
+      firstFlag: true
     };
   },
-  props: ["option", "data"],
-  computed: {
-    // 计算
+  mounted() {
+    let that = this;
+    (() => Object.assign(that.chartData, that.data))();
   },
+  created() {
+    this.dataChange();
+  },
+  components: {
+    colorPicker
+  },
+  props: ['option', 'data'],
   methods: {
-    // TODO 数据操作
-    handleChange() {
-      // this.$emit("getSeries", this.seriesOption.option);
-    },
-    colorChange() {
-      // this.$emit("getSeries", this.seriesOption.option);
-    },
+    // 数据处理
     dataChange() {
       let that = this;
       let newData = {};
@@ -101,59 +84,60 @@ export default {
         }
       });
       that.seriesOption.option.series = [];
-
       // xAxis数据 数组
-      // that.seriesOption.option.xAxis
-      //   ? (that.seriesOption.option.xAxis.data = [])
-      //   : (that.seriesOption.option.xAxis = {});
       newData.xAxis = that.seriesOption.option.xAxis;
-      for (let i = 0; i < queryNameKeyX.length; i++) {
-        let arr = [];
-        for (let j = 0; j < rows.length; j++) {
-          arr.push(rows[j][queryNameKeyX[i]]);
+      if (queryNameKeyX.length) {
+        for (let i = 0; i < queryNameKeyX.length; i++) {
+          let arr = [];
+          for (let j = 0; j < rows.length; j++) {
+            arr.push(rows[j][queryNameKeyX[i]]);
+          }
+          newData.xAxis.data = arr;
         }
+      } else {
+        let arr = queryNameY.map(function(x) {
+          for (let i = 0; i < columns.length; i++) {
+            if (columns[i].source.name == x) {
+              return columns[i].source.text;
+            }
+          }
+        });
         newData.xAxis.data = arr;
       }
-      
       // series.data的数据
-      // if (queryNameKeyY.length > 1) {
-        // 多个数值
-        // let arr = [];
-        // for (let i = 0; i < queryNameKeyY.length; i++) {
-        //   let copy = JSON.parse(JSON.stringify(seriesDefault));
-        //   arr.push({
-        //     data: rows.map(x => x[queryNameKeyY[i]]),
-        //     type: that.type,
-        //     itemStyle: copy.itemStyle,
-        //     name: queryNameKeyY[i]
-        //   });
-        // }
-        // that.seriesOption.option.series = arr;
-        newData.series = seriesBar(rows,queryNameKeyY,seriesDefault);
-      // } else {
-        // 一个数值
-        // let arr = [];
-        // let copy = JSON.parse(JSON.stringify(seriesDefault));
-        // arr.push({
-        //   data: rows.map(x => x[queryNameKeyY[0]]),
-        //   type: that.type,
-        //   itemStyle: copy.itemStyle,
-        //   name: queryNameKeyY[0]
-        // });
-        // that.seriesOption.option.series = arr;
-        // newData.series = arr;
-      // }
-      // that.$set(this.seriesOption, "option", newData);
-      Vue.set(this.seriesOption.option, "xAxis", newData.xAxis);
-      Vue.set(this.seriesOption.option, "series", newData.series);
-      that.$emit("getSeries", that.seriesOption.option);
+      if (that.firstFlag) {
+        newData.series = seriesBar(
+          columns,
+          rows,
+          queryNameKeyX,
+          queryNameKeyY,
+          seriesDefault,
+          that.option.series,
+          true
+        );
+      } else {
+        // 新建
+        newData.series = seriesBar(
+          columns,
+          rows,
+          queryNameKeyX,
+          queryNameKeyY,
+          seriesDefault
+        );
+      }
+
+      that.firstFlag = false;
       
+      Vue.set(this.seriesOption.option, 'grid', seriesDefault.grid);
+      Vue.set(this.seriesOption.option, 'xAxis', newData.xAxis);
+      Vue.set(this.seriesOption.option, 'series', newData.series);
+      that.$emit('getSeries', that.seriesOption.option);
     }
   },
   watch: {
     seriesOption: {
       handler: function(newVal, oldVal) {
-        this.$emit("getSeries", this.seriesOption.option);
+        this.$emit('getSeries', this.seriesOption.option);
       },
       deep: true
     },
@@ -163,15 +147,7 @@ export default {
         this.dataChange();
       },
       deep: true
-    },
-    option:{
-      // 父级传来的图表数据
-      handler: function(newVal, oldVal) {
-        // this.seriesOption.option = Object.assign({},this.seriesOption.option,this.option)
-      },
-      deep: true
-    },
-
+    }
   }
 };
 </script>

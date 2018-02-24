@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-dialog title="数据源操作" :visible.sync="dialogFormVisible">
-            <el-form v-loading="loading" :model="form">
+            <el-form v-loading="loading" :model="form" onsubmit="return false">
                 <input v-model="form.id" type="hidden">
                 <el-form-item label="数据源类型" :label-width="formLabelWidth">
                     <el-input @input="saveFlagFalse" v-model="form.dbType" readonly="readonly" auto-complete="off"></el-input>
@@ -35,8 +35,7 @@
 </template>
 <script type="text/babel">
 import vars from '../../assets/js/vars';
-import axios from 'axios';
-
+import { getJson } from '../../router/utils';
 export default {
   data: function () {
     return {
@@ -51,11 +50,33 @@ export default {
     onClickDataSourceTest() {
       let that = this;
       that.loading = true;
-      axios({
-        method: 'post',
-        url: '/datasource/test.do',
-        baseURL: vars.api,
-        params: {
+      getJson('/datasource/test.do',{
+        id: that.form.id,
+        name: that.form.name,
+        dbType: that.form.dbType,
+        host: that.form.jdbcHost,
+        port: that.form.jdbcPort,
+        user: that.form.jdbcUser,
+        password: that.form.password,
+        database: that.form.jdbcDatabases
+      },function(res){
+        that.loading = false;
+        if (res.success) {
+          that.$message('测试成功');
+          that.saveFlag = true;
+          //   console.log(resData.data.rows);
+        } else {
+          // console.log(res);
+          that.$message('测试失败' + res.errorMessage);
+          that.saveFlag = false;
+        }
+      });
+    },
+    onClickDataSourceSave() {
+      let that = this;
+      if (that.saveFlag) {
+        that.loading = true;
+        getJson('/datasource/save.do',{
           id: that.form.id,
           name: that.form.name,
           dbType: that.form.dbType,
@@ -64,64 +85,15 @@ export default {
           user: that.form.jdbcUser,
           password: that.form.password,
           database: that.form.jdbcDatabase
-        }
-      })
-        .then(function (res) {
+        },function(res){
           that.loading = false;
-          var resData = res.data;
-          if (resData.success) {
-            that.$message('测试成功');
-            that.saveFlag = true;
-            //   console.log(resData.data.rows);
+          if (res.success) {
+            that.dialogFormVisible = false;
+            that.$message('保存成功');
           } else {
-            console.log(resData);
-            that.$message('测试失败' + ' ' + resData.errorMessage);
-            that.saveFlag = false;
-          }
-        })
-        .catch(function (res) {
-          that.loading = false;
-          console.error(res);
-          that.$message('测试失败' + res.errorMessage);
-          that.saveFlag = false;
-        });
-
-    },
-    onClickDataSourceSave() {
-      let that = this;
-      if (that.saveFlag) {
-        that.loading = true;
-        axios({
-          method: 'post',
-          url: '/datasource/save.do',
-          baseURL: vars.api,
-          params: {
-            id: that.form.id,
-            name: that.form.name,
-            dbType: that.form.dbType,
-            host: that.form.jdbcHost,
-            port: that.form.jdbcPort,
-            user: that.form.jdbcUser,
-            password: that.form.password,
-            database: that.form.jdbcDatabase
-          }
-        })
-          .then(function (res) {
-            that.loading = false;
-            var resData = res.data;
-            if (resData.success) {
-              that.dialogFormVisible = false;
-              that.$message('保存成功');
-            } else {
-              that.$message('保存未成功');
-            }
-
-          })
-          .catch(function (res) {
-            that.loading = false;
-            console.error(res);
             that.$message('保存未成功');
-          });
+          }
+        });
       } else {
         this.$message('测试链接未通过，请通过测试后再保存');
       }

@@ -1,55 +1,40 @@
 <template>
-<el-collapse @change="handleChange" id="chartsComponents">
-  <el-collapse-item title="面积图" name="1">
-    <div class="comp_group fix">
-      <div v-for="(item,index) in seriesOption.option.series" :key="index" class="colums_list">
-          {{item.name}}
-          <el-color-picker class="color_picker" v-model="item.itemStyle.normal.color"></el-color-picker>    
+<el-collapse v-model="activeNames" id="chartsComponents">
+  <form action onsubmit="return false">
+    <el-collapse-item title="面积图" name="1">
+      <div class="comp_group fix">
+        <div v-for="(item,index) in seriesOption.option.series" :key="index" class="colums_list">
+          <div class="fix lh30">
+            <colorPicker class="color_picker" :color.sync="item.itemStyle.normal.color" ></colorPicker>
+            {{item.name}}
+          </div>
+          <div class="fix lh30">
+            <colorPicker class="color_picker" :color.sync="item.areaStyle.normal.color.colorStops[0].color" ></colorPicker>
+            <colorPicker class="color_picker" :color.sync="item.areaStyle.normal.color.colorStops[1].color" ></colorPicker>
+            起止颜色
+          </div>
+        </div>
       </div>
-    </div>
-    <!-- <div class="comp_group fix">
-      <el-switch
-        v-model="smooth"
-        active-color="#5182E4"
-        @change="smoothChange"
-        inactive-color="#cccccc">
-      </el-switch> 平滑曲线
-    </div> -->
-    
-    
-  </el-collapse-item>
-  
+      <div class="comp_group fix">
+        <el-switch v-model="smooth" active-color="#5182E4" @change="smoothChange" inactive-color="#cccccc"></el-switch> 
+        平滑曲线
+      </div>
+    </el-collapse-item>
+  </form>
 </el-collapse>
 </template>
 
 <script>
-import axios from "axios";
-import seriesDefault from "../../vendor/seriesArea.json";
-import "../../vendor/seriesArea.js";
-import Vue from "vue";
+import Vue from 'vue';
+
+import seriesDefault from '../../vendor/seriesArea.json';
+import '../../vendor/jsVendor/seriesArea.js';
+
+import colorPicker from '../chartEditor/propSelect/colorPicker.vue';
 
 export default {
-  mounted() {
-    let that = this;
-    (() => Object.assign(that.chartData, that.data))();
-    if ("undefined" == typeof that.seriesOption.option.series) {
-      that.seriesOption.option.series = [];
-    }
-    for (let i = 0; i < that.seriesOption.option.series.length; i++) {
-      let copy = JSON.parse(JSON.stringify(seriesDefault));
-      that.seriesOption.option.series[i] = Object.assign(
-        {},
-        copy,
-        that.seriesOption.option.series[i]
-      );
-    }
-  },
-  created() {
-    this.dataChange();
-  },
   data() {
     return {
-      seriesDefault: {},
       // 返回父级的数据，包括series和xAxis与yAxis的data部分
       seriesOption: {
         option: {
@@ -58,27 +43,43 @@ export default {
       },
       // 数据
       chartData: {},
-      activeNames: [], // 展开的组
-      type: "line",
-      smooth: false, // TODO: 取值
-      
+      // 默认配置项展开
+      activeNames: ['1'], 
+      // 图表类型
+      type: 'line',
+      pageName: '面积图',
+      // 是否平滑曲线
+      smooth: false,
+      // 第一次进入页面
+      firstFlag: true
     };
   },
-  props: ["option", "data"],
-  computed: {
-    // 计算
+  mounted() {
+    let that = this;
+    (() => Object.assign(that.chartData, that.data))();
+    if (that.option.series) {
+      if (that.option.series[0].smooth) {
+        that.smooth = that.option.series[0].smooth;
+      }
+    }
   },
+  created() {
+    this.dataChange();
+  },
+  components: {
+    colorPicker
+  },
+  props: ['option', 'data'],
   methods: {
-    // TODO 数据操作
-    handleChange() {
-      // this.$emit("getSeries", this.seriesOption.option);
-    },
+    // 平滑曲线
     smoothChange(data) {
       for (let i = 0; i < this.seriesOption.option.series.length; i++) {
         this.seriesOption.option.series[i].smooth = data;
       }
       this.seriesOption.option = Object.assign({}, this.seriesOption.option);
+      this.$emit('getSeries', this.seriesOption.option);
     },
+    // 数据处理
     dataChange() {
       let that = this;
       let newData = {};
@@ -120,21 +121,40 @@ export default {
           arr.push(rows[j][queryNameKeyX[i]]);
         }
         newData.xAxis.data = arr;
-        // that.seriesOption.option.xAxis.data = arr;
       }
       // series.data的数据
-      newData.series = seriesLine(rows, queryNameKeyY, seriesDefault);
+      if (that.firstFlag) {
+        // 第一次进入页面
+        newData.series = seriesArea(
+          columns,
+          rows,
+          queryNameKeyX,
+          queryNameKeyY,
+          seriesDefault,
+          that.option.series,
+          true
+        );
+      } else {
+        newData.series = seriesArea(
+          columns,
+          rows,
+          queryNameKeyX,
+          queryNameKeyY,
+          seriesDefault
+        );
+      }
 
-      // that.$set(this.seriesOption, "option", newData);
-      Vue.set(this.seriesOption.option, "xAxis", newData.xAxis);
-      Vue.set(this.seriesOption.option, "series", newData.series);
-      that.$emit("getSeries", that.seriesOption.option);
+      that.firstFlag = false;
+      Vue.set(this.seriesOption.option, 'grid', seriesDefault.grid);
+      Vue.set(this.seriesOption.option, 'xAxis', newData.xAxis);
+      Vue.set(this.seriesOption.option, 'series', newData.series);
+      that.$emit('getSeries', that.seriesOption.option);
     }
   },
   watch: {
     seriesOption: {
       handler: function(newVal, oldVal) {
-        this.$emit("getSeries", this.seriesOption.option);
+        this.$emit('getSeries', this.seriesOption.option);
       },
       deep: true
     },
@@ -149,5 +169,7 @@ export default {
 };
 </script>
 <style>
-
+  .lh30{
+    line-height: 30px;
+  }
 </style>
