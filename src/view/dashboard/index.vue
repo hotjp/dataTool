@@ -25,7 +25,7 @@
                 <div class="chart_tit">{{item.title}}</div>
                 <div class="edit_bar fix">
                   <router-link class="edit_bar_btn r el-icon-edit" :to="'/chart_editor/'+item.id" alt="编辑"></router-link>
-                  <span class=" edit_bar_btn r el-icon-refresh" @click="getChartData(item.id,index,$event)" alt="刷新"></span>
+                  <span class=" edit_bar_btn r el-icon-refresh" @click="refreshChartData(item.id,index,$event)" alt="刷新"></span>
                   <span class="el-icon-delete r edit_bar_btn" @click="deleteChart(item.id,index,$event)" alt="删除"></span>
                 </div>
                 <tableView v-if="item.type =='table'" class="full table_container" :myMessage="item.chartData"></tableView>
@@ -86,7 +86,6 @@
 <script>
 // 引入公用配置
 import vars from '../../assets/js/vars';
-import { ajax } from 'jquery';
 import { Message } from 'element-ui';
 import { Loading } from 'element-ui';
 import { getJson } from '../../router/utils';
@@ -187,7 +186,8 @@ export default {
     };
   },
   mounted() {
-    let that = this;
+    let that = this,
+      params = that.$route.params;
     that.loadDashboard();
     // 加载已有chart 列表
     getJson('/chart/list.do',{
@@ -254,65 +254,155 @@ export default {
               }
             }
           }
-          for (let i = 0; i < that.chartList.length; i++) {
-            that.getChartData(that.chartList[i].id, i);
-          }
-          // FIXME: 需要等到dom加载完后再load
-          setTimeout(function() {
-            that.loadGrid();
-            that.toggleFullScreen();
-          }, 1000);
+          that.getDashboardData()
         }
       });
     },
+    // 空函数
+    noop(){},
+    getDashboardData(callback){
+      let that = this,
+        params = that.$route.params;
+      for(let j=0;j<that.chartList.length;j++){
+        that.chartList[j].option={}
+      }
+      // 第一个promise取chart列表
+      var resultArr=[];
+      for (let i = 0; i < that.chartList.length; i++) {
+        resultArr.push(request(that.chartList[i].id, i))
+      }
+      function request(id, i){
+        return new Promise(function(resolve,reject){
+          that.getChartData(id, i,resolve,reject);
+        })
+      }
+      Promise.all(resultArr).then((result)=>{
+        var chartDataPms = [];
+        for (let i=0;i<result.length;i++) {
+          that.chartList[i].option = result[i] && result[i].option ? result[i].option : {};
+          that.chartList[i].loading = false;
+          that.chartList[i].type = result[i].type;
+          that.chartList[i].sql = result[i].tableName.sql;
+          that.chartList[i].query = result[i].query;
+          that.chartList[i].title = that.chartList[i].option.title.text;
+          // 清空title，把title提出来
+          that.chartList[i].option.title = '';
+          // 手动清空series.data里数据   
+          if (that.chartList[i].option && that.chartList[i].option.series) {
+            for (let j = 0; j < that.chartList[i].option.series.length; j++) {
+              that.chartList[i].option.series[j].data = [];
+            }
+          }
+        }
+        for (let i = 0; i < that.chartList.length; i++) {
+          chartDataPms.push(chartDataRequest(that.chartList[i].sql,JSON.stringify(that.chartList[i].query), i,that.chartList[i].type))
+        }
+        function chartDataRequest(sql, queryInfo, index, type){
+          return new Promise(function(resolve,reject){
+            that.getChartSeriesData(sql, queryInfo, index, type,resolve,reject);
+          })
+        }
+        Promise.all(chartDataPms).then((result2)=>{
+            for(let i=0;i<result2.length;i++){
+              if (result2[i].data.dataError || !result2[i].data.data) {
+                continue
+              }
+              that.dataHandler(result2[i], i, that.chartList[i].type);
+            }
+            that.loadGrid();
+            that.toggleFullScreen();
+            if('function' == typeof callback){
+              callback()
+            }
+        })
+      });
+    },
     // 获取单一图表数据,i是在索引中的顺序
-    getChartData(chartId, i, $event) {
+    getChartData(chartId, i,resolve,reject) {
+      let that = this;
+      if('function' != typeof resolve){
+        resolve = that.noop
+      }
+      if('function' != typeof reject){
+        reject = that.noop
+      }
+      // 查询图表源 数据
+      getJson('/chart/info.do',{
+        chart: chartId
+      },
+      function(data) {
+        resolve(data.data)
+      },
+      function(){
+        reject()
+      })
+    },
+    // 获取图表数据，手动组织series.data
+    getChartSeriesData(id, queryInfo, index, type,resolve,reject) {
+      let that = this;
+      getJson('/query.do',{
+        view: id,
+        query: queryInfo
+      },
+      function(data) {
+        if (data.success) {
+          resolve(data)
+        }
+      },
+      function(){
+        reject()
+      });
+    },
+    refreshChartData(chartId, i, $event){
       let that = this,
         loadingInstance;
-      if ($event) {
-        loadingInstance = Loading.service({
-          target: $($event.target).closest('._wrap')[0]
-        });
-      }
+      loadingInstance = Loading.service({
+        target: $($event.target).closest('._wrap')[0]
+      });
       // TODO: loading使用elementUI的，但是关闭事件用了延时
       // that.chartList[i].loading = true;
       // that.chartList.splice(i, 1, this.chartList[i])
       // that.chartList = Object.assign([],that.chartList)
 
       // 查询图表源 数据
-      ajax({
-        type: 'post',
-        url: vars.api + '/chart/info.do',
-        async: false, // 设为同步
-        data: {
-          chart: chartId
-        },
-        dataType: 'json',
-        success: function(data) {
-          if (data.success && data.data) {
-            that.chartList[i].option = data.data && data.data.option ? data.data.option : {};
-            that.chartList[i].loading = false;
-            that.chartList[i].type = data.data.type;
-            that.chartList[i].title = that.chartList[i].option.title.text;
-            // 清空title，把title提出来
-            that.chartList[i].option.title = '';
-            // 手动清空series.data里数据   
-            if (that.chartList[i].option && that.chartList[i].option.series) {
-              for (let j = 0; j < that.chartList[i].option.series.length; j++) {
-                that.chartList[i].option.series[j].data = [];
-              }
+      getJson('/chart/info.do',{
+        chart: chartId
+      },
+      function(data) {
+        if (data.success && data.data) {
+          that.chartList[i].option = data.data && data.data.option ? data.data.option : {};
+          that.chartList[i].loading = false;
+          that.chartList[i].type = data.data.type;
+          that.chartList[i].sql = data.data.tableName.sql;
+          that.chartList[i].query = data.data.query;
+          that.chartList[i].title = that.chartList[i].option.title.text;
+          // 清空title，把title提出来
+          that.chartList[i].option.title = '';
+          // 手动清空series.data里数据   
+          if (that.chartList[i].option && that.chartList[i].option.series) {
+            for (let j = 0; j < that.chartList[i].option.series.length; j++) {
+              that.chartList[i].option.series[j].data = [];
             }
-            that.getChartSeriesData(data.data.tableName.sql,JSON.stringify(data.data.query),i,data.data.type);
           }
+          getJson('/query.do',{
+            view: data.data.tableName.sql,
+            query: JSON.stringify(data.data.query)
+          },
+          function(res) {
+            if (res.success) {
+              if (res.data.dataError || !res.data.data) {
+                return;
+              }
+              that.dataHandler(res, i, data.data.type);
+            }
+          });
         }
       });
-      if (loadingInstance) {
-        setTimeout(function() {
-          that.$nextTick(function() {
-            loadingInstance.close();
-          });
-        }, 1000);
-      }
+      setTimeout(function() {
+        that.$nextTick(function() {
+          loadingInstance.close();
+        });
+      }, 1000);
     },
     // 选择工作表
     handleNodeClick(data) {
@@ -364,29 +454,6 @@ export default {
           }
         });
       }
-    },
-    // 获取图表数据，手动组织series.data
-    getChartSeriesData(id, queryInfo, index, type) {
-      let that = this;
-      ajax({
-        type: 'post',
-        url: vars.api + '/query.do',
-        async: false, // 设为同步
-        data: {
-          view: id,
-          query: queryInfo
-        },
-        dataType: 'json',
-        success: function(data) {
-          if (data.success) {
-            if (data.data.dataError || !data.data.data) {
-              return;
-            }
-            that.dataHandler(data, index, type);
-            
-          }
-        }
-      });
     },
     // 保存仪表盘
     saveDashboard(callback) {
@@ -506,18 +573,10 @@ export default {
           height: 4,
           isAutoPosition: true
         });
-
-        for (let i = 0; i < that.chartList.length; i++) {
-          that.getChartData(that.chartList[i].id, i);
-        }
-        that.chartList = Object.assign([], that.chartList);
         that.dash.destroy(false);
         $('#dash').data('gridstack', '');
-        setTimeout(function() {
-          that.loadGrid();
-          that.toggleFullScreen();
-          that.saveDashboard();
-        }, 1000);
+        that.getDashboardData(that.saveDashboard)
+
       }
     },
     // 拖拽区遮罩

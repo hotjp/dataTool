@@ -6,13 +6,16 @@
   </div>
 </template>
 <script>
+import vars from '../assets/js/vars';
+
 export default {
 
   mounted() {
   },
   data: function () {
     return {
-      titleType: 1
+      titleType: 1,
+      vars:vars
     };
   },
   methods: {

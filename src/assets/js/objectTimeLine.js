@@ -2,7 +2,7 @@
  * 自动保存对象历史的工具类
  * 0.0.1
  */
-import { merge, throttle } from 'lodash';
+import { merge, throttle, debounce } from 'lodash';
 
 export default class TimeLine {
   initBackup() {
@@ -17,10 +17,9 @@ export default class TimeLine {
     if (isInit) {
       key += 'Init';
     }
-    let name = key + opt._initTime,
+    let name = key,
       item = this.timeLine[this.timeLine.length - 1];
     if (isInit) {
-      item = this.options.treasures;
       opt.backupOpt._initKey = name;
     } else {
       opt.backupOpt._backupKey = name;
@@ -49,18 +48,27 @@ export default class TimeLine {
     return false;
   }
 
-  snapshoot(obj) {
+  snapshootAct(obj) {
     // 去重
     if (this.options.timeLineOpt.uniq && this.isSame(this.timeLine[this.timeLine.length - 1], obj)) {
       return;
     }
-
+    // 去空值
+    if(JSON.stringify(obj) === '{}'){
+      return;
+    }
+    
     // 长度控制
     if (this.timeLine.length == this.options.timeLineOpt.maxLength) {
       this.timeLine.shift();
     }
     // 增加
     this.timeLine.push(merge({}, obj));
+    // 初始状态
+    if(!this.inited){
+      this.inited = !this.inited;
+      this.setBackup(true);
+    }
   }
   constructor(opt) {
     makeTimeLine.call(this, opt);
@@ -90,13 +98,15 @@ function makeTimeLine(opt) {
   options._treasures = opt.treasures;
   this.options = merge({}, options, opt);
   this.options._initTime = +new Date();
-  this.setBackup(true);
+  
   if (this.options.backupOpt.autoBackup) {
     this.initBackup();
   }
-  this.snapshoot = throttle(this.snapshoot, this.options.timeLineOpt.throttleInterval);
+  this.snapshoot = debounce(this.snapshootAct, this.options.timeLineOpt.debounceInterval,true);
 }
 const options = {
+  // 是否初始化完成（保存初始化后的初值）
+  inited:false,
   // 实例时间
   _initTime: 0,
   // 来源对象,请勿传参
@@ -105,8 +115,8 @@ const options = {
   timeLineOpt: {
     // 历史记录最大值
     maxLength: 3,
-    // 历史记录保存节流间隔
-    throttleInterval: 1e2,
+    // 历史记录保存防抖间隔
+    debounceInterval: 5*1e2,
     // 是否去重
     uniq: true
   },
@@ -116,7 +126,7 @@ const options = {
     _initKey: '',
     // 最新值name
     _backupKey: '',
-    // 没有自定义则由’backup'+_initTime命名
+    // 没有自定义则由’backup'命名
     name: '',
     // 是否自动备份
     autoBackup: true,

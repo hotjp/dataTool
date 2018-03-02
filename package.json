@@ -2,6 +2,7 @@
   "name": "dt_tools",
   "description": "A Vue.js DT Tools",
   "author": "hotjp@126.com",
+  "version":"0.2.1",
   "private": true,
   "scripts": {
     "dev": "webpack-dev-server --inline --hot --env.dev",

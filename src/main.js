@@ -29,3 +29,7 @@ const app = new Vue({
 
 // 数据编辑
 
+// 设置版本
+import {version} from '../package.json';
+var body = document.getElementsByTagName('body')[0];
+body.setAttribute('data-version',version)

@@ -720,7 +720,7 @@ export default {
     };
   },
   watch: {
-    // 如果 `question` 发生改变，这个函数就会运行
+    // 如果 charts 改变，函数运行
     charts: {
       handler: function (newCharts) {
         this.timeLine.snapshoot(newCharts);
