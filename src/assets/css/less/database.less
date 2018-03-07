@@ -1,0 +1,142 @@
+// out:false 
+// 数据源
+#database{
+    position: fixed;
+    top: 64px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #f0f2f3;
+    .database_left{
+        padding-top: 20px;
+        border-right: 1px solid #ddd;
+        .title{
+            padding-left: 20px;
+            background-color: #f0f2f3;
+            line-height: 30px;
+        }
+    }
+    .database_list{
+        padding-left: 20px;
+        li{
+            .centered-line(26px);
+            position: relative;
+            color: #888888;
+            font-size: 12px;
+            .database_name{
+                float: left;
+            }
+            .el-icon-more {
+                float: right;
+                margin-right: 10px;
+                display: none;
+                position: relative;
+                top: 0px;
+                padding: 3px;
+            }
+            &:hover {
+                .el-icon-more {
+                    display: inline-block;
+                }
+            }
+            &.hover{
+                .cover{
+                    display: block;
+                }
+            }
+            .cover{
+                display: none;
+                width: 50px;
+                background-color: #ffffff;
+                position: absolute;
+                right: 10px;
+                top: 15px;
+                text-align: center;
+                z-index: 10;
+                cursor: default;
+                a{
+                    color: #888888;
+                    display: block;
+                    line-height: 24px;
+                    margin: 5px 0;
+                    cursor: pointer;
+                    text-decoration: none;
+                    &:hover{
+                        color: @c-main;
+                    }
+                }
+            }
+        }
+    }
+    .database_right{
+        .top{
+            padding-top: 10px;
+        }
+        .database_add{
+            float: right;
+            margin-right: 30px;
+            .centered-line(30px);
+            position: relative;
+            padding-left: 20px;
+            font-size: 14px;
+            &:before{
+                content:'';
+                position: absolute;
+                width: 16px;
+                height: 16px;
+                top: 50%;
+                margin-top: -8px;
+                left: 0;
+                background: url(../../images/database_add.png) center no-repeat;
+                background-size: contain;
+            }
+        }
+    }
+
+}
+// 添加数据源
+#addDataList{
+    position: fixed;
+    top: 64px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding-top: 30px;
+    background-color: #f0f2f3;
+    *[class*="rect-"]{
+        position: relative;
+        display: block; 
+        width: 100%;
+        height: 0;
+        overflow: hidden;
+        ._full{
+            position: absolute;
+            left: 0;
+            top:0;
+            width: 100%;
+            height: 100%;
+            *height: auto;
+        }
+    }
+    .input_wrap{
+        width: 70%;
+        margin: 0 auto 30px;
+    }
+    .rect-100{padding-bottom: 100%;}
+    .database_item{
+        background-color: #ffffff;
+        text-align: center;
+        img{
+            display: block;
+            width: 80%;
+            margin: 15px auto;
+        }
+        ._full{
+            display: none;
+            background:rgba(255,255,255,.95) url(../../images/hover_add.png) center no-repeat ;
+        }
+        &:hover ._full{
+            display: block;
+        }
+    }
+}

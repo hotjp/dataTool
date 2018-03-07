@@ -278,7 +278,7 @@ audio:not([controls]),
   top: 50%;
   left: 0;
   margin-top: -7px;
-  background: url(../images/add_charts.png) no-repeat center;
+  background: url(../../images/add_charts.png) no-repeat center;
   background-size: cover;
 }
 #dashboard .top .edit_switch {
@@ -351,7 +351,7 @@ audio:not([controls]),
 #dashboard .grid-stack > .grid-stack-item > .ui-resizable-se {
   right: 7px;
   bottom: 7px;
-  background: url(../images/handel.png) center no-repeat;
+  background: url(../../images/handel.png) center no-repeat;
   background-size: cover;
   transform: rotate(0);
 }
@@ -370,7 +370,7 @@ audio:not([controls]),
 }
 #dashboard .searchColumns {
   width: 100%;
-  background: url("../images/search_icon.png") no-repeat scroll 50% center;
+  background: url("../../images/search_icon.png") no-repeat scroll 50% center;
   border: none;
   border-bottom: 1px solid #8ea7e4;
   -webkit-transition: all 0.2s;

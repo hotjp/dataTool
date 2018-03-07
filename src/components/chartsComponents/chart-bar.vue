@@ -12,8 +12,6 @@
 </template>
 
 <script>
-import Vue from 'vue';
-
 import seriesDefault from '../../vendor/seriesBar.json';
 import '../../vendor/jsVendor/seriesBar.js';
 
@@ -128,9 +126,9 @@ export default {
 
       that.firstFlag = false;
       
-      Vue.set(this.seriesOption.option, 'grid', seriesDefault.grid);
-      Vue.set(this.seriesOption.option, 'xAxis', newData.xAxis);
-      Vue.set(this.seriesOption.option, 'series', newData.series);
+      that.$set(this.seriesOption.option, 'grid', seriesDefault.grid);
+      that.$set(this.seriesOption.option, 'xAxis', newData.xAxis);
+      that.$set(this.seriesOption.option, 'series', newData.series);
       that.$emit('getSeries', that.seriesOption.option);
     }
   },

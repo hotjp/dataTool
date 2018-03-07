@@ -254,7 +254,7 @@ export default {
               }
             }
           }
-          that.getDashboardData()
+          that.getDashboardData();
         }
       });
     },
@@ -264,17 +264,17 @@ export default {
       let that = this,
         params = that.$route.params;
       for(let j=0;j<that.chartList.length;j++){
-        that.chartList[j].option={}
+        that.chartList[j].option={};
       }
       // 第一个promise取chart列表
       var resultArr=[];
       for (let i = 0; i < that.chartList.length; i++) {
-        resultArr.push(request(that.chartList[i].id, i))
+        resultArr.push(request(that.chartList[i].id, i));
       }
       function request(id, i){
         return new Promise(function(resolve,reject){
           that.getChartData(id, i,resolve,reject);
-        })
+        });
       }
       Promise.all(resultArr).then((result)=>{
         var chartDataPms = [];
@@ -295,47 +295,47 @@ export default {
           }
         }
         for (let i = 0; i < that.chartList.length; i++) {
-          chartDataPms.push(chartDataRequest(that.chartList[i].sql,JSON.stringify(that.chartList[i].query), i,that.chartList[i].type))
+          chartDataPms.push(chartDataRequest(that.chartList[i].sql,JSON.stringify(that.chartList[i].query), i,that.chartList[i].type));
         }
         function chartDataRequest(sql, queryInfo, index, type){
           return new Promise(function(resolve,reject){
             that.getChartSeriesData(sql, queryInfo, index, type,resolve,reject);
-          })
+          });
         }
         Promise.all(chartDataPms).then((result2)=>{
-            for(let i=0;i<result2.length;i++){
-              if (result2[i].data.dataError || !result2[i].data.data) {
-                continue
-              }
-              that.dataHandler(result2[i], i, that.chartList[i].type);
+          for(let i=0;i<result2.length;i++){
+            if (result2[i].data.dataError || !result2[i].data.data) {
+              continue;
             }
-            that.loadGrid();
-            that.toggleFullScreen();
-            if('function' == typeof callback){
-              callback()
-            }
-        })
+            that.dataHandler(result2[i], i, that.chartList[i].type);
+          }
+          that.loadGrid();
+          that.toggleFullScreen();
+          if('function' == typeof callback){
+            callback();
+          }
+        });
       });
     },
     // 获取单一图表数据,i是在索引中的顺序
     getChartData(chartId, i,resolve,reject) {
       let that = this;
       if('function' != typeof resolve){
-        resolve = that.noop
+        resolve = that.noop;
       }
       if('function' != typeof reject){
-        reject = that.noop
+        reject = that.noop;
       }
       // 查询图表源 数据
       getJson('/chart/info.do',{
         chart: chartId
       },
       function(data) {
-        resolve(data.data)
+        resolve(data.data);
       },
       function(){
-        reject()
-      })
+        reject();
+      });
     },
     // 获取图表数据，手动组织series.data
     getChartSeriesData(id, queryInfo, index, type,resolve,reject) {
@@ -346,11 +346,11 @@ export default {
       },
       function(data) {
         if (data.success) {
-          resolve(data)
+          resolve(data);
         }
       },
       function(){
-        reject()
+        reject();
       });
     },
     refreshChartData(chartId, i, $event){
@@ -575,7 +575,7 @@ export default {
         });
         that.dash.destroy(false);
         $('#dash').data('gridstack', '');
-        that.getDashboardData(that.saveDashboard)
+        that.getDashboardData(that.saveDashboard);
 
       }
     },
