@@ -1,58 +1,41 @@
 <template>
-<el-collapse v-model="activeNames" id="chartsComponents">
-  <form action onsubmit="return false">
-    <el-collapse-item title="面积图" name="1">
-      <div class="comp_group fix">
-        <div v-for="(item,index) in seriesOption.option.series" :key="index" class="colums_list">
-          <div class="fix lh30">
-            <colorPicker class="color_picker" :color.sync="item.itemStyle.normal.color" ></colorPicker>
-            {{item.name}}
-          </div>
-          <div class="fix lh30">
-            <colorPicker class="color_picker" :color.sync="item.areaStyle.normal.color.colorStops[0].color" ></colorPicker>
-            <colorPicker class="color_picker" :color.sync="item.areaStyle.normal.color.colorStops[1].color" ></colorPicker>
-            起止颜色
+  <el-collapse v-model="activeNames" id="chartsComponents">
+    <form action onsubmit="return false">
+      <el-collapse-item title="面积图" name="1">
+        <div class="comp_group fix">
+          <div v-for="(item,index) in seriesOption.option.series" :key="index" class="colums_list">
+            <div class="fix lh30">
+              <colorPicker class="color_picker" :color.sync="item.itemStyle.normal.color" ></colorPicker>
+              {{item.name}}
+            </div>
+            <div class="fix lh30">
+              <colorPicker class="color_picker" :color.sync="item.areaStyle.normal.color.colorStops[0].color" ></colorPicker>
+              <colorPicker class="color_picker" :color.sync="item.areaStyle.normal.color.colorStops[1].color" ></colorPicker>
+              起止颜色
+            </div>
           </div>
         </div>
-      </div>
-      <div class="comp_group fix">
-        <el-switch v-model="smooth" active-color="#5182E4" @change="smoothChange" inactive-color="#cccccc"></el-switch> 
-        平滑曲线
-      </div>
-    </el-collapse-item>
-  </form>
-</el-collapse>
+        <div class="comp_group fix">
+          <el-switch v-model="smooth" active-color="#5182E4" @change="smoothChange" inactive-color="#cccccc"></el-switch> 
+          平滑曲线
+        </div>
+      </el-collapse-item>
+    </form>
+  </el-collapse>
 </template>
 
 <script>
-import Vue from 'vue';
+import seriesDefault from "../../vendor/seriesArea.json";
+import "../../vendor/jsVendor/seriesArea.js";
 
-import seriesDefault from '../../vendor/seriesArea.json';
-import '../../vendor/jsVendor/seriesArea.js';
-
-import colorPicker from '../chartEditor/propSelect/colorPicker.vue';
+import colorPicker from "../chartEditor/propSelect/colorPicker.vue";
 
 export default {
-  data() {
-    return {
-      // 返回父级的数据，包括series和xAxis与yAxis的data部分
-      seriesOption: {
-        option: {
-          series: []
-        }
-      },
-      // 数据
-      chartData: {},
-      // 默认配置项展开
-      activeNames: ['1'], 
-      // 图表类型
-      type: 'line',
-      pageName: '面积图',
-      // 是否平滑曲线
-      smooth: false,
-      // 第一次进入页面
-      firstFlag: true
-    };
+  components: {
+    colorPicker
+  },
+  created() {
+    this.dataChange();
   },
   mounted() {
     let that = this;
@@ -63,13 +46,40 @@ export default {
       }
     }
   },
-  created() {
-    this.dataChange();
+  data: () => ({
+    // 返回父级的数据，包括series和xAxis与yAxis的data部分
+    seriesOption: {
+      option: {
+        series: []
+      }
+    },
+    // 数据
+    chartData: {},
+    // 默认配置项展开
+    activeNames: ["1"],
+    // 图表类型
+    type: "line",
+    pageName: "面积图",
+    // 是否平滑曲线
+    smooth: false,
+    // 第一次进入页面
+    firstFlag: true
+  }),
+  watch: {
+    seriesOption: {
+      handler: function(newVal, oldVal) {
+        this.$emit("getSeries", this.seriesOption.option);
+      },
+      deep: true
+    },
+    data: {
+      // 父级传来的图表数据
+      handler: function(newVal, oldVal) {
+        this.dataChange();
+      },
+      deep: true
+    }
   },
-  components: {
-    colorPicker
-  },
-  props: ['option', 'data'],
   methods: {
     // 平滑曲线
     smoothChange(data) {
@@ -77,7 +87,7 @@ export default {
         this.seriesOption.option.series[i].smooth = data;
       }
       this.seriesOption.option = Object.assign({}, this.seriesOption.option);
-      this.$emit('getSeries', this.seriesOption.option);
+      this.$emit("getSeries", this.seriesOption.option);
     },
     // 数据处理
     dataChange() {
@@ -145,31 +155,17 @@ export default {
       }
 
       that.firstFlag = false;
-      Vue.set(this.seriesOption.option, 'grid', seriesDefault.grid);
-      Vue.set(this.seriesOption.option, 'xAxis', newData.xAxis);
-      Vue.set(this.seriesOption.option, 'series', newData.series);
-      that.$emit('getSeries', that.seriesOption.option);
+      that.$set(this.seriesOption.option, "grid", seriesDefault.grid);
+      that.$set(this.seriesOption.option, "xAxis", newData.xAxis);
+      that.$set(this.seriesOption.option, "series", newData.series);
+      that.$emit("getSeries", that.seriesOption.option);
     }
   },
-  watch: {
-    seriesOption: {
-      handler: function(newVal, oldVal) {
-        this.$emit('getSeries', this.seriesOption.option);
-      },
-      deep: true
-    },
-    data: {
-      // 父级传来的图表数据
-      handler: function(newVal, oldVal) {
-        this.dataChange();
-      },
-      deep: true
-    }
-  }
+  props: ["option", "data"]
 };
 </script>
 <style>
-  .lh30{
-    line-height: 30px;
-  }
+.lh30 {
+  line-height: 30px;
+}
 </style>

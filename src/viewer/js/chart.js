@@ -54,7 +54,7 @@ function getChartData(chartId) {
           viewId = res.data.tableName.sql
         $.ajax({
           type: "post",
-          url: "http://192.168.50.200:8880/dataviz/api/query.do",
+          url: "http://119.180.98.134:8880/dataviz/api/query.do",
           data: {
             view: viewId,
             query: queryInfo

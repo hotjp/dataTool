@@ -38,6 +38,19 @@ function evalConditional(first, condition, second) {
   return new Function('return ' + first + condition + second)();
 }
 export default{
+  mounted(){
+    let that=this;
+    // 初始化页面数据
+    Object.assign(that.chart,that.charts);
+    this.option.echartsShow=this.echartsShow;
+    this.option.tableShow=this.tableShow;
+    this.sortArr=Object.keys(chartTypes).sort(function(a,b){
+      return chartTypes[a].sort - chartTypes[b].sort;
+    });
+    this.weightArr=Object.keys(chartTypes).sort(function(a,b){
+      return chartTypes[a].weight - chartTypes[b].weight;
+    });
+  },
   data:()=>({
     // 页面初始化
     init:1,
@@ -52,44 +65,44 @@ export default{
         valueColumns: [],
         categoryColumns: [],
         filters: [
-          {
-            conj: 'and',
-            name: 'price',
-            op: 'gt',
-            values: [
-              1
-            ]
-          },
-          {
-            conj: 'and',
-            name: 'qty',
-            op: 'lt',
-            values: [
-              99999
-            ]
-          },
-          {
-            conj: 'and',
-            exprs: [
-              {
-                conj: 'or',
-                name: 'type',
-                op: 'eq',
-                values: [
-                  'requirement'
-                ]
-              },
-              {
-                conj: 'or',
-                name: 'status',
-                op: 'in',
-                values: [
-                  'closed',
-                  'done'
-                ]
-              }
-            ]
-          }
+          // {
+          //   conj: 'and',
+          //   name: 'price',
+          //   op: 'gt',
+          //   values: [
+          //     1
+          //   ]
+          // },
+          // {
+          //   conj: 'and',
+          //   name: 'qty',
+          //   op: 'lt',
+          //   values: [
+          //     99999
+          //   ]
+          // },
+          // {
+          //   conj: 'and',
+          //   exprs: [
+          //     {
+          //       conj: 'or',
+          //       name: 'type',
+          //       op: 'eq',
+          //       values: [
+          //         'requirement'
+          //       ]
+          //     },
+          //     {
+          //       conj: 'or',
+          //       name: 'status',
+          //       op: 'in',
+          //       values: [
+          //         'closed',
+          //         'done'
+          //       ]
+          //     }
+          //   ]
+          // }
         ]
       },
       rule: {
@@ -102,7 +115,6 @@ export default{
     sortArr:[],
     weightArr:[]
   }),
-  props:['charts','tableShow','echartsShow','setqueryInfo'],
   methods:{
     // 根据数据确定哪些图表可用
     checkChartType() {
@@ -192,7 +204,7 @@ export default{
         this.option.tableShow = false;
       }
       this.chart.type=typeName;
-      if(typeName=='pie'||typeName=='area'||typeName=='funnel'||typeName=='rosePie'||typeName=='radar'||typeName=='treemap'){
+      if(typeName=='pie'||typeName=='area'||typeName=='funnel'||typeName=='rosePie'||typeName=='radar'||typeName=='treemap'||typeName=='gauge'||typeName=='wordCloud'){
         this.chart.option.xAxis.show = false;
         this.chart.option.yAxis.show = false;
       }else{
@@ -204,19 +216,7 @@ export default{
       this.$emit('getechartsShow',this.option.echartsShow);
     }
   },
-  mounted(){
-    let that=this;
-    // 初始化页面数据
-    Object.assign(that.chart,that.charts);
-    this.option.echartsShow=this.echartsShow;
-    this.option.tableShow=this.tableShow;
-    this.sortArr=Object.keys(chartTypes).sort(function(a,b){
-      return chartTypes[a].sort - chartTypes[b].sort;
-    });
-    this.weightArr=Object.keys(chartTypes).sort(function(a,b){
-      return chartTypes[a].weight - chartTypes[b].weight;
-    });
-  }
+  props:['charts','tableShow','echartsShow','setqueryInfo']  
 };
 </script>
 <style scoped>
@@ -228,10 +228,10 @@ export default{
   margin-top: 10px;
 }
 .chart_type{
-  width:40px;
-  height:40px;
+  width:25px;
+  height:25px;
   text-align: center;
-  margin:0 13px 4px 0;
+  margin:0 0 9px 13px;
   padding:0;
   border:none;
   overflow: hidden;
@@ -245,47 +245,64 @@ export default{
 }
 .chart_type_icon{
   display: inline-block;
-  width:32px;
-  height:32px;
+  width:25px;
+  height:25px;
   vertical-align: middle;
 }
+/* FIXME: 背景图缩放为62.6% */
 .bar{
-  background: url('../../assets/images/icon.png') -2px -42px no-repeat;
+  background: url('../../assets/images/icon.png') 0px -26px no-repeat;
+  background-size: 500px;
 }
 .line{
-  background: url('../../assets/images/icon.png') -42px -42px no-repeat;
+  background: url('../../assets/images/icon.png') -26px -26px no-repeat;
+  background-size: 500px;
 }
 .pie{
-  background: url('../../assets/images/icon.png') -82px -42px no-repeat;
+  background: url('../../assets/images/icon.png') -51px -26px no-repeat;
+  background-size: 500px;
 }
 .table{
-  background: url('../../assets/images/icon.png') -122px -42px no-repeat;
+  background: url('../../assets/images/icon.png') -76px -26px no-repeat;
+  background-size: 500px;
 }
 .area{
-  background: url('../../assets/images/icon.png') -162px -42px no-repeat;
+  background: url('../../assets/images/icon.png') -101px -26px no-repeat;
+  background-size: 500px;
 }
 .stackbar{
-  background: url('../../assets/images/icon.png') -202px -42px no-repeat;
+  background: url('../../assets/images/icon.png') -126px -26px no-repeat;
+  background-size: 500px;
 }
 .funnel{
-  background: url('../../assets/images/icon.png') -242px -42px no-repeat;
+  background: url('../../assets/images/icon.png') -151px -26px no-repeat;
+  background-size: 500px;
 }
 .rosePie{
-  background: url('../../assets/images/icon.png') -282px -42px no-repeat;
+  background: url('../../assets/images/icon.png') -176px -26px no-repeat;
+  background-size: 500px;
 }
 .radar{
-  background: url('../../assets/images/icon.png') -322px -42px no-repeat;
+  background: url('../../assets/images/icon.png') -201px -26px no-repeat;
+  background-size: 500px;
 }
 .treemap{
-  background: url('../../assets/images/icon.png') -362px -42px no-repeat;
+  background: url('../../assets/images/icon.png') -226px -26px no-repeat;
+  background-size: 500px;
 }
 .waterfall{
-  background: url('../../assets/images/icon.png') -402px -42px no-repeat;
+  background: url('../../assets/images/icon.png') -251px -26px no-repeat;
+  background-size: 500px;
 }
 .gauge{
-  background: url('../../assets/images/icon.png') -442px -42px no-repeat;
+  background: url('../../assets/images/icon.png') -276px -26px no-repeat;
+  background-size: 500px;
+}
+.wordCloud{
+  background: url('../../assets/images/icon.png') -301px -26px no-repeat;
+  background-size: 500px;
 }
 .isAllow{
-  background-position-y:-2px; 
+  background-position-y:-1px; 
 }
 </style>

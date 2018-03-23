@@ -27,46 +27,57 @@
 </template>
 
 <script>
-import Vue from 'vue';
-import axios from 'axios';
+import axios from "axios";
 
-import seriesDefault from '../../vendor/seriesGauge.json';
-import '../../vendor/jsVendor/seriesGauge.js';
+import seriesDefault from "../../vendor/seriesGauge.json";
+import "../../vendor/jsVendor/seriesGauge.js";
 
-import colorPicker from '../chartEditor/propSelect/colorPicker.vue';
+import colorPicker from "../chartEditor/propSelect/colorPicker.vue";
 
 export default {
-  data() {
-    return {
-      // 返回父级的数据，包括series和xAxis与yAxis的data部分
-      seriesOption: {
-        option: {
-          series: [],
-          xAxis: {}
-        }
-      },
-      // 数据
-      chartData: {},
-      // 默认配置项展开
-      activeNames: ['1'],
-      // 图表类型
-      pageName: '计量图',
-      type: 'gauge',
-      // 第一次进入页面
-      firstFlag: true
-    };
+  components: {
+    colorPicker
+  },
+  created() {
+    this.dataChange();
   },
   mounted() {
     let that = this;
     (() => Object.assign(that.chartData, that.data))();
   },
-  created() {
-    this.dataChange();
+  data: () => ({
+    // 返回父级的数据，包括series和xAxis与yAxis的data部分
+    seriesOption: {
+      option: {
+        series: [],
+        xAxis: {}
+      }
+    },
+    // 数据
+    chartData: {},
+    // 默认配置项展开
+    activeNames: ["1"],
+    // 图表类型
+    pageName: "计量图",
+    type: "gauge",
+    // 第一次进入页面
+    firstFlag: true
+  }),
+  watch: {
+    seriesOption: {
+      handler: function(newVal, oldVal) {
+        this.$emit("getSeries", this.seriesOption.option);
+      },
+      deep: true
+    },
+    data: {
+      // 父级传来的图表数据
+      handler: function(newVal, oldVal) {
+        this.dataChange();
+      },
+      deep: true
+    }
   },
-  components: {
-    colorPicker
-  },
-  props: ['option', 'data'],
   methods: {
     // 数据处理
     dataChange() {
@@ -136,31 +147,17 @@ export default {
       }
 
       that.firstFlag = false;
-      Vue.set(this.seriesOption.option, 'grid', seriesDefault.grid);
-      Vue.set(this.seriesOption.option, 'xAxis', newData.xAxis);
-      Vue.set(this.seriesOption.option, 'series', newData.series);
-      that.$emit('getSeries', that.seriesOption.option);
+      that.$set(this.seriesOption.option, "grid", seriesDefault.grid);
+      that.$set(this.seriesOption.option, "xAxis", newData.xAxis);
+      that.$set(this.seriesOption.option, "series", newData.series);
+      that.$emit("getSeries", that.seriesOption.option);
     }
   },
-  watch: {
-    seriesOption: {
-      handler: function(newVal, oldVal) {
-        this.$emit('getSeries', this.seriesOption.option);
-      },
-      deep: true
-    },
-    data: {
-      // 父级传来的图表数据
-      handler: function(newVal, oldVal) {
-        this.dataChange();
-      },
-      deep: true
-    }
-  }
+  props: ["option", "data"]
 };
 </script>
 <style scoped>
-.item_name{
+.item_name {
   margin-left: 0;
 }
 </style>

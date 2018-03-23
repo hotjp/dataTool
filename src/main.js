@@ -12,7 +12,7 @@ import 'animate.css/animate.min.css';
 import 'element-ui/lib/theme-chalk/index.css';
 import './assets/css/app.less';
 // import axios from 'axios'
-import IEcharts from 'vue-echarts-v3/src/full.vue';
+// import IEcharts from 'vue-echarts-v3/src/full.vue';
 import VueRouter from 'vue-router';
 Vue.use(VueRouter);
 Vue.use(ElementUI);
@@ -32,4 +32,4 @@ const app = new Vue({
 // 设置版本
 import {version} from '../package.json';
 var body = document.getElementsByTagName('body')[0];
-body.setAttribute('data-version',version)
+body.setAttribute('data-version',version);

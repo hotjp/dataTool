@@ -28,36 +28,12 @@
 </template>
 
 <script>
-import Vue from 'vue';
-
-import seriesDefault from '../../vendor/seriesRosePie.json';
-import '../../vendor/jsVendor/seriesRosePie.js';
+import seriesDefault from "../../vendor/seriesRosePie.json";
+import "../../vendor/jsVendor/seriesRosePie.js";
 
 export default {
-  data() {
-    return {
-      // 返回父级的数据，包括series和xAxis与yAxis的data部分
-      seriesOption: {
-        option: {
-          series: [],
-          xAxis: {},
-          yAxis: {}
-        }
-      },
-      // 数据
-      chartData: {},
-      // 默认配置项展开
-      activeNames: ['1'],
-      // 图表类型
-      type: 'pie',
-      pageName: '南丁格尔玫瑰图',
-      // 第一次进入页面
-      firstFlag: true,
-      // 玫瑰图类型
-      roseType: seriesDefault.roseType,
-      // 半径
-      radius: seriesDefault.radius
-    };
+  created() {
+    this.dataChange();
   },
   mounted() {
     let that = this;
@@ -71,12 +47,46 @@ export default {
       }
     }
   },
-  created() {
-    this.dataChange();
+  data: () => ({
+    // 返回父级的数据，包括series和xAxis与yAxis的data部分
+    seriesOption: {
+      option: {
+        series: [],
+        xAxis: {},
+        yAxis: {}
+      }
+    },
+    // 数据
+    chartData: {},
+    // 默认配置项展开
+    activeNames: ["1"],
+    // 图表类型
+    type: "pie",
+    pageName: "南丁格尔玫瑰图",
+    // 第一次进入页面
+    firstFlag: true,
+    // 玫瑰图类型
+    roseType: seriesDefault.roseType,
+    // 半径
+    radius: seriesDefault.radius
+  }),
+  watch: {
+    seriesOption: {
+      handler: function(newVal, oldVal) {
+        this.$emit("getSeries", newVal.option);
+      },
+      deep: true
+    },
+    data: {
+      // 父级传来的图表数据
+      handler: function(newVal, oldVal) {
+        this.dataChange();
+      },
+      deep: true
+    }
   },
-  props: ['option', 'data'],
   methods: {
-    // 数据处理    
+    // 数据处理
     dataChange() {
       let that = this;
       if (that.data.dataError || !that.data.data) {
@@ -106,14 +116,17 @@ export default {
 
       // series.data的数据
       if (that.firstFlag) {
-        // 第一次进入页面        
-        if(this.option.series){
+        // 第一次进入页面
+        if (this.option.series) {
           for (let i = 0; i < this.option.series.length; i++) {
-            this.option.series[i].radius = this.radius?this.radius : seriesDefault.radius;
+            this.option.series[i].radius = this.radius
+              ? this.radius
+              : seriesDefault.radius;
           }
         }
         that.seriesOption.option.series = seriesRosePie(
-          columns,rows,
+          columns,
+          rows,
           queryNameKeyX,
           queryNameKeyY,
           seriesDefault,
@@ -122,7 +135,8 @@ export default {
         );
       } else {
         that.seriesOption.option.series = seriesRosePie(
-          columns,rows,
+          columns,
+          rows,
           queryNameKeyX,
           queryNameKeyY,
           seriesDefault
@@ -130,8 +144,8 @@ export default {
       }
 
       that.firstFlag = false;
-      Vue.set(this.seriesOption.option, 'grid', seriesDefault.grid);
-      this.$emit('getSeries', that.seriesOption.option);
+      that.$set(this.seriesOption.option, "grid", seriesDefault.grid);
+      this.$emit("getSeries", that.seriesOption.option);
     },
     // 切换玫瑰图种类
     selectRoseType(command) {
@@ -140,41 +154,27 @@ export default {
         this.seriesOption.option.series[i].roseType = this.roseType;
       }
       this.seriesOption.option = Object.assign({}, this.seriesOption.option);
-      this.$emit('getSeries', this.seriesOption.option);
+      this.$emit("getSeries", this.seriesOption.option);
     },
     // 内径
-    radiusInside(data){
+    radiusInside(data) {
       this.radius[0] = data;
       for (let i = 0; i < this.seriesOption.option.series.length; i++) {
         this.seriesOption.option.series[i].radius = this.radius;
       }
       this.seriesOption.option = Object.assign({}, this.seriesOption.option);
-      this.$emit('getSeries', this.seriesOption.option);
+      this.$emit("getSeries", this.seriesOption.option);
     },
     // 外径
-    radiusOutside(data){
+    radiusOutside(data) {
       this.radius[1] = data;
       for (let i = 0; i < this.seriesOption.option.series.length; i++) {
         this.seriesOption.option.series[i].radius = this.radius;
       }
       this.seriesOption.option = Object.assign({}, this.seriesOption.option);
-      this.$emit('getSeries', this.seriesOption.option);
+      this.$emit("getSeries", this.seriesOption.option);
     }
   },
-  watch: {
-    seriesOption: {
-      handler: function(newVal, oldVal) {
-        this.$emit('getSeries', newVal.option);
-      },
-      deep: true
-    },
-    data: {
-      // 父级传来的图表数据
-      handler: function(newVal, oldVal) {
-        this.dataChange();
-      },
-      deep: true
-    }
-  }
+  props: ["option", "data"]
 };
 </script>

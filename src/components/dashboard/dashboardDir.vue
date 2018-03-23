@@ -3,9 +3,13 @@
     <div class="fix dirTreeTitle">
       仪表盘
       <i class="el-icon-more r"></i>
-      <i class="el-icon-plus r"  @click="showDialog"></i>
+      <i class="el-icon-plus r"  @click="showAddDialog"></i>
       <!-- TODO: 搜索 -->
-      <!-- <i class="el-icon-search r"></i> -->
+      <div class="search_box r">
+        <i class="el-icon-search"></i>
+        <input type="text" v-model="search" class="search_input">
+      </div>
+      
     </div>
     <!--  TODO: 目前仪表盘列表没有层级 -->
     <!-- <ul>
@@ -42,10 +46,10 @@
     </ul> -->
 
       <ul>
-        <li class="dirChildren right" :class="{active:child.active,hover:hoverIndex == childIndex,cur:child.id==dashboardId}"  v-for="(child,childIndex) in dashboardList" :key="childIndex">
+        <li class="dirChildren right" v-for="(child,childIndex) in dataList" :key="childIndex" v-if="child.show" :class="{active:child.active,hover:hoverIndex == childIndex,cur:child.id==activeId}"  >
           <el-tooltip class="item" effect="light" :content="'名称：'+child.text" placement="right">
             <div>
-              <div class="childrenText" @click="changeDashborad(childIndex)">
+              <div class="childrenText" @click="itemClick(childIndex)">
                 <i class="el-icon-document"></i>
                 {{child.text}}
               </div>
@@ -81,9 +85,21 @@ export default {
     // 拖拽
     dragObj: {},
     // 仪表盘 指向索引
-    hoverIndex:null
+    hoverIndex:null,
+    // 搜索用
+    search:''
   }),
-  props: ['dashboardList','dashboardId'],
+  watch: {
+    search:function(val){
+      for(let i=0;i<this.dataList.length;i++){
+        if(this.dataList[i].text&&this.dataList[i].text.indexOf(val)<0){
+          this.dataList[i].show=false;
+        }else{
+          this.dataList[i].show=true;          
+        }
+      }
+    }
+  },
   methods: {
     // 禁止被选中  拖拽元素
     onSelectstart() {
@@ -133,15 +149,12 @@ export default {
       // }
     },
     // 打开父级弹窗
-    showDialog() {
-      this.$emit('showDialog', true);
+    showAddDialog() {
+      this.$emit('toggleAddDashboardDialog', true);
     },
-    // dashboard切换,跳转页面
-    changeDashborad(index) {
-      this.$router.push({
-        path: '/empty',
-        query: { link: '/dashboard/' + this.dashboardList[index].id }
-      });
+    // 列表点击，传id到浮层做处理
+    itemClick(index) {
+      this.$emit('itemClick', this.dataList[index].id);
     },
     // 鼠标指向
     mouseenter(index){
@@ -153,8 +166,9 @@ export default {
     },
     // 仪表盘编辑
     editDashboard(index){
-      this.$emit('showEditor', {status:true,index:index});
+      this.$emit('showTitleEditor', {status:true,index:index});
     }
-  }
+  },
+  props: ['dataList','activeId']  
 };
 </script>

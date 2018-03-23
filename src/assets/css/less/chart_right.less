@@ -1,5 +1,23 @@
 // out:false 
 .chart_right {
+    position: fixed;
+    z-index: 103;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    padding-top: 90px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    width: 212px;
+    background: #44546e;
+    // border-left: 1px solid #888888;
+    // box-shadow: 0 0 10px #bbbbbb;
+    .range_input {
+        width: 60px;
+    }
+    .range_input input{
+        height: 30px;
+    }
     #chartsComponents {
         .input {
             width: 70%;
@@ -20,40 +38,46 @@
     }
     .el-collapse{
         border-bottom: none;
+        border-top: none;
     }
     .el-collapse-item__header {
         padding-left: 10px;
-        height: 40px;
-        line-height: 40px;
+        height: 37px;
+        line-height: 37px;
+        color: #a9c6d6;
+        background-color: transparent; 
+        border-bottom: 1px solid #364660;
+        overflow: hidden;
+    }
+    .el-collapse-item__wrap{
+        background-color: #364660;
+        border-bottom: none;
     }
     .el-collapse-item__arrow{
-        line-height: 40px;        
+        line-height: 37px;        
     }
-    .el-color-picker__trigger{
-        .size(30px);
-        line-height: 30px;
+    .el-checkbox{
+        color: @c-main;
+    }
+    .el-slider{
+        margin-right: 18px;
     }
     .el-checkbox__input.is-checked+.el-checkbox__label{
         color: @c-main;
     }
     .el-checkbox__input.is-checked .el-checkbox__inner, .el-checkbox__input.is-indeterminate .el-checkbox__inner{
-        background-color:  @c-main;
+        background-color:  transparent;
         border-color:  @c-main;
-    }
-    .el-collapse-item__wrap{
-        padding:0 5px 0 10px;
+        &:after{
+            border-color:  @c-main;            
+        }
     }
     .el-collapse-item__content{
-        padding-top: 25px;
+        padding-bottom: 0;
     }
     .el-checkbox__inner{
-        border-radius: 0px;
-    }
-    // .el-collapse-item__wrap:nth-child(2n-1){
-    //     background-color: #e9ebeb;
-    // }
-    .el-collapse-item__wrap:nth-child(2n){
-        background-color: #f1f2f2;
+        border-radius: 2px;
+        background-color: transparent;
     }
     .series{
         // 标题样式
@@ -73,9 +97,87 @@
             .ss_item{
                 color: @gray;
             }
+            ul{
+                width: 172px;
+                margin: 8px auto;
+                padding: 5px;
+                background-color: transparent;
+                border-radius: 2px;
+                overflow: hidden;
+                &.show{
+                    background-color: #959dab;
+                    li,li.active{
+                        margin-top: 5px;
+                        display: block;
+                        .arr{
+                            display: none;
+                        }
+                    }
+                    li:first-child{
+                        margin-top: 0;
+                        .arr{
+                            display: block;
+                        }
+                    }
+                }
+                li.active{
+                    margin-top: 0;                    
+                }
+            }
+            li{
+                display: none;
+                border-radius: 2px;      
+                overflow: hidden;  
+                &.active {
+                    display: block;
+                    background: #959dab;                    
+                    .ss_item{
+                        background: #959dab;
+                    }  
+                    .arr{
+                        display: block;
+                    }
+                }
+            }
+            .ss_item{
+                display: block;
+                width:142px;
+                height: 26px;
+                overflow: hidden;
+                background: #fff; 
+                border-radius: 2px;                  
+            }
+            .arr{
+                width: 20px;
+                height: 20px;
+                display: none;
+                margin-top: 3px;
+                text-align: center;
+                padding-top: 3px;
+                // background-color: red;
+            }
+            .block{
+                width: 20px;
+                height:20px;
+                border-radius: 2px;
+                margin:3px 0 0 3px;
+            }
         }
     }
-    
-    
-      
+    .chartConfig{
+        .el-collapse-item__wrap{
+            padding:10px 0 10px 18px;
+        }
+        .el-collapse-item__content{
+            color: #a9c6d6;
+        }
+    }
+    .el-checkbox{
+        height: 20px;
+        line-height: 20px;
+        margin-bottom: 10px;
+    }
+    .el-dropdown{
+        margin-bottom: 10px;
+    }
 }

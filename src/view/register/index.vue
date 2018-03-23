@@ -12,9 +12,9 @@ export default {
       this.$route.go(-1);
     }
   },
-  data() {
-    return {};
-  },
+  data:()=>({
+    
+  }),
   methods: {}
 };
 </script>

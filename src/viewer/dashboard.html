@@ -30,9 +30,9 @@
 
     <script id="gridItem" type="text/html">
         <%for(i=0;i<xData.length;i++){%>
-            <div class="grid-stack-item" id="" data-id="<%=xData[i].id%>" data-gs-auto-position="false" data-gs-x="<%=xData[i].x%>" data-gs-y="<%=xData[i].y%>" data-gs-width="<%=xData[i].width%>" data-gs-height="<%=xData[i].height%>" data-gs-min-height="2" data-gs-max-height="6">
-                <div class="chart_tit"><%=xData[i].title%></div>
+            <div class="grid-stack-item" id="" data-id="<%=xData[i].id%>" data-gs-auto-position="false" data-gs-x="<%=xData[i].x%>" data-gs-y="<%=xData[i].y%>" data-gs-width="<%=xData[i].width%>" data-gs-height="<%=xData[i].height%>" data-gs-min-height="2">
                 <div class="_wrap">
+                    <div class="chart_tit"><%=xData[i].title%></div>                    
                     <div id="chart<%=xData[i].id%>"></div>
                 </div>
             </div>
@@ -47,6 +47,7 @@
 <script src="./js/gridstack.js"></script>
 <script src="./js/gridstack.jQueryUI.js"></script>
 <script src="./js/echarts.js"></script>
+<script src="./js/echarts-wordcloud.min.js"></script>
 
 <script src="./js/viewer_common.js"></script>
 <script src="../vendor/jsVendor/seriesBar.js"></script>
@@ -60,6 +61,7 @@
 <script src="../vendor/jsVendor/seriesWaterfall.js"></script>
 <script src="../vendor/jsVendor/seriesStackbar.js"></script>
 <script src="../vendor/jsVendor/seriesGauge.js"></script>
+<script src="../vendor/jsVendor/seriesWordCloud.js"></script>
 
 <script src="./js/dashboard.js"></script>
 

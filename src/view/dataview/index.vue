@@ -1,70 +1,73 @@
 <template>
-<div id="dataView" class="full data_view">
-  <div class="left">
-    <!-- <ul>
-      <li class="list" @click="changeView(item)" v-for="(item,index) in list">
-        {{item.name}}
-        <div class="del" @click.stop="del(item)"><i class="el-icon-delete"></i></div>
-      </li>
-    </ul> -->
-    <div class="fix dirTreeTitle">
-      数据视图
-      <!-- <i class="el-icon-more r"></i> -->
-      <i class="el-icon-plus r" @click="addSouch()" ></i>
-      <!-- TODO: 搜索 -->
-      <!-- <i class="el-icon-search r"></i> -->
-    </div>
+  <div id="dataView" class="full data_view">
+    <div class="left">
+      <!-- <ul>
+        <li class="list" @click="changeView(item)" v-for="(item,index) in list">
+          {{item.name}}
+          <div class="del" @click.stop="del(item)"><i class="el-icon-delete"></i></div>
+        </li>
+      </ul> -->
+      <div class="fix dirTreeTitle">
+        数据视图
+        <!-- <i class="el-icon-more r"></i> -->
+        <i class="el-icon-plus r" @click="addSouch()" ></i>
+        <div class="search_box r">
+          <i class="el-icon-search"></i>
+          <input type="text"  v-model="search" class="search_input">
+        </div>
+      </div>
 
-    <ul>
-      <li class="dirChildren" :class="{active:childIndex == activeIndex,hover:hoverIndex == childIndex}" v-for="(child,childIndex) in list" :key="childIndex">
-        <el-tooltip class="item" effect="light" disabled :content="'数据源名称：'+child.sourceType.name" placement="right">
-          <div>
-            <div class="childrenText" @click="changeView(child,childIndex)">
-              <i class="el-icon-document"></i>
-              {{child.name}}
+      <ul>
+        <li class="dirChildren" :class="{active:childIndex == activeIndex,hover:hoverIndex == childIndex}" v-for="(child,childIndex) in list" v-if="child.show" :key="childIndex">
+          <el-tooltip class="item" effect="light" disabled :content="'数据源名称：'+child.sourceType.name" placement="right">
+            <div>
+              <div class="childrenText" @click="changeView(child,childIndex)">
+                <i class="el-icon-document"></i>
+                {{child.name}}
+              </div>
+              <i class="el-icon-more" @mouseenter="mouseenter(childIndex)" @mouseleave="mouseleave()" ></i>
+              <div class="cover" @mouseenter="mouseenter(childIndex)" @mouseleave="mouseleave()" >
+                <p class="cover_item" @click="del(child)">删除</p>
+              </div>
             </div>
-            <i class="el-icon-more" @mouseenter="mouseenter(childIndex)" @mouseleave="mouseleave()" ></i>
-            <div class="cover" @mouseenter="mouseenter(childIndex)" @mouseleave="mouseleave()" >
-              <p class="cover_item" @click="del(child)">删除</p>
-            </div>
-          </div>
-        </el-tooltip>
-      </li>
-    </ul>
+          </el-tooltip>
+        </li>
+      </ul>
+    </div>
+    <div class="right_r">
+      <iframe ref="iframe" :src="src" width="100%" height="100%" frameborder="0" border="0" scrolling="atuo"></iframe>
+    </div>
+    <el-dialog title="提示" :visible.sync="dialogVisible" width="30%">
+      <span>您确定删除{{tip}}吗?</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button class="btn-confirm" type="primary" @click="confirm()">确 定</el-button>
+        <el-button class="btn-cancel" @click="dialogVisible = false">取 消</el-button>
+      </span>
+    </el-dialog>
+
+    <el-dialog class="common_dialog chart_add_dialog" title="添加数据视图" :visible.sync="addVisible" >
+      <form action onsubmit="return false">
+        <el-input v-model="newName.text" class="new_name" type="text" placeholder="请输入视图名称"></el-input><i class="required">*</i>
+        <div class="tit">
+          选择数据源<i class="required">*</i>  
+          <div class="search_box r">
+            <i class="el-icon-search"></i>
+            <input type="text" class="search_input" v-model="searchView">
+          </div> 
+        </div>
+        <el-tree class="dialog_content" :data="listFolders.list" :props="listFolders.defaultProps"  @node-click="handleNodeClick" :filter-node-method="filterView" ref="viewTree"></el-tree>
+      </form>
+        
+        <span slot="footer" class="dialog-footer">
+          <el-button class="btn-confirm" type="primary" @click="addView()">确 定</el-button>
+          <el-button class="btn-cancel" @click="addVisible = false">取 消</el-button>
+        </span>
+    </el-dialog>
   </div>
-  <div class="right_r">
-    <iframe ref="iframe" :src="src" width="100%" height="100%" frameborder="0" border="0" scrolling="atuo"></iframe>
-  </div>
-  <el-dialog title="提示" :visible.sync="dialogVisible" width="30%">
-  <span>您确定删除{{tip}}吗?</span>
-  <span slot="footer" class="dialog-footer">
-    <el-button @click="dialogVisible = false">取 消</el-button>
-    <el-button type="primary" @click="confirm()">确 定</el-button>
-  </span>
-</el-dialog>
-<el-dialog title="新建数据视图(输入视图名称并选择数据源)" :visible.sync="addVisible" width="30%"><form action onsubmit="return false">数据视图名称:<input v-model="newName.text" class="new_name" type="text" placeholder="请输入数据视图名称">
-  <el-tree :data="listFolders.list" :props="listFolders.defaultProps"   @node-click="handleNodeClick"></el-tree>
-  <span slot="footer" class="dialog-footer">
-    <el-button @click="addVisible = false">取 消</el-button>
-    <el-button type="primary" @click="addView()">确 定</el-button>
-  </span>
-  </form>
-</el-dialog>
-</div>
 </template>
 <script>
 import { getJson } from '../../router/utils';
 export default {
-  beforeCreate() {
-    // 组件创建前
-  },
-  created() {
-    // 组件创建后
-
-  },
-  beforeMount() {
-    // 挂载前
-  },
   mounted() {
     // 挂载后
     let that=this;
@@ -72,6 +75,9 @@ export default {
       folder:''
     },function(res){
       if (res.success) {
+        for(let i=0;i<res.data.length;i++){
+          res.data[i].show = true
+        }
         that.list=res.data;
         let params = that.$route.params;
         for(let i=0;i<res.data.length;i++){
@@ -90,18 +96,7 @@ export default {
     });
     
   },
-  beforeUpdate() {
-    // 数据更新前
-  },
-  updated() {
-    // 数据更新后
-  },
-  beforeDestroy() {
-    // 销毁前
-  },
-  destroyed() {
-    // 销毁后
-  },
+  
   data: () => ({
     list:[],
     src:'http://localhost:8080/src/data_editor/index.html',
@@ -126,12 +121,24 @@ export default {
     activeIndex:null,
     newName:{
       text:''
-    }
+    },
+     // 搜索用
+    search:'',
+    searchView:''
   }),
-  computed: {
-
-  },
   watch: {
+    search:function(val){
+      for(let i=0;i<this.list.length;i++){
+        if(this.list[i].name.indexOf(val)<0){
+          this.list[i].show=false;
+        }else{
+          this.list[i].show=true;          
+        }
+      }    
+    },
+    searchView:function(val){
+      this.$refs.viewTree.filter(val);
+    }
   },
   methods: {
     // 更换数据视图
@@ -248,132 +255,12 @@ export default {
         });
         return loading.close();
       }
+    },
+    // 选择视图搜索
+    filterView(value,data){
+      if (!value) return true;
+        return data.name.indexOf(value) !== -1;
     }
   }
 };
 </script>
-
-<style scoped>
-.data_view .left{
-  position: absolute;
-  top:64px;
-  left: 0;
-  bottom:0;
-  width:220px;
-  background: #f0f2f3;
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-.data_view .right_r{
-  position: absolute;
-  top:64px;
-  left: 220px;
-  right: 0;
-  bottom:0;
-  overflow: hidden;
-}
-/* .data_view .right_r iframe{ */
-  /* width:100%;
-  height:100%; */
-/* } */
-/* .list{
-  position: relative;
-  width: 100%;
-  height: 32px;
-  line-height: 32px;
-  padding-left: 20px;
-  cursor: pointer;
-  font-size: 12px;
-  position: relative;
-}
-.list:hover{
-  cursor: pointer;
-  background: #fff;
-}
-.del{
-  position: absolute;
-  top:0;
-  right:10px;
-} */
-/*滚动条垂直方向的宽度*/
-
-::-webkit-scrollbar {
-    width: 10px;
-}
-
-
-/* 垂直滚动条的滑动块 */
-
-::-webkit-scrollbar-thumb:vertical {
-    border-radius: 4px;
-    -webkit-box-shadow: inset 0 0 6px rgba(188, 176, 241, 0.3);
-    background-color: rgba(189, 183, 247, 0.281);
-}
-.dirChildren{
-    width: 100%;
-    height: 32px;
-    line-height: 32px;
-    padding-left: 20px;
-    cursor: pointer;
-    font-size: 12px;
-    position: relative;
-}
-.dirChildren.active{
-  background: #e0e0e0;
-}
-.childrenText{
-    width: 80%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    float: left;
-}
-.dirChildren .el-icon-more{
-    display: none;
-    position: relative;
-    top: 0px;
-    padding: 3px;
-}
-.dirChildren .cover{
-    display: none;
-    width: 50px;
-    background-color: #ffffff;
-    position: absolute;
-    right: 25px;
-    top: 25px;
-    text-align: center;
-    z-index: 10;
-    cursor: default;
-}
-.dirChildren .cover .cover_item{
-    line-height: 24px;
-    margin: 5px 0;
-    cursor: pointer;
-}
-.dirChildren.hover .cover{
-  display: block;
-}
-.dirChildren:hover .el-icon-more {
-  display: inline-block;
-}
-.dirTreeTitle{
-    padding-left: 16px;
-    line-height: 48px;
-    height: 48px;
-    font-size: 14px;
-}
-.dirTreeTitle .el-icon-more,.dirTreeTitle .el-icon-plus{
-    margin-top: 18px;
-    margin-right: 5px;
-    cursor: pointer;
-}
-.el-dialog__body{
-  padding-top:10px;
-}
-.data_view .workTableDialog .el-dialog__header{
-  padding-top: 10px;
-  text-align: left;
-}
-
-
-</style>

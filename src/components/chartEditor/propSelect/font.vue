@@ -1,6 +1,6 @@
 <template>
   <div class="fix">
-    <el-dropdown @command="linefontFamily">
+    <el-dropdown class="font_family" @command="linefontFamily">
       <span class="el-dropdown-link">
         <span class="font_family_menu">{{fontFamily}}</span>
         <i class="el-icon-arrow-down el-icon--right"></i>
@@ -14,7 +14,7 @@
         <el-dropdown-item command="Microsoft YaHei">Microsoft YaHei</el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
-    <el-dropdown @command="linefontSize">
+    <el-dropdown class="font_size" @command="linefontSize">
       <span class="el-dropdown-link">
         <span class="font_family_menu">
           {{fontSize}}
@@ -48,6 +48,9 @@
 import colorPicker from './colorPicker.vue';
 
 export default {
+  components: {
+    colorPicker
+  },
   data: () => ({
     // 字体样式
     style: {
@@ -56,20 +59,6 @@ export default {
       fontSize: ''
     }
   }),
-  components: {
-    colorPicker
-  },
-  props: ['color', 'fontFamily', 'fontSize'],
-  methods: {
-    // 字体
-    linefontFamily(command) {
-      this.style.fontFamily = command;
-    },
-    // 字号
-    linefontSize(command) {
-      this.style.fontSize = command;
-    }
-  },
   watch: {
     'style.color':{
       handler: function(val, oldval) {
@@ -99,23 +88,27 @@ export default {
     fontSize: function(val, oldval) {
       this.style.fontSize = val;
     }
-  }
+  },
+  methods: {
+    // 字体
+    linefontFamily(command) {
+      this.style.fontFamily = command;
+    },
+    // 字号
+    linefontSize(command) {
+      this.style.fontSize = command;
+    }
+  },
+  props: ['color', 'fontFamily', 'fontSize']
+  
 };
 </script>
 <style scoped>
 .el-dropdown,
 .color_block {
   float: left;
-  height: 24px;
-  line-height: 24px;
 }
-.el-dropdown-item {
-  height: 24px;
-  line-height: 24px;
-}
-.el-dropdown {
-  margin-right: 10px;
-}
+
 .el-dropdown-menu {
   margin-top: -3px;
 }

@@ -2,11 +2,12 @@
   <div class="series series_styles">
     <el-collapse v-model="activeNames">
         <el-collapse-item title="序列风格" name="1">
-          <ul>
-            <li v-for="(colors,index) in seriesColors" :key="index">
-              <a @click="onClickSeriesColors(index)" href="javascript:;" v-bind:class="[colors.active==0?'active':'']" class="ss_item fix ">
+          <ul v-bind:class="[isAllStyleShow ?'show':'']" >
+            <li v-for="(colors,index) in seriesColors" :key="index" v-bind:class="[colors.active==0?'active':'',colors.show==0?'show':'']">
+              <a @click="onClickSeriesColors(index)" href="javascript:;"  class="ss_item fix l">
                 <div class="l block" v-for="(color,index) in colors.value" v-bind:style="{background:color}"></div>
               </a>
+              <i class="arr l el-icon-arrow-down"  @click="toggleSeriesStyle()" ></i>
             </li>
           </ul>    
         </el-collapse-item>
@@ -34,7 +35,8 @@ export default{
           '#724e58',
           '#4b565b'
         ],
-        active:0
+        active:0,
+        show:0
       },
       {
         name: 'westeros',
@@ -46,7 +48,8 @@ export default{
           '#a5e7f0',
           '#cbb0e3'
         ],
-        active:1
+        active:1,
+        show:1
       },
       {
         name: 'essos',
@@ -58,7 +61,8 @@ export default{
           '#f2d643',
           '#ebdba4'
         ],
-        active:1
+        active:1,
+        show:1
       },
       {
         name: 'walden',
@@ -70,25 +74,13 @@ export default{
           '#c4ebad',
           '#96dee8'
         ],
-        active:1
+        active:1,
+        show:1        
       }
-    ]
+    ],
+    // 是否展开所有序列风格
+    isAllStyleShow:false
   }),
-  props: ['charts'],
-  methods:{
-    // 通过索引进行系列颜色赋值
-    onClickSeriesColors(index) {
-      this.$emit('seriesStyles',this.seriesColors[index]);
-      for(let i = 0;i<this.seriesColors.length;i++){
-        if(i==index){
-          this.seriesColors[i]['active']=0;
-        }else{
-          this.seriesColors[i]['active']=1;
-        }
-      }
-      
-    }
-  },
   watch:{
     charts: {
       handler: function (val, oldval) {
@@ -116,28 +108,43 @@ export default{
       },
       deep: true
     }
-  }
+  },
+  methods:{
+    // 通过索引进行系列颜色赋值
+    onClickSeriesColors(index) {
+      this.isAllStyleShow = false;
+      this.$emit('seriesStyles',this.seriesColors[index]);
+      for(let i = 0;i<this.seriesColors.length;i++){
+        if(i==index){
+          this.seriesColors[i]['active']=0;
+          this.seriesColors[i]['show']=0;
+        }else{
+          this.seriesColors[i]['active']=1;
+          this.seriesColors[i]['show']=1;
+        }
+      }
+      
+    },
+    
+    toggleSeriesStyle(){
+      this.isAllStyleShow = !this.isAllStyleShow;
+    
+      if(this.isAllStyleShow){
+        for(let i = 0;i<this.seriesColors.length;i++){
+            this.seriesColors[i]['show']=0;
+        }
+      }else{
+        for(let i = 0;i<this.seriesColors.length;i++){
+          if(this.seriesColors[i]['active']==0){
+            this.seriesColors[i]['show']=0;
+          }else{
+            this.seriesColors[i]['show']=1;
+          }
+        }
+      }
+
+    }
+  },
+  props: ['charts']  
 };
 </script>
-<style>
-.series_styles .ss_item{
-  display: block;
-  width:190px;
-  height: 50px;
-  overflow: hidden;
-  padding:8px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  margin-bottom: 5px;
-  background: #fff;
-}
-.series_styles .block{
-  width: 30px;
-  height:30px;
-  margin:0 2px 10px 2px;
-}
-.series_styles .active{
-  background: #ddd;
-  border-color: #8ea7e4;
-}
-</style>

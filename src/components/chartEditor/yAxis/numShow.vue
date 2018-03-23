@@ -23,14 +23,17 @@
         <input type="text" placeholder="2">
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="valueDisplayFormat(0)">取 消</el-button>
-        <el-button type="primary" @click="valueDisplayFormat(1)">确 定</el-button>
+        <el-button class="btn-confirm" type="primary" @click="valueDisplayFormat(1)">确 定</el-button>
+        <el-button class="btn-cancel" @click="valueDisplayFormat(0)">取 消</el-button>
       </span>
     </form>
   </el-dialog>
 </template>
 <script type="text/babel">
 export default {
+  mounted() {
+    this.option=Object.assign({}, this.option, this.YnumOption);
+  },
   data: () => ({
     option:{
       valueDisplayFormat: false,
@@ -58,17 +61,6 @@ export default {
       label: 'G'
     }]
   }),
-  props: ['YnumOption'],
-  methods: {
-    // 隐藏组件并传值
-    valueDisplayFormat(e){
-      this.option.valueDisplayFormat=false;
-      this.$emit('Ynum', this.option);
-    }
-  },
-  mounted() {
-    this.option=Object.assign({}, this.option, this.YnumOption);
-  },
   watch: {
     YnumOption: {
       handler: function(val, oldval) {
@@ -82,7 +74,16 @@ export default {
         this.$emit('Ynum', this.option);
       }
     }
-  }
+  },
+  methods: {
+    // 隐藏组件并传值
+    valueDisplayFormat(e){
+      this.option.valueDisplayFormat=false;
+      this.$emit('Ynum', this.option);
+    }
+  },
+  props: ['YnumOption']
+  
 };
 </script>
 <style scoped>

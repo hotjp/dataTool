@@ -8,31 +8,23 @@
       <p>字段描述</p>
       <input type="text" class="field_description" placeholder="字段描述">
       <span slot="footer" class="dialog-footer">
-        <el-button @click="valueSetColums(0)">取 消</el-button>
-        <el-button type="primary" @click="valueSetColums(1)">确 定</el-button>
+        <el-button class="btn-confirm" type="primary" @click="valueSetColums(1)">确 定</el-button>
+        <el-button class="btn-cancel" @click="valueSetColums(0)">取 消</el-button>
       </span>
     </form>
   </el-dialog>
 </template>
 <script type="text/babel">
 export default {
+  mounted() {
+    this.option=Object.assign({}, this.option, this.YfieldOption);
+  },
   data: () => ({
     // 维度设置字段弹出框
     option:{
       valueSetColums: false
     }
   }),
-  props: ['YfieldOption'],
-  methods: {
-    valueSetColums(e){
-      // if(e){}
-      this.option.valueSetColums=false;
-      this.$emit('Yfield', this.option);
-    }
-  },
-  mounted() {
-    this.option=Object.assign({}, this.option, this.YfieldOption);
-  },
   watch: {
     YfieldOption: {
       handler: function(val, oldval) {
@@ -45,7 +37,15 @@ export default {
         this.$emit('Yfield', this.option);
       }
     }
-  }
+  },
+  methods: {
+    valueSetColums(e){
+      // if(e){}
+      this.option.valueSetColums=false;
+      this.$emit('Yfield', this.option);
+    }
+  },
+  props: ['YfieldOption'],
 };
 </script>
 <style scoped>

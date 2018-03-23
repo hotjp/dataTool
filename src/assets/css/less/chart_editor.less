@@ -1,34 +1,116 @@
 // out:false 
 #chartEditor {
+    .common_top {
+        z-index: 105;
+        position: fixed;
+        left: 180px;
+        top: 50px;
+        right: 0;
+        .name{
+            padding-left: 10px;
+            input{
+                background-color: transparent;
+                border: none;
+                height: 30px;
+                padding-left: 5px;
+                color: #a9c6d6;
+            }
+        }
+        .top_btn:before{
+            content:'';
+            display: inline-block;
+            .size(16px);
+        }
+        .menu{
+            width: 42px;
+            position: relative;
+            float: right;
+            &:before{
+                width: 18px;
+                position: relative;
+                top: 3px;
+                background: url(../../images/menu.png) center no-repeat;
+                background-size: contain;
+            }
+        }
+        .preview{
+            width: 85px;            
+            &:before{
+                vertical-align: middle;
+                margin-right: 10px;
+                background: url(../../images/chart_preview.png) no-repeat center;
+                background-size: cover;
+                margin-top: -2px;
+            }
+        }
+        .save{
+            width: 85px;
+            &:before{
+                position: relative;
+                top: 3px;
+                background: url(../../images/save_ord.png) center no-repeat;
+                background-size: contain;
+                margin-right: 10px;
+            }
+            &:hover:before{
+                background: url(../../images/save_hover.png) center no-repeat;
+                background-size: contain;
+            }
+        }
+        .redo{
+            width: 75px;
+            margin-right: 25px;
+            &:before{
+                position: relative;
+                top: 3px;
+                width: 17px;
+                background: url(../../images/redo.png) center no-repeat;
+                background-size: contain;
+                margin-right: 10px;
+            }
+        }
+        .undo{
+            width: 75px;
+            &:before{
+                position: relative;
+                top: 3px;
+                width: 17px;
+                background: url(../../images/undo.png) center no-repeat;
+                background-size: contain;
+                margin-right: 10px;
+            }
+        }
+    }
     .chart_left {
         position: fixed;
         top: 0;
         bottom: 0;
-        padding-top: 64px;
-        padding-left: 5px;
-        padding-right: 5px;
+        padding-top: 50px;
+        // padding-left: 5px;
+        // padding-right: 5px;
         float: left;
         overflow-x: hidden;
         overflow-y: auto;
-        width: 220px;
+        width: 180px;
         z-index: 103;
-        box-shadow: 0 0 10px #bbbbbb;
-        background: rgba(128, 133, 144, .06);
+        color: #ffffff;
+        // box-shadow: 0 0 10px #bbbbbb;
+        background: #44546e;
+        font-size: 12px;        
         .width_full{
             width: 100%;
         }
         // border-right: 1px solid #888888; //box-shadow: 2px 2px 2px #888888;
         .chart_data_info {
             font-size: 12px;
-            padding: 12px 16px 12px 0;
+            padding: 0 10px;
             position: relative;
-            margin-left: 16px;
+            border-bottom: 1px solid #364660;
             p {
                 height: 32px;
                 line-height: 32px;
             }
             .table_name {
-                padding: 0 8px;
                 a {
                     display: inline-block;
                 }
@@ -49,12 +131,13 @@
                 }
             }
         }
-        font-size: 12px;
+        
         .colums_item {
             cursor: pointer;
-            padding-left: 15px; //height: 32px;
-            line-height: 32px;
+            padding-left: 10px; //height: 32px;
+            line-height: 26px;
             &:hover {
+                background-color: #364660;
                 .el-icon-sort {
                     opacity: 1;
                 }
@@ -92,35 +175,49 @@
                 margin-bottom: 19px;
             }
         }
+        .search_wrap{
+            padding: 0 10px;
+            height: 32px;
+            line-height: 32px;
+            .el-icon-plus{
+                margin-top: 9px;
+                margin-left: 5px;
+            }
+            i{
+                .size(16px);
+                font-size: 14px;
+                color: #c9cdd5;
+            }
+        }
     }
     .chart_main {
         position: fixed;
-        padding-top: 64px;
+        padding-top: 90px;
         top: 0;
         width: 100%;
         height: 100%;
-        padding-left: 220px;
-        padding-right: 270px;
+        padding-left: 180px;
+        padding-right: 212px;
         z-index: 101;
         .grid-content {
             position: relative;
             overflow-x: auto;
+            overflow-y: hidden;
             min-width: 450px; //height: calc(100% - 64px);
+            height: 100%;
             z-index: 102;
-            padding: 15px 20px;
+            padding: 10px 25px 35px;
+            background-color: #f1f5f8;
             .el-card__body {
                 overflow-x: auto;
                 overflow-y: auto;
             }
-            .query{
-                margin-bottom: 15px;
-            }
             .xAxis {
                 .list_row {
                     border-bottom: 1px solid #bbb;
-                    margin-bottom: 5px;
+                    // margin-bottom: 5px;
                     font-size: 12px;
-                    padding-bottom: 3px;
+                    padding: 8px 0;
                     .el-input {
                         top: 2px;
                     }
@@ -192,11 +289,14 @@
                             /*超出部分文字以...显示*/
                         }
                     }
+                    &:last-child{
+                        border-bottom:none;
+                    }
                 }
                 .tit {
                     display: inline-block; //width: 110px;
-                    height: 30px;
-                    line-height: 30px;
+                    height: 24px;
+                    line-height: 24px;
                     width: 8%;
                     overflow: hidden;
                     text-decoration: none;
@@ -207,19 +307,19 @@
                     li {
                         cursor: pointer;
                         background: #fff;
-                        color: @c-main;
-                        border: 1px solid @c-main;
-                        margin-left: 20px;
-                        height: 28px;
-                        line-height: 26px;
+                        color: #7f8b9c;
+                        border: 1px solid #d2d2d2;
+                        margin-left: 5px;
+                        height: 24px;
+                        line-height: 22px;
                         text-align: left;
                         padding-left: 5px;
                         padding-right: 3px;
                         font-size: 12px;
                         margin-bottom: 2px;
-                        transition: all 5s;
+                        transition: all .5s;
                         i {
-                            color: @c-main;
+                            color: #7f8b9c;
                         }
                         .el-icon-arrow-down {
                             position: relative;
@@ -230,6 +330,7 @@
                             animation: all 0.1s;
                         }
                         &:hover {
+                            border-color:@c-main;
                             .el-icon-circle-close {
                                 opacity: 1;
                             }
@@ -239,7 +340,7 @@
             }
             .display_container {
                 //width: 100%;
-                height: 100%;
+                // height: 100%;
                 .empty_container {
                     width: 100%;
                     text-align: center; //line-height:450px;
@@ -254,26 +355,7 @@
             }
         }
     }
-    .chart_right {
-        position: fixed;
-        z-index: 103;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        padding-top: 64px;
-        overflow-x: hidden;
-        overflow-y: auto;
-        width: 260px;
-        background: #f1f1f3;
-        // border-left: 1px solid #888888;
-        box-shadow: 0 0 10px #bbbbbb;
-        .range_input {
-            width: 60px;
-        }
-        .range_input input{
-            height: 30px;
-        }
-    }
+    
     .workTableDialog {
         .el-dialog__header {
             padding-top: 10px;

@@ -45,6 +45,7 @@ var vb = {
             vb.showView(res.data.structure);
             getNewViewProvider(VIEW_TYPE_USER_COMPOSITE);
             $('#viewName').val(res.data.name);
+            $('.data_editor_header .name').text(res.data.name)
             vb._layout=res.data.layout;
             // vb._folder=res.data.folder;
           }
@@ -1290,7 +1291,7 @@ vb.diagram = {
 
         // 视图编辑按钮
         // FIXME mxCellOverlay.tooltip无效
-        var overlay = new mxCellOverlay(new mxImage('images/iconPencilSmall.png', 10, 10), '编辑视图', 'right', 'top', new mxPoint(-235, 12), 'default');
+        var overlay = new mxCellOverlay(new mxImage('images/iconPencilSmall.png', 24, 24), '编辑视图', 'right', 'top', new mxPoint(-235, 16), 'default');
         overlay.addListener(mxEvent.CLICK, function (sender, evt) {
           // 从cell中获取最新的值
           vb.viewRefEditor.edit(viewRefCell.getValue().viewRef);
@@ -1442,7 +1443,7 @@ vb.diagram = {
     // 列映射
     var colMappings = viewRef['columns'],
       w = 250,
-      h = 25 + colMappings.length * 20;
+      h = 35 + colMappings.length * 30;
 
     // 视图
     var viewRefObj = new ViewRef(viewRef),
@@ -1451,9 +1452,9 @@ vb.diagram = {
 
     // 添加列映射cell
     $.each(colMappings, function (index) {
-      var y = index * 20 + 25,
+      var y = index * 30 + 35,
         columnMappingObj = new ColumnMapping(this),
-        columnMappingCell = new mxCell(columnMappingObj, new mxGeometry(0, y, w, 20), 'COLUMN_STYLE');
+        columnMappingCell = new mxCell(columnMappingObj, new mxGeometry(0, y, w, 30), 'COLUMN_STYLE');
       columnMappingCell.setVertex(true);
       columnMappingCell.setConnectable(true);
       viewRefCell.insert(columnMappingCell);
@@ -1526,7 +1527,7 @@ vb.diagram = {
 
         // cell连接控制
         g.setConnectable(true);
-        mxConnectionHandler.prototype.connectImage = new mxImage('images/iconConnector.png', 16, 16);
+        mxConnectionHandler.prototype.connectImage = new mxImage('images/iconConnector.png', 24, 24);
         mxConnectionHandler.prototype.connectIconOffset = new mxPoint(0, mxConstants.TOOLTIP_VERTICAL_OFFSET);
         mxConnectionHandler.prototype.isConnectableCell = function (cell) {
           // 只能在表之间连接
@@ -1663,7 +1664,7 @@ vb.diagram = {
         style[mxConstants.STYLE_FOLDABLE] = false;
 
         var edgeStyle = g.stylesheet.getDefaultEdgeStyle();
-        edgeStyle[mxConstants.STYLE_LABEL_BACKGROUNDCOLOR] = 'white';
+        edgeStyle[mxConstants.STYLE_LABEL_BACKGROUNDCOLOR] = 'transparent';
         edgeStyle[mxConstants.STYLE_STROKEWIDTH] = 2;
         edgeStyle[mxConstants.STYLE_ROUNDED] = true;
         edgeStyle[mxConstants.STYLE_EDGE] = mxEdgeStyle.EntityRelation;
@@ -1671,7 +1672,7 @@ vb.diagram = {
         var colStyle = {};
         colStyle[mxConstants.STYLE_STROKEWIDTH] = 0;
         colStyle[mxConstants.STYLE_FONTCOLOR] = '#8e8eaf';
-        colStyle[mxConstants.STYLE_FILLCOLOR] = '#f5f5f5';
+        colStyle[mxConstants.STYLE_FILLCOLOR] = '#ffffff';
         colStyle[mxConstants.STYLE_ALIGN] = 'left';
         colStyle[mxConstants.STYLE_SPACING_LEFT] = 2;
         colStyle[mxConstants.STYLE_SPACING_RIGHT] = 2;
@@ -1680,9 +1681,9 @@ vb.diagram = {
         var viewStyle = {};
         viewStyle[mxConstants.STYLE_STROKEWIDTH] = 0;
         viewStyle[mxConstants.STYLE_FONTCOLOR] = '#000000';
-        viewStyle[mxConstants.STYLE_FILLCOLOR] = '#c8ddf7';
+        viewStyle[mxConstants.STYLE_FILLCOLOR] = '#f0f2f5';
         viewStyle[mxConstants.STYLE_VERTICAL_ALIGN] = 'top';
-        viewStyle[mxConstants.STYLE_SPACING_TOP] = 4;
+        viewStyle[mxConstants.STYLE_SPACING_TOP] = 8;
         g.getStylesheet().putCellStyle('VIEW_STYLE', viewStyle);
 
         style = g.getStylesheet().getDefaultEdgeStyle();
@@ -1828,7 +1829,7 @@ vb.diagram = {
   },
 
   _getViewRefRelationLabel: function (viewRefRel) {
-    return '(双击编辑)';
+    return '<img src=\'images/link.png\' style=\'width:24px;height:24px;\'/>';
   },
   _getViewRefLabel: function (viewRef) {
     // return viewRef.name + ' -> ' + (viewRef.alias ? viewRef.alias : '');
@@ -1837,16 +1838,16 @@ vb.diagram = {
   _getColumnMappingLabel: function (columnMapping) {
     var label = [];
     if (columnMapping['alias']) {
-      label.push('<img src=\'images/iconCheckSmall.png\' style=\'width:10px;height:10px;\'/> ');
+      label.push('<img src=\'images/iconCheckSmall.png\' style=\'width:16px;height:16px;vertical-align: middle;\'/> ');
     } else {
-      label.push('<img src=\'images/transparent.gif\' style=\'width:10px;height:10px;\'/> ');
+      label.push('<img src=\'images/transparent.gif\' style=\'width:16px;height:16px;vertical-align: middle;\'/> ');
     }
     if(columnMapping['javaType']=='Number'){
-      label.push('<img src=\'images/num_icon.png\' style=\'width:14px;height:16px;\'/>  ');
+      label.push('<img src=\'images/num_icon.png\' style=\'width:14px;height:16px;vertical-align: middle;\'/>  ');
     }else if(columnMapping['javaType']=='String'){
-      label.push('<img src=\'images/text_icon.png\' style=\'width:14px;height:16px;\'/>  ');
+      label.push('<img src=\'images/text_icon.png\' style=\'width:14px;height:16px;vertical-align: middle;\'/>  ');
     }else if(columnMapping['javaType']=='Date'){
-      label.push('<img src=\'images/data_icon.png\' style=\'width:14px;height:16px;\'/>  ');
+      label.push('<img src=\'images/data_icon.png\' style=\'width:14px;height:16px;vertical-align: middle;\'/>  ');
     }
     if(columnMapping['text']){
       label.push(columnMapping['text']);

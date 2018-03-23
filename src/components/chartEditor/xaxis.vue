@@ -7,7 +7,7 @@
             <div>
               <el-checkbox v-model="xaxis.show">显示坐标轴</el-checkbox>
             </div>
-            <div class="fix pl20">
+            <div class="fix ">
               <lineStyle :color.sync="xaxis.axisLine.lineStyle.color" :type.sync="xaxis.axisLine.lineStyle.type" :width.sync="xaxis.axisLine.lineStyle.width" ></lineStyle>
             </div>
           </div>
@@ -15,7 +15,7 @@
             <div>
               <el-checkbox v-model="xaxis.axisLabel.show">显示标签</el-checkbox>
             </div>
-            <div class="fix pl20">
+            <div class="fix ">
               <font :color.sync="xaxis.axisLabel.color" :fontFamily.sync="xaxis.axisLabel.fontFamily" :fontSize.sync="xaxis.axisLabel.fontSize"  ></font>
             </div>
           </div>
@@ -24,7 +24,7 @@
             <div>
               <el-checkbox v-model="xaxis.splitLine.show">纵向网格线</el-checkbox>
             </div>
-            <div class="fix pl20">
+            <div class="fix ">
               <lineStyle :color.sync="xaxis.splitLine.lineStyle.color" :type.sync="xaxis.splitLine.lineStyle.type" :width.sync="xaxis.splitLine.lineStyle.width" ></lineStyle>
             </div>
           </div>
@@ -38,6 +38,14 @@ import lineStyle from './propSelect/lineStyle.vue';
 import font from './propSelect/font.vue';
 
 export default {
+  components: {
+    lineStyle,font
+  },
+  mounted() {
+    let that = this;
+    // 初始化页面数据
+    Object.assign(that.xaxis, that.setXaxis);
+  },
   data: () => ({
     // 默认配置项展开
     activeNames: ['1'],
@@ -72,15 +80,6 @@ export default {
       }
     }
   }),
-  mounted() {
-    let that = this;
-    // 初始化页面数据
-    Object.assign(that.xaxis, that.setXaxis);
-  },
-  components: {
-    lineStyle,font
-  },
-  props: ['setXaxis'],
   watch: {
     xaxis: {
       handler: function(val, oldval) {
@@ -98,7 +97,9 @@ export default {
       },
       deep: true
     }
-  }
+  },  
+  props: ['setXaxis']
+  
 };
 </script>
 <style scoped>
@@ -117,9 +118,6 @@ export default {
 }
 .el-dropdown-menu {
   margin-top: -3px;
-}
-.pl20 {
-  padding-left: 20px;
 }
 .chart_right .el-color-picker {
   margin-top: -4px;

@@ -2,9 +2,6 @@
 </template>
 <script>
 export default {
-  data() {
-    return {};
-  },
   mounted() {
     let query = this.$route.query;
     if(query.link){

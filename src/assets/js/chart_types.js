@@ -334,5 +334,26 @@ export default {
     ],
     sort:11,
     weight:10
+  },
+  wordCloud:{
+    allowUse:false,
+    type: 'wordCloud',
+    name: '字云',
+    rules: [
+      {
+        columns: {
+          rule: '==',
+          num: 1,
+          text: '1个'
+        },
+        values: {
+          rule: '==',
+          num: 0,
+          text: '0个'
+        }
+      }
+    ],
+    sort:12,
+    weight:10
   }
 };

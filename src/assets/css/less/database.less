@@ -2,18 +2,32 @@
 // 数据源
 #database{
     position: fixed;
-    top: 64px;
+    top: 50px;
     left: 0;
     right: 0;
     bottom: 0;
     background-color: #f0f2f3;
     .database_left{
-        padding-top: 20px;
-        border-right: 1px solid #ddd;
+        float: left;
+        width: 180px;
+        background-color: #44546e;
+        color: #ffffff;
         .title{
-            padding-left: 20px;
-            background-color: #f0f2f3;
-            line-height: 30px;
+            padding: 0 10px 0 15px;
+            height: 45px;
+            line-height: 45px;
+            font-size: 14px;
+            color: #a9c6d6;
+            .el-icon-plus,.el-icon-more{
+                margin-top: 16px;
+                margin-left: 5px;
+                color: #c9cdd5;
+            }
+            &:hover{
+                input{
+                    width: 140px;
+                }
+            }
         }
     }
     .database_list{
@@ -21,7 +35,7 @@
         li{
             .centered-line(26px);
             position: relative;
-            color: #888888;
+            color: #fff;
             font-size: 12px;
             .database_name{
                 float: left;
@@ -69,25 +83,38 @@
         }
     }
     .database_right{
-        .top{
-            padding-top: 10px;
-        }
-        .database_add{
+        padding-left: 180px;
+        .database_save{
+            width: 85px;
             float: right;
-            margin-right: 30px;
-            .centered-line(30px);
-            position: relative;
-            padding-left: 20px;
-            font-size: 14px;
             &:before{
                 content:'';
-                position: absolute;
+                display: inline-block;
+                position: relative;
+                top: 3px;
                 width: 16px;
                 height: 16px;
-                top: 50%;
-                margin-top: -8px;
-                left: 0;
-                background: url(../../images/database_add.png) center no-repeat;
+                background: url(../../images/save_ord.png) center no-repeat;
+                background-size: contain;
+                margin-right: 10px;
+            }
+            &:hover:before{
+                background: url(../../images/save_hover.png) center no-repeat;
+                background-size: contain;
+            }
+        }
+        .menu{
+            width: 60px;
+            position: relative;
+            float: right;
+            &:before{
+                content:'';
+                display: inline-block;
+                width: 18px;
+                height: 16px;
+                position: relative;
+                top: 3px;
+                background: url(../../images/menu.png) center no-repeat;
                 background-size: contain;
             }
         }
@@ -97,12 +124,13 @@
 // 添加数据源
 #addDataList{
     position: fixed;
-    top: 64px;
+    top: 50px;
     left: 0;
     right: 0;
     bottom: 0;
     padding-top: 30px;
     background-color: #f0f2f3;
+    overflow-y: auto;
     *[class*="rect-"]{
         position: relative;
         display: block; 
@@ -138,5 +166,8 @@
         &:hover ._full{
             display: block;
         }
+    }
+    li {
+        line-height: 26px;
     }
 }

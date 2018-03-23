@@ -1,6 +1,6 @@
 <template>
   <div class="fix">
-    <el-dropdown @command="lineStyleType">
+    <el-dropdown class="line_type" @command="lineStyleType">
       <span class="el-dropdown-link">
         <span class="font_family_menu">{{style.type}}</span>
         <i class="el-icon-arrow-down el-icon--right"></i>
@@ -11,7 +11,7 @@
         <el-dropdown-item command="dotted">dotted</el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
-    <el-dropdown @command="lineStyleWidth">
+    <el-dropdown class="line_width" @command="lineStyleWidth">
       <span class="el-dropdown-link">
         <span class="font_family_menu">
           {{style.width}}
@@ -38,6 +38,9 @@
 import colorPicker from './colorPicker.vue';
 
 export default {
+  components: {
+    colorPicker
+  },
   data: () => ({
     // 线条样式
     style: {
@@ -46,20 +49,6 @@ export default {
       width: ''
     }
   }),
-  components: {
-    colorPicker
-  },
-  props: ['color', 'type', 'width'],
-  methods: {
-    // 线型
-    lineStyleType(command) {
-      this.style.type = command;
-    },
-    // 线宽
-    lineStyleWidth(command) {
-      this.style.width = command;
-    }
-  },
   watch: {
     'style.color':{
       handler: function(val, oldval) {
@@ -88,23 +77,27 @@ export default {
     width: function(val, oldval) {
       this.style.width = val;
     }
-  }
+  },
+  methods: {
+    // 线型
+    lineStyleType(command) {
+      this.style.type = command;
+    },
+    // 线宽
+    lineStyleWidth(command) {
+      this.style.width = command;
+    }
+  },
+  props: ['color', 'type', 'width'],
+  
 };
 </script>
 <style scoped>
 .el-dropdown,
 .color_block {
   float: left;
-  height: 24px;
-  line-height: 24px;
 }
-.el-dropdown-item {
-  height: 24px;
-  line-height: 24px;
-}
-.el-dropdown {
-  margin-right: 10px;
-}
+
 .el-dropdown-menu {
   margin-top: -3px;
 }

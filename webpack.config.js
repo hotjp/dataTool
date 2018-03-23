@@ -25,7 +25,8 @@ module.exports = (options = {}) => ({
     {
       test: /\.js$/,
       use: ['babel-loader'],
-      exclude: [resolve(__dirname,'node_modules'),resolve(__dirname, 'src/vendor')]
+      exclude: [resolve(__dirname, 'src/vendor')],
+      include:[resolve('src'),resolve('node_modules/vue-echarts-v3/src')]
     },
     {
       test: /\.less$/,

@@ -12,6 +12,9 @@
 import axios from 'axios';
 
 export default {
+  mounted() {
+    this.init();
+  },
   data: () => ({
     // 初始数据
     chartData: {
@@ -27,10 +30,6 @@ export default {
     // 合并相同数据
     order: []
   }),
-  props: ['myMessage'],
-  mounted() {
-    this.init();
-  },
   computed: {
     //null值的format 为null时 处理成'-'
     tableData: function() {
@@ -51,6 +50,14 @@ export default {
           })()
         };
       return prop;
+    }
+  },
+  watch: {
+    myMessage: {
+      handler: function(val, oldval) {
+        this.init();
+      },
+      deep: true
     }
   },
   methods: {
@@ -177,14 +184,7 @@ export default {
       tableFormat.column();
     }
   },
-  watch: {
-    myMessage: {
-      handler: function(val, oldval) {
-        this.init();
-      },
-      deep: true
-    }
-  }
+  props: ['myMessage']  
 };
 </script>
 <style>

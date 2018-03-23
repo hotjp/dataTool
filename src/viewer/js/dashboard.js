@@ -154,7 +154,16 @@ function getChartData(chartId) {
             myChart.resize();
           }
           $('#chart' + chartId).closest('.grid-stack-item').find('.chart_tit').text(res.data.text)
-          
+          res.data.background?res.data.background:{
+            backgroundColor:'#fff',
+            backgroundRepeat:'no-repeat',
+            backgroundImage:''
+          }
+          $('#chart' + chartId).closest('._wrap').css({
+            'background-color':res.data.background.backgroundColor,
+            'background-repeat':res.data.background.backgroundRepeat,
+            'background-image':res.data.background.backgroundImage
+          })
         })
     }
 
@@ -257,6 +266,12 @@ function dataHandler(data, series, type) {
       seriesGauge(columns, rows, queryNameKeyX, queryNameKeyY, {}, series)
     );
     return series;
+  }else if (type == 'wordCloud') {
+    series = Object.assign(
+      [],
+      seriesWordCloud(columns, rows, queryNameKeyX, queryNameKeyY, {}, series)
+    );
+    return series;
   }
 }
 
@@ -301,7 +316,17 @@ $('body').on('dblclick', '.grid-stack-item', function() {
             singleChart.clear()
             var chartData = res.data.chartData;
             $('#singleTable').html('');
-            renderTmp('#singleTable', 'tableViewTpl', chartData)
+            renderTmp('#singleTable', 'tableViewTpl', chartData);
+            res.data.background?res.data.background:{
+              backgroundColor:'#fff',
+              backgroundRepeat:'no-repeat',
+              backgroundImage:''
+            }
+            $('#singleTable').css({
+              'background-color':res.data.background.backgroundColor,
+              'background-repeat':res.data.background.backgroundRepeat,
+              'background-image':res.data.background.backgroundImage
+            })
           } else {
             res.data.option.series = dataHandler(data.data, res.data.option.series, res.data.type);
             $('#singleChart').show();
@@ -309,7 +334,18 @@ $('body').on('dblclick', '.grid-stack-item', function() {
             singleChart.clear()
             singleChart.setOption(res.data.option);
             singleChart.resize();
+            res.data.background?res.data.background:{
+              backgroundColor:'#fff',
+              backgroundRepeat:'no-repeat',
+              backgroundImage:''
+            }
+            $('#singleChart').css({
+              'background-color':res.data.background.backgroundColor,
+              'background-repeat':res.data.background.backgroundRepeat,
+              'background-image':res.data.background.backgroundImage
+            })
           }
+          
         })
     }
   })
@@ -319,6 +355,7 @@ $('body').on('dblclick', '.grid-stack-item', function() {
 $('body').on('click', '.close', function() {
   $('.chart_box').hide();
   $('body').removeClass('ovh');
+  $('#singleTable').attr('css','')
 
 });
 

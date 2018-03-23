@@ -6,6 +6,7 @@
 
 <script>
 export default {
+  components: {},
   beforeCreate() {
     // 组件创建前
   },
@@ -47,7 +48,8 @@ export default {
         el.style.width = el.scrollWidth + 'px';
       }
     }
-  }
+  },
+  props:[]
 };
 </script>
 

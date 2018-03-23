@@ -11,6 +11,7 @@
     <chartTreemap v-else-if="type=='treemap'" :option="option" :data="data" @getSeries="getOption"></chartTreemap>
     <chartWaterfall v-else-if="type=='waterfall'" :option="option" :data="data" @getSeries="getOption"></chartWaterfall>
     <chartGauge v-else-if="type=='gauge'" :option="option" :data="data" @getSeries="getOption"></chartGauge>
+    <chartWordCloud v-else-if="type=='wordCloud'" :option="option" :data="data" @getSeries="getOption"></chartWordCloud>
 
     <!-- <div class="split_line">图表样式</div>  
     <div>
@@ -69,10 +70,17 @@ import chartRadar from '../chartsComponents/chart-radar.vue';
 import chartTreemap from '../chartsComponents/chart-treemap.vue';
 import chartWaterfall from '../chartsComponents/chart-waterfall.vue';
 import chartGauge from '../chartsComponents/chart-gauge.vue';
+import chartWordCloud from '../chartsComponents/chart-wordCloud.vue';
+
 
 export default {
-  data() {
-    return {
+  components: {
+    chartBar, chartLine, chartPie, chartArea, chartStackbar, chartFunnel, 
+    chartRosePie, chartRadar,chartTreemap,chartWaterfall,chartGauge,chartWordCloud
+  },
+  mounted() {
+  },
+  data:()=>({
       // series设置
       seriesOption: {
       },
@@ -100,14 +108,13 @@ export default {
         }
 
       }
-    };
-  },
-  mounted() {
-  },
-  props: ['option', 'data', 'type'],
-  components: {
-    chartBar, chartLine, chartPie, chartArea, chartStackbar, chartFunnel, 
-    chartRosePie, chartRadar,chartTreemap,chartWaterfall,chartGauge
+    }),
+  watch: {
+    chartsStyle: {
+      handler: function (oldval, val) {
+        this.$emit('submitOption', val);
+      }
+    }
   },
   methods: {
     getOption(data) {
@@ -120,13 +127,7 @@ export default {
       this.chartsStyle.xAxis.splitLine.lineStyle.width = command;
     }
   },
-  watch: {
-    chartsStyle: {
-      handler: function (oldval, val) {
-        this.$emit('submitOption', val);
-      }
-    }
-  },
+  props: ['option', 'data', 'type']  
 };
 </script>
 

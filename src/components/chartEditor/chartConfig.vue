@@ -1,38 +1,52 @@
 <template>
   <div class="chartConfig">
-    <prop-title class="series" @titleText="getTitle" :setTitle="option.title"></prop-title>
-    <prop-xaxis v-if="charts.type!='table'" class="series" @xaxisOptions="getOptions" :setXaxis="option.xAxis"></prop-xaxis>
-    <prop-yaxis v-if="charts.type!='table'" class="series" @yaxisOptions="getOptions" :setYaxis="option.yAxis"></prop-yaxis>
-    <prop-legend v-if="charts.type!='table'" class="series" @legendOptions="getOptions" :propData="setProp" :setLegend="option.legend" :chartsType="charts.type"></prop-legend>
+    <chartXaxis v-if="charts.type!='table'" class="series" @xaxisOptions="getOptions" :setXaxis="option.xAxis"></chartXaxis>
+    <chartYaxis v-if="charts.type!='table'" class="series" @yaxisOptions="getOptions" :setYaxis="option.yAxis"></chartYaxis>
+    <chartLegend v-if="charts.type!='table'" class="series" @legendOptions="getOptions" :propData="setProp" :setLegend="option.legend" :chartsType="charts.type"></chartLegend>
     <chartTypeOption class="series" :option="option" :data="setProp" :type="charts.type" @submitOption="submitOption"></chartTypeOption>
+    <background class="series" :backgroundStyle="charts.background" @backgroundOption="backgroundOption"></background>
   </div>
 </template>
 <script type="text/babel">
 import defaultData from '../../vendor/defaultOption.json';
-import title from './title.vue';
-import xaxis from './xaxis.vue';
-import yaxis from './yaxis.vue';
-import legend from './legend.vue';
+import chartXaxis from './xaxis.vue';
+import chartYaxis from './yaxis.vue';
+import chartLegend from './legend.vue';
 import chartTypeOption from './chartTypeOption.vue';
+import background from './background.vue';
+
 export default {
+  components: {
+    chartXaxis,
+    chartYaxis,
+    chartLegend,
+    chartTypeOption,
+    background
+  },
+  beforeMount() {
+    Object.assign(this.option, defaultData.option, this.charts.option);
+  },
   data: () => ({
     option: {
     },
     graphData: {}
   }),
-  components: {
-    'prop-title': title,
-    'prop-xaxis': xaxis,
-    'prop-yaxis': yaxis,
-    'prop-legend': legend,
-    chartTypeOption: chartTypeOption
-  },
-  props: ['setProp', 'charts'],
-  methods: {
-    // 获取图表标题的值
-    getTitle: function (data) {
-      Object.assign(this.option.title, data);
+  watch: {
+    option: {
+      handler: function (val, oldval) {
+        // 发数据
+        this.$emit('getProp', val);
+      },
+      deep: true
     },
+    'charts.type': {
+      handler: function (val, oldval) {
+        this.option = Object.assign({}, this.option, defaultData.option, this.charts.option);
+      },
+      deep: true
+    }
+  },
+  methods: {
     // 获取图表配置
     getOptions: function (data) {
       Object.assign(this.option, data.option);
@@ -58,26 +72,12 @@ export default {
         this.option.grid = data.grid;
       }
       this.$emit('getProp', this.option);
-    }
-  },
-  watch: {
-    option: {
-      handler: function (val, oldval) {
-        // 发数据
-        this.$emit('getProp', val);
-      },
-      deep: true
     },
-    'charts.type': {
-      handler: function (val, oldval) {
-        this.option = Object.assign({}, this.option, defaultData.option, this.charts.option);
-      },
-      deep: true
+    backgroundOption:function(data){
+      this.$emit('getBackground', data);
     }
   },
-  beforeMount() {
-    Object.assign(this.option, defaultData.option, this.charts.option);
-  }
+  props: ['setProp', 'charts']  
 };
 </script>
 

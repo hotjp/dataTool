@@ -123,37 +123,42 @@ audio:not([controls]),
   display: none;
 }
 #dashboard .el-dialog__body {
-  max-height: 450px;
   overflow-y: auto;
 }
 #dashboard .dashboard_left {
-  color: #888;
   position: fixed;
-  top: 0;
+  top: 50px;
   bottom: 0;
-  padding-top: 64px;
-  padding-left: 5px;
-  padding-right: 3px;
   float: left;
   overflow-x: hidden;
   overflow-y: auto;
-  width: 220px;
+  width: 180px;
   z-index: 103;
-  background: #f0f2f3;
-  border-right: 1px solid #dddddd;
+  background: #44546e;
 }
 #dashboard .dashboard_left .dirTreeTitle {
+  color: #a9c6d6;
   padding-left: 16px;
-  line-height: 48px;
-  height: 48px;
+  line-height: 45px;
+  height: 45px;
   font-size: 14px;
 }
 #dashboard .dashboard_left .dirTreeTitle .el-icon-more,
-#dashboard .dashboard_left .dirTreeTitle .el-icon-plus,
-#dashboard .dashboard_left .dirTreeTitle .el-icon-search {
-  margin-top: 18px;
+#dashboard .dashboard_left .dirTreeTitle .el-icon-plus {
+  margin-top: 16px;
   margin-right: 5px;
   cursor: pointer;
+  color: #c9cdd5;
+}
+#dashboard .dashboard_left .dirTreeTitle .el-icon-search {
+  color: #c9cdd5;
+  cursor: pointer;
+}
+#dashboard .dashboard_left .dirTreeTitle .search_box {
+  margin-right: 5px;
+}
+#dashboard .dashboard_left .dirTreeTitle .search_box:hover input {
+  width: 120px;
 }
 #dashboard .dashboard_left .el-tree-node__content:hover {
   background-color: #fff;
@@ -168,6 +173,7 @@ audio:not([controls]),
   line-height: 32px;
 }
 #dashboard .dashboard_left .dirChildren {
+  color: #fff;
   width: 100%;
   height: 32px;
   line-height: 32px;
@@ -210,9 +216,11 @@ audio:not([controls]),
   line-height: 24px;
   margin: 5px 0;
   cursor: pointer;
+  color: #68b6ff;
 }
 #dashboard .dashboard_left .dirChildren.cur {
-  background-color: #e0e0e0;
+  background-color: #364660;
+  color: #68b6ff;
 }
 #dashboard .dashboard_left .dirText {
   font-size: 12px;
@@ -226,21 +234,23 @@ audio:not([controls]),
   text-decoration: none;
 }
 #dashboard .dashboard_main {
-  background-color: #fff;
+  background-color: #f1f5f8;
   position: fixed;
-  padding-top: 64px;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  padding-left: 220px;
+  top: 50px;
+  left: 180px;
+  bottom: 0;
+  right: 0;
   z-index: 101;
+}
+#dashboard .dashboard_main #dash {
+  margin-top: 50px;
 }
 #dashboard .dashboard_main .grid-content {
   position: relative;
   overflow-x: auto;
   min-width: 450px;
   z-index: 102;
-  padding: 5px 20px;
+  padding: 0;
   height: 100%;
   overflow-y: auto;
 }
@@ -248,59 +258,56 @@ audio:not([controls]),
   overflow-x: auto;
   overflow-y: auto;
 }
-#dashboard .top {
-  height: 40px;
-  line-height: 40px;
-  font-size: 12px;
+#dashboard .top.common_top {
+  position: fixed;
+  top: 50px;
+  left: 180px;
+  right: 0;
+  z-index: 15;
 }
 #dashboard .top .name {
-  font-size: 16px;
-  padding-left: 5px;
-}
-#dashboard .top .add_chart {
-  height: 40px;
-  line-height: 40px;
-  margin-right: 30px;
-  border: none;
-  background-color: transparent;
-  position: relative;
-  padding-left: 20px;
-  outline: none;
-  cursor: pointer;
   font-size: 12px;
+  padding-left: 15px;
 }
 #dashboard .top .add_chart:before {
   content: '';
   vertical-align: middle;
-  width: 14px;
-  height: 14px;
-  position: absolute;
-  top: 50%;
-  left: 0;
-  margin-top: -7px;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 10px;
   background: url(../../images/add_charts.png) no-repeat center;
   background-size: cover;
+  margin-top: -2px;
 }
-#dashboard .top .edit_switch {
-  width: 110px;
-}
-#dashboard .top .edit_switch button {
-  border: 1px solid #5182E4;
-  background-color: transparent;
-  color: #5182e4;
-  font-size: 12px;
-  padding: 5px 10px;
-  margin-left: 10px;
+#dashboard .top .edit_switch:before {
+  content: '';
+  vertical-align: middle;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 10px;
+  background: url(../../images/edit.png) no-repeat center;
+  background-size: cover;
+  margin-top: -2px;
 }
 #dashboard .top .preview {
-  height: 40px;
-  line-height: 40px;
-  margin-right: 30px;
-  color: #333333;
+  margin-right: 13px;
+}
+#dashboard .top .preview:before {
+  content: '';
+  vertical-align: middle;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 10px;
+  background: url(../../images/preview.png) no-repeat center;
+  background-size: cover;
+  margin-top: -2px;
 }
 #dashboard .grid-stack-item {
   box-sizing: border-box;
-  padding: 10px;
+  padding: 0;
 }
 #dashboard .grid-stack-item.no_padding ._wrap {
   left: 0;
@@ -312,10 +319,10 @@ audio:not([controls]),
   border: 1px solid #e8ebed;
   background-color: #ffffff;
   position: absolute;
-  left: 5px;
-  right: 5px;
-  top: 5px;
-  bottom: 5px;
+  left: 8px;
+  right: 8px;
+  top: 8px;
+  bottom: 8px;
   padding: 30px 10px 10px;
   transition: box-shadow 0.3s ease-in-out;
   overflow: hidden;
@@ -357,6 +364,8 @@ audio:not([controls]),
 }
 #dashboard .grid-stack {
   border: 2px dashed transparent;
+  margin-top: 8px;
+  margin-left: 8px;
 }
 #dashboard.dashboard_viewer .grid-stack {
   border-color: #e8ebed;
@@ -393,12 +402,12 @@ audio:not([controls]),
 #dashboard .colums_list li {
   font-size: 12px;
   position: relative;
-  padding-left: 20px;
+  padding-left: 30px;
 }
 #dashboard .colums_list li:before {
   content: '';
   position: absolute;
-  left: 0;
+  left: 9px;
   top: 50%;
   width: 10px;
   height: 10px;
@@ -421,11 +430,6 @@ audio:not([controls]),
 #dashboard .new_built:hover {
   color: #5182e4;
 }
-#dashboard .tit {
-  font-size: 14px;
-  color: #333333;
-  margin-top: 10px;
-}
 #dashboard .chart_table {
   width: 100%;
   border-collapse: collapse;
@@ -443,6 +447,34 @@ audio:not([controls]),
 }
 #dashboard .table_container {
   overflow: auto;
+}
+.dialog_content {
+  background-color: #f5f7fa;
+  overflow-y: auto;
+}
+.chart_add_dialog .dialog_content {
+  max-height: 260px;
+}
+.chart_add_dialog .add_new {
+  display: block;
+  height: 20px;
+  line-height: 20px;
+}
+.chart_add_dialog .tit {
+  font-size: 12px;
+  color: #333333;
+  margin-top: 10px;
+  position: relative;
+}
+.chart_add_dialog .tit .search_box {
+  height: 30px;
+  width: 30px;
+}
+.chart_add_dialog .tit .search_box:hover input {
+  border: 1px solid #ccc;
+}
+.chart_add_dialog .tit .search_box .el-icon-search {
+  right: 3px;
 }
 .ovh {
   width: 100%;

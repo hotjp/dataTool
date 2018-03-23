@@ -7,6 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
     <link rel="stylesheet" type="text/css" href="css/data_editor.css" />
+    <link rel="stylesheet" type="text/css" href="../assets/css/font-awesome.css" />
     <style>
     .dialog {
         border: solid 1px #333
@@ -19,18 +20,16 @@
 </head>
 
 <body class="data_editor">
-    <!-- <div class="data_editor_header fix">
-        
-        
-
-    </div> -->
-    <div class="editor_left">
-        <aside>
-            <div class="fix massage_btn">
+    <div class="data_editor_header fix">
+        <span class="name l "></span>
+        <div class="fix massage_btn r">
                 <!-- <a href="javascript:;" class="block l close_container">
                     <i class="icon_btn_close"></i>
                     关闭
                 </a> -->
+                <a href="javascript:;" class="block r menu_container">
+                    <i class="icon_btn_menu"></i>
+                </a>
                 <a id="saveView" href="javascript:;" class="block l save_container">
                     <i class="icon_btn_save"></i>
                     <!-- <i class="el-icon-circle-check-outline"></i> -->
@@ -41,8 +40,12 @@
                     <!-- <i class="el-icon-circle-check-outline"></i> -->
                     预览
                 </a>
+                
             </div>
-            
+    </div>
+    <div class="editor_left">
+        <aside>
+                       
             <div class="head_input_container">
                 <span class="red">*</span>视图名
                 <form action onsubmit="return false">
@@ -100,7 +103,7 @@
         </aside>
     </div>
     <div class="editor_right">
-        <div id="content" style="background-image: url('./mxClient/images/grid.gif'); background-position: left top;height:100%;overflow-y: auto;">
+        <div id="content" style="background-color:#f1f5f8;height:100%;overflow-y: auto;">
         </div>
     </div>
     <!-- 编辑关联关系 -->
@@ -145,7 +148,7 @@
                             <%}%>
                           <%}%>
                       </select>
-                      <span class="refDel">删除</span>
+                      <span class="refDel fa fa-close"></span>
                     </li>
                   <%}%>
                 <%}%>
@@ -177,7 +180,8 @@
                             <input type="text" class="text" placeholder="请填写备注名称">                   
                         </div>
                         <div class="filters" data-filters="">
-                            <input type="checkbox" class="checkFilters">是否筛选<div class="help">*在数据视图中提前过滤数据可以有效增加最终图表准确度</div>
+                            <input type="checkbox" class="checkFilters">是否筛选
+                            
                             <div class="filters_inner">
                                 <select name="" id="">
                                     <option value="eq">等于</option>
@@ -217,6 +221,7 @@
                                 <input type="radio" value="desc" name="order" class="dese" id="dese"><label for="dese">倒序</label>
                             </div>
                         </div>
+                        <div class="help">*在数据视图中提前过滤数据可以有效增加最终图表准确度</div>
                     </div>
                 </div> 
                 <script id="viewRefTpl" type="text/html">

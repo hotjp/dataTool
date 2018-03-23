@@ -17,34 +17,17 @@
 </template>
 
 <script>
-import Vue from 'vue';
+import seriesDefault from "../../vendor/seriesLine.json";
+import "../../vendor/jsVendor/seriesLine.js";
 
-import seriesDefault from '../../vendor/seriesLine.json';
-import '../../vendor/jsVendor/seriesLine.js';
-
-import colorPicker from '../chartEditor/propSelect/colorPicker.vue';
+import colorPicker from "../chartEditor/propSelect/colorPicker.vue";
 
 export default {
-  data() {
-    return {
-      // 返回父级的数据，包括series和xAxis与yAxis的data部分
-      seriesOption: {
-        option: {
-          series: []
-        }
-      },
-      // 数据
-      chartData: {},
-      // 默认配置项展开
-      activeNames: ['1'],
-      // 图表类型
-      type: 'line',
-      pageName: '折线图',
-      // 是否平滑曲线
-      smooth: false,
-      // 第一次进入页面
-      firstFlag: true
-    };
+  components: {
+    colorPicker
+  },
+  created() {
+    this.dataChange();
   },
   mounted() {
     let that = this;
@@ -55,13 +38,40 @@ export default {
       }
     }
   },
-  created() {
-    this.dataChange();
+  data: () => ({
+    // 返回父级的数据，包括series和xAxis与yAxis的data部分
+    seriesOption: {
+      option: {
+        series: []
+      }
+    },
+    // 数据
+    chartData: {},
+    // 默认配置项展开
+    activeNames: ["1"],
+    // 图表类型
+    type: "line",
+    pageName: "折线图",
+    // 是否平滑曲线
+    smooth: false,
+    // 第一次进入页面
+    firstFlag: true
+  }),
+  watch: {
+    seriesOption: {
+      handler: function(newVal, oldVal) {
+        this.$emit("getSeries", this.seriesOption.option);
+      },
+      deep: true
+    },
+    data: {
+      // 父级传来的图表数据
+      handler: function(newVal, oldVal) {
+        this.dataChange();
+      },
+      deep: true
+    }
   },
-  components: {
-    colorPicker
-  },
-  props: ['option', 'data'],
   methods: {
     // 平滑曲线
     smoothChange(data) {
@@ -69,7 +79,7 @@ export default {
         this.seriesOption.option.series[i].smooth = data;
       }
       this.seriesOption.option = Object.assign({}, this.seriesOption.option);
-      this.$emit('getSeries', this.seriesOption.option);
+      this.$emit("getSeries", this.seriesOption.option);
     },
     // 数据处理
     dataChange() {
@@ -116,7 +126,7 @@ export default {
       }
       // series.data的数据
       if (that.firstFlag) {
-        // 第一次进入页面        
+        // 第一次进入页面
         newData.series = seriesLine(
           columns,
           rows,
@@ -137,29 +147,12 @@ export default {
       }
 
       that.firstFlag = false;
-      Vue.set(this.seriesOption.option, 'grid', seriesDefault.grid);
-      Vue.set(this.seriesOption.option, 'xAxis', newData.xAxis);
-      Vue.set(this.seriesOption.option, 'series', newData.series);
-      that.$emit('getSeries', that.seriesOption.option);
+      that.$set(this.seriesOption.option, "grid", seriesDefault.grid);
+      that.$set(this.seriesOption.option, "xAxis", newData.xAxis);
+      that.$set(this.seriesOption.option, "series", newData.series);
+      that.$emit("getSeries", that.seriesOption.option);
     }
   },
-  watch: {
-    seriesOption: {
-      handler: function(newVal, oldVal) {
-        this.$emit('getSeries', this.seriesOption.option);
-      },
-      deep: true
-    },
-    data: {
-      // 父级传来的图表数据
-      handler: function(newVal, oldVal) {
-        this.dataChange();
-      },
-      deep: true
-    }
-  }
+  props: ["option", "data"]
 };
 </script>
-<style>
-
-</style>

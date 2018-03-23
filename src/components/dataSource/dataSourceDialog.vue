@@ -27,56 +27,37 @@
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <span class="tipText" :class="{opcityP:!saveFlag}">测试成功，请点击保存</span>
-                <el-button @click="onClickDataSourceTest">测试链接</el-button>
-                <el-button type="primary" @click="onClickDataSourceSave">Save</el-button>
+                <el-button class="btn-confirm" type="primary" @click="onClickDataSourceSave">保存</el-button>
+                <el-button class="btn-confirm" @click="onClickDataSourceTest">测试链接</el-button>
             </div>
         </el-dialog>
     </div>
 </template>
 <script type="text/babel">
-import vars from '../../assets/js/vars';
-import { getJson } from '../../router/utils';
+import vars from "../../assets/js/vars";
+import { getJson } from "../../router/utils";
 export default {
-  data: function () {
-    return {
-      saveFlag: false,
-      dialogFormVisible: true,
-      formLabelWidth: '120px',
-      loading: false
-    };
+  data: () => ({
+    saveFlag: false,
+    dialogFormVisible: true,
+    formLabelWidth: "120px",
+    loading: false
+  }),
+  watch: {
+    dialogFormVisible: function(val) {
+      if (val === false) {
+        this.saveFlag = false;
+      }
+      this.changeFatherDialogFormVisible(val);
+    }
   },
-  props: ['form'],
   methods: {
     onClickDataSourceTest() {
       let that = this;
       that.loading = true;
-      getJson('/datasource/test.do',{
-        id: that.form.id,
-        name: that.form.name,
-        dbType: that.form.dbType,
-        host: that.form.jdbcHost,
-        port: that.form.jdbcPort,
-        user: that.form.jdbcUser,
-        password: that.form.password,
-        database: that.form.jdbcDatabases
-      },function(res){
-        that.loading = false;
-        if (res.success) {
-          that.$message('测试成功');
-          that.saveFlag = true;
-          //   console.log(resData.data.rows);
-        } else {
-          // console.log(res);
-          that.$message('测试失败' + res.errorMessage);
-          that.saveFlag = false;
-        }
-      });
-    },
-    onClickDataSourceSave() {
-      let that = this;
-      if (that.saveFlag) {
-        that.loading = true;
-        getJson('/datasource/save.do',{
+      getJson(
+        "/datasource/test.do",
+        {
           id: that.form.id,
           name: that.form.name,
           dbType: that.form.dbType,
@@ -84,37 +65,61 @@ export default {
           port: that.form.jdbcPort,
           user: that.form.jdbcUser,
           password: that.form.password,
-          database: that.form.jdbcDatabase
-        },function(res){
+          database: that.form.jdbcDatabases
+        },
+        function(res) {
           that.loading = false;
           if (res.success) {
-            that.dialogFormVisible = false;
-            that.$message('保存成功');
+            that.$message("测试成功");
+            that.saveFlag = true;
+            //   console.log(resData.data.rows);
           } else {
-            that.$message('保存未成功');
+            // console.log(res);
+            that.$message("测试失败" + res.errorMessage);
+            that.saveFlag = false;
           }
-        });
+        }
+      );
+    },
+    onClickDataSourceSave() {
+      let that = this;
+      if (that.saveFlag) {
+        that.loading = true;
+        getJson(
+          "/datasource/save.do",
+          {
+            id: that.form.id,
+            name: that.form.name,
+            dbType: that.form.dbType,
+            host: that.form.jdbcHost,
+            port: that.form.jdbcPort,
+            user: that.form.jdbcUser,
+            password: that.form.password,
+            database: that.form.jdbcDatabase
+          },
+          function(res) {
+            that.loading = false;
+            if (res.success) {
+              that.dialogFormVisible = false;
+              that.$message("保存成功");
+            } else {
+              that.$message("保存未成功");
+            }
+          }
+        );
       } else {
-        this.$message('测试链接未通过，请通过测试后再保存');
+        this.$message("测试链接未通过，请通过测试后再保存");
       }
     },
     changeFatherDialogFormVisible(value) {
       //向父组件传值
-      this.$emit('changeDialogFormVisible', value);
+      this.$emit("changeDialogFormVisible", value);
     },
     saveFlagFalse() {
       this.saveFlag = false;
     }
   },
-  watch: {
-    dialogFormVisible: function (val) {
-      if (val === false) {
-        this.saveFlag = false;
-      }
-      this.changeFatherDialogFormVisible(val);
-    }
-  }
-
+  props: ["form"]
 };
 </script>
 <style scoped>

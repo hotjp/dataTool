@@ -12,33 +12,14 @@
 </template>
 
 <script>
-import Vue from 'vue';
+import seriesDefault from "../../vendor/seriesBar.json";
+import "../../vendor/jsVendor/seriesStackbar.js";
 
-import seriesDefault from '../../vendor/seriesBar.json';
-import '../../vendor/jsVendor/seriesStackbar.js';
-
-import colorPicker from '../chartEditor/propSelect/colorPicker.vue';
+import colorPicker from "../chartEditor/propSelect/colorPicker.vue";
 
 export default {
-  data() {
-    return {
-      // 返回父级的数据，包括series和xAxis与yAxis的data部分
-      seriesOption: {
-        option: {
-          series: [],
-          xAxis:{}
-        }
-      },
-      // 数据
-      chartData: {},
-      // 默认配置项展开
-      activeNames: ['1'],
-      // 图表类型
-      type: 'bar',
-      pageName: '堆叠柱状图',
-      // 第一次进入页面
-      firstFlag:true
-    };
+  components: {
+    colorPicker
   },
   mounted() {
     let that = this;
@@ -47,10 +28,39 @@ export default {
   created() {
     this.dataChange();
   },
-  components: {
-    colorPicker
+  data: () => ({
+    // 返回父级的数据，包括series和xAxis与yAxis的data部分
+    seriesOption: {
+      option: {
+        series: [],
+        xAxis: {}
+      }
+    },
+    // 数据
+    chartData: {},
+    // 默认配置项展开
+    activeNames: ["1"],
+    // 图表类型
+    type: "bar",
+    pageName: "堆叠柱状图",
+    // 第一次进入页面
+    firstFlag: true
+  }),
+  watch: {
+    seriesOption: {
+      handler: function(newVal, oldVal) {
+        this.$emit("getSeries", this.seriesOption.option);
+      },
+      deep: true
+    },
+    data: {
+      // 父级传来的图表数据
+      handler: function(newVal, oldVal) {
+        this.dataChange();
+      },
+      deep: true
+    }
   },
-  props: ['option', 'data'],
   methods: {
     // 数据处理
     dataChange() {
@@ -95,37 +105,35 @@ export default {
         }
         newData.xAxis.data = arr;
       }
-      
+
       // series.data的数据
-      if(that.firstFlag){
-        // 第一次进入页面        
-        newData.series = seriesStackbar(columns,rows,queryNameKeyY,seriesDefault,that.option.series,true);
-      }else{
-        newData.series = seriesStackbar(columns,rows,queryNameKeyY,seriesDefault);
+      if (that.firstFlag) {
+        // 第一次进入页面
+        newData.series = seriesStackbar(
+          columns,
+          rows,
+          queryNameKeyY,
+          seriesDefault,
+          that.option.series,
+          true
+        );
+      } else {
+        newData.series = seriesStackbar(
+          columns,
+          rows,
+          queryNameKeyY,
+          seriesDefault
+        );
       }
 
-      that.firstFlag = false;      
-      Vue.set(this.seriesOption.option, 'grid', seriesDefault.grid);
-      Vue.set(this.seriesOption.option, 'xAxis', newData.xAxis);
-      Vue.set(this.seriesOption.option, 'series', newData.series);
-      that.$emit('getSeries', that.seriesOption.option);
+      that.firstFlag = false;
+      that.$set(this.seriesOption.option, "grid", seriesDefault.grid);
+      that.$set(this.seriesOption.option, "xAxis", newData.xAxis);
+      that.$set(this.seriesOption.option, "series", newData.series);
+      that.$emit("getSeries", that.seriesOption.option);
     }
   },
-  watch: {
-    seriesOption: {
-      handler: function(newVal, oldVal) {
-        this.$emit('getSeries', this.seriesOption.option);
-      },
-      deep: true
-    },
-    data: {
-      // 父级传来的图表数据
-      handler: function(newVal, oldVal) {
-        this.dataChange();
-      },
-      deep: true
-    }
-  }
+  props: ["option", "data"]
 };
 </script>
 <style>

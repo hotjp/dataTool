@@ -13,14 +13,16 @@
         <input class="interval_input" type="number" @input="input(1,$event)" placeholder="请输入数值">
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="summaryFilter(0)">取 消</el-button>
-        <el-button type="primary" @click="summaryFilter(1)">确 定</el-button>
+        <el-button class="btn-confirm" type="primary" @click="summaryFilter(1)">确 定</el-button>
+        <el-button class="btn-cancel" @click="summaryFilter(0)">取 消</el-button>
       </span>
     </form>
   </el-dialog>
 </template>
 <script type="text/babel">
 export default {
+  mounted() {
+  },
   data: () => ({
     // 汇总数值筛选器 数值输入旗帜
     filterValueFlag: 1,
@@ -68,7 +70,39 @@ export default {
     },
     getqueryInfo:{}
   }),
-  props: ['ScreenOption','queryInfo'],
+  watch: {
+    'option.filter.op': function (val) {
+      if (val == 'between') {
+        this.filterValueFlag = 2;
+      } else if (val == '不为空' || val == '为空') {
+        this.filterValueFlag = 3;
+      } else {
+        this.filterValueFlag = 1;
+      }
+    },
+    ScreenOption: {
+      handler: function(val, oldval) {
+        this.option=Object.assign({}, this.option, this.ScreenOption);
+        this.option.filter=Object.assign({}, this.option.filter, this.getqueryInfo.valueColumns[this.option.index].filter);
+      },
+      deep: true
+    },
+    'option.summaryFilter':{
+      handler:function(val,oldval){
+        this.$emit('summaryFilter', this.option.summaryFilter);
+      }
+    },
+    queryInfo:{
+      handler:function(val,oldval){
+        this.getqueryInfo=Object.assign({},this.getqueryInfo,val);
+      }
+    },
+    filterValueFlag:{
+      handler:function(val,oldval){
+        console.log(val);
+      }
+    }
+  },
   methods: {
     // 筛选主函数
     summaryFilter(e){
@@ -102,41 +136,8 @@ export default {
       this.option.filter.values[e]=val.target.value;
     }
   },
-  mounted() {
-  },
-  watch: {
-    'option.filter.op': function (val) {
-      if (val == 'between') {
-        this.filterValueFlag = 2;
-      } else if (val == '不为空' || val == '为空') {
-        this.filterValueFlag = 3;
-      } else {
-        this.filterValueFlag = 1;
-      }
-    },
-    ScreenOption: {
-      handler: function(val, oldval) {
-        this.option=Object.assign({}, this.option, this.ScreenOption);
-        this.option.filter=Object.assign({}, this.option.filter, this.getqueryInfo.valueColumns[this.option.index].filter);
-      },
-      deep: true
-    },
-    'option.summaryFilter':{
-      handler:function(val,oldval){
-        this.$emit('summaryFilter', this.option.summaryFilter);
-      }
-    },
-    queryInfo:{
-      handler:function(val,oldval){
-        this.getqueryInfo=Object.assign({},this.getqueryInfo,val);
-      }
-    },
-    filterValueFlag:{
-      handler:function(val,oldval){
-        console.log(val);
-      }
-    }
-  }
+  props: ['ScreenOption','queryInfo'],
+  
 };
 </script>
 <style scoped>

@@ -6,8 +6,8 @@
         <a href="javascript:;" @click="onAddGroupColumsDialog">添加分组字段</a>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="addColFlag = false">取 消</el-button>
-        <el-button type="primary" @click="addColFlag = false">确 定</el-button>
+        <el-button class="btn-confirm" type="primary" @click="addColFlag = false">确 定</el-button>
+        <el-button class="btn-cancel" @click="addColFlag = false">取 消</el-button>
       </span>
 
     </el-dialog>
@@ -16,6 +16,8 @@
 </template>
 <script type="text/babel">
 export default {
+  mounted() {
+  },
   data: () => ({
     //添加字段显示隐藏标志
     addColFlag: false
@@ -33,11 +35,6 @@ export default {
       this.addGroupColumsDialogVisible = true;
       // console.log(data);
     }
-  },
-  mounted() {
   }
 };
 </script>
-<style scoped>
-
-</style>

@@ -12,44 +12,54 @@
 </template>
 
 <script>
-import Vue from 'vue';
+import seriesDefault from "../../vendor/seriesRadar.json";
+import "../../vendor/jsVendor/seriesRadar.js";
 
-import seriesDefault from '../../vendor/seriesRadar.json';
-import '../../vendor/jsVendor/seriesRadar.js';
-
-import colorPicker from '../chartEditor/propSelect/colorPicker.vue';
+import colorPicker from "../chartEditor/propSelect/colorPicker.vue";
 
 export default {
-  data() {
-    return {
-      // 返回父级的数据，包括series和xAxis与yAxis的data部分
-      seriesOption: {
-        option: {
-          series: []
-        }
-      },
-      // 数据
-      chartData: {},
-      // 默认配置项展开
-      activeNames: ['1'],
-      // 图表类型
-      type: 'radar',
-      pageName: '雷达图',
-      // 第一次进入页面
-      firstFlag: true
-    };
+  components: {
+    colorPicker
+  },
+  created() {
+    this.dataChange();
   },
   mounted() {
     let that = this;
     (() => Object.assign(that.chartData, that.data))();
   },
-  created() {
-    this.dataChange();
+  data: () => ({
+    // 返回父级的数据，包括series和xAxis与yAxis的data部分
+    seriesOption: {
+      option: {
+        series: []
+      }
+    },
+    // 数据
+    chartData: {},
+    // 默认配置项展开
+    activeNames: ["1"],
+    // 图表类型
+    type: "radar",
+    pageName: "雷达图",
+    // 第一次进入页面
+    firstFlag: true
+  }),
+  watch: {
+    seriesOption: {
+      handler: function(newVal, oldVal) {
+        this.$emit("getSeries", this.seriesOption.option);
+      },
+      deep: true
+    },
+    data: {
+      // 父级传来的图表数据
+      handler: function(newVal, oldVal) {
+        this.dataChange();
+      },
+      deep: true
+    }
   },
-  components: {
-    colorPicker
-  },
-  props: ['option', 'data'],
   methods: {
     dataChange() {
       let that = this;
@@ -96,7 +106,7 @@ export default {
       }
       // series.data的数据
       if (that.firstFlag) {
-        // 第一次进入页面        
+        // 第一次进入页面
         newData.series = seriesRadar(
           columns,
           rows,
@@ -124,7 +134,7 @@ export default {
       var max = 0;
       for (var i = 0; i < rows.length; i++) {
         for (var j in rows[i]) {
-          if ('number' == typeof rows[i][j] && rows[i][j] > max) {
+          if ("number" == typeof rows[i][j] && rows[i][j] > max) {
             max = rows[i][j];
           }
         }
@@ -137,30 +147,16 @@ export default {
           };
         });
       }
-      
+
       that.firstFlag = false;
-      Vue.set(this.seriesOption.option, 'grid', seriesDefault.grid);
-      Vue.set(this.seriesOption.option, 'xAxis', newData.xAxis);
-      Vue.set(this.seriesOption.option, 'series', newData.series);
-      Vue.set(this.seriesOption.option, 'radar', newData.radar);
-      that.$emit('getSeries', that.seriesOption.option);
+      that.$set(this.seriesOption.option, "grid", seriesDefault.grid);
+      that.$set(this.seriesOption.option, "xAxis", newData.xAxis);
+      that.$set(this.seriesOption.option, "series", newData.series);
+      that.$set(this.seriesOption.option, "radar", newData.radar);
+      that.$emit("getSeries", that.seriesOption.option);
     }
   },
-  watch: {
-    seriesOption: {
-      handler: function(newVal, oldVal) {
-        this.$emit('getSeries', this.seriesOption.option);
-      },
-      deep: true
-    },
-    data: {
-      // 父级传来的图表数据
-      handler: function(newVal, oldVal) {
-        this.dataChange();
-      },
-      deep: true
-    }
-  }
+  props: ["option", "data"]
 };
 </script>
 <style>

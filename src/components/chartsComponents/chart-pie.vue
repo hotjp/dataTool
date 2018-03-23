@@ -11,54 +11,67 @@
 </template>
 
 <script>
-import Vue from 'vue';
-
-import seriesDefault from '../../vendor/seriesPie.json';
-import '../../vendor/jsVendor/seriesPie.js';
+import seriesDefault from "../../vendor/seriesPie.json";
+import "../../vendor/jsVendor/seriesPie.js";
 
 export default {
-  data() {
-    return {
-      // 返回父级的数据，包括series和xAxis与yAxis的data部分
-      seriesOption: {
-        option: {
-          series: [],
-          xAxis: {},
-          yAxis: {}
-        }
-      },
-      //默认series数据
-      seriesItem: seriesDefault,
-      // 数据
-      chartData: {},
-      // 默认配置项展开
-      activeNames: ['1'],
-      // 图表类型
-      type: 'pie',
-      pageName: '饼图',
-      // 第一次进入页面
-      firstFlag:true,
-      // 半径
-      radius: null
-    };
+  created() {
+    this.dataChange();
   },
   mounted() {
     let that = this;
     (() => Object.assign(that.chartData, that.data))();
-    if(that.option.series){
-      if (that.option.series[0].radius && 'string' == typeof that.option.series[0].radius) {
-        that.radius = parseInt(that.option.series[0].radius.split('%')[0]);
-      }else{
-        that.radius = parseInt(seriesDefault.radius.split('%')[0]);
+    if (that.option.series) {
+      if (
+        that.option.series[0].radius &&
+        "string" == typeof that.option.series[0].radius
+      ) {
+        that.radius = parseInt(that.option.series[0].radius.split("%")[0]);
+      } else {
+        that.radius = parseInt(seriesDefault.radius.split("%")[0]);
       }
     }
   },
-  created() {
-    this.dataChange();
+  data: () => ({
+    // 返回父级的数据，包括series和xAxis与yAxis的data部分
+    seriesOption: {
+      option: {
+        series: [],
+        xAxis: {},
+        yAxis: {}
+      }
+    },
+    //默认series数据
+    seriesItem: seriesDefault,
+    // 数据
+    chartData: {},
+    // 默认配置项展开
+    activeNames: ["1"],
+    // 图表类型
+    type: "pie",
+    pageName: "饼图",
+    // 第一次进入页面
+    firstFlag: true,
+    // 半径
+    radius: null
+  }),
+  watch: {
+    seriesOption: {
+      handler: function(newVal, oldVal) {
+        this.$emit("getSeries", newVal.option);
+      },
+      deep: true
+    },
+    data: {
+      // 父级传来的图表数据
+      handler: function(newVal, oldVal) {
+        this.dataChange();
+      },
+      deep: true
+    }
   },
-  props: ['option', 'data'],
   methods: {
-    // 数据处理    
+    // 数据处理
     dataChange() {
       let that = this;
       let newData = {};
@@ -106,50 +119,49 @@ export default {
         newData.xAxis.data = arr;
       }
       // series.data的数据
-      if(that.firstFlag){
-        // 第一次进入页面        
-        if(this.option.series){
+      if (that.firstFlag) {
+        // 第一次进入页面
+        if (this.option.series) {
           for (let i = 0; i < this.option.series.length; i++) {
-            this.option.series[i].radius = this.radius?this.radius+'%' : seriesDefault.radius;
+            this.option.series[i].radius = this.radius
+              ? this.radius + "%"
+              : seriesDefault.radius;
           }
         }
-        that.seriesOption.option.series = seriesPie(columns,rows,queryNameKeyX,queryNameKeyY,seriesDefault,that.option.series,true);
-      }else{
-        that.seriesOption.option.series = seriesPie(columns,rows,queryNameKeyX,queryNameKeyY,seriesDefault);
+        that.seriesOption.option.series = seriesPie(
+          columns,
+          rows,
+          queryNameKeyX,
+          queryNameKeyY,
+          seriesDefault,
+          that.option.series,
+          true
+        );
+      } else {
+        that.seriesOption.option.series = seriesPie(
+          columns,
+          rows,
+          queryNameKeyX,
+          queryNameKeyY,
+          seriesDefault
+        );
       }
 
       that.firstFlag = false;
-      Vue.set(this.seriesOption.option, 'grid', seriesDefault.grid);
-      Vue.set(this.seriesOption.option, 'xAxis', newData.xAxis);
-      this.$emit('getSeries', that.seriesOption.option);
+      that.$set(this.seriesOption.option, "grid", seriesDefault.grid);
+      that.$set(this.seriesOption.option, "xAxis", newData.xAxis);
+      this.$emit("getSeries", that.seriesOption.option);
     },
     // 半径调整
-    radiusChange(data){
+    radiusChange(data) {
       this.radius = data;
       for (let i = 0; i < this.seriesOption.option.series.length; i++) {
-        this.seriesOption.option.series[i].radius = this.radius+'%';
+        this.seriesOption.option.series[i].radius = this.radius + "%";
       }
       this.seriesOption.option = Object.assign({}, this.seriesOption.option);
-      this.$emit('getSeries', this.seriesOption.option);
+      this.$emit("getSeries", this.seriesOption.option);
     }
   },
-  watch: {
-    seriesOption: {
-      handler: function(newVal, oldVal) {
-        this.$emit('getSeries', newVal.option);
-      },
-      deep: true
-    },
-    data: {
-      // 父级传来的图表数据
-      handler: function(newVal, oldVal) {
-        this.dataChange();
-      },
-      deep: true
-    }
-  }
+  props: ["option", "data"]
 };
 </script>
-<style>
-
-</style>

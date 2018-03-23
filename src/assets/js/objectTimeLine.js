@@ -2,7 +2,8 @@
  * 自动保存对象历史的工具类
  * 0.0.1
  */
-import { merge, throttle, debounce } from 'lodash';
+import merge from 'lodash/merge';
+import debounce from 'lodash/debounce';
 
 export default class TimeLine {
   initBackup() {
@@ -15,6 +16,10 @@ export default class TimeLine {
     const opt = this.options;
     let key = opt.backupOpt.name ? opt.backupOpt.name : 'backup';
     if (isInit) {
+      // TODO: 让用户判断是否恢复数据
+
+      // 删除旧数据
+      localStorage.removeItem(key);
       key += 'Init';
     }
     let name = key,
@@ -78,12 +83,12 @@ export default class TimeLine {
         localStorage.removeItem(this.options.backupOpt._backupKey);
       };
       
-
-      if (window.attachEvent) {
-        window.attachEvent('onbeforeunload', addOnBeforeUnload);
-      } else {
-        window.addEventListener('beforeunload', addOnBeforeUnload, false);
-      }
+      // 离开网页提示
+      // if (window.attachEvent) {
+      //   window.attachEvent('onbeforeunload', addOnBeforeUnload);
+      // } else {
+      //   window.addEventListener('beforeunload', addOnBeforeUnload, false);
+      // }
     }
   }
 }

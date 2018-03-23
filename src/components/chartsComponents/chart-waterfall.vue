@@ -12,45 +12,55 @@
 </template>
 
 <script>
-import Vue from 'vue';
+import seriesDefault from "../../vendor/seriesWaterfall.json";
+import "../../vendor/jsVendor/seriesWaterfall.js";
 
-import seriesDefault from '../../vendor/seriesWaterfall.json';
-import '../../vendor/jsVendor/seriesWaterfall.js';
-
-import colorPicker from '../chartEditor/propSelect/colorPicker.vue';
+import colorPicker from "../chartEditor/propSelect/colorPicker.vue";
 
 export default {
-  data() {
-    return {
-      // 返回父级的数据，包括series和xAxis与yAxis的data部分
-      seriesOption: {
-        option: {
-          series: [],
-          xAxis: {}
-        }
-      },
-      // 数据
-      chartData: {},
-      // 默认配置项展开
-      activeNames: ['1'], 
-      // 图表类型
-      type: 'bar',
-      pageName: '瀑布图',
-      // 第一次进入页面
-      firstFlag: true
-    };
+  components: {
+    colorPicker
+  },
+  created() {
+    this.dataChange();
   },
   mounted() {
     let that = this;
     (() => Object.assign(that.chartData, that.data))();
   },
-  created() {
-    this.dataChange();
+  data: () => ({
+    // 返回父级的数据，包括series和xAxis与yAxis的data部分
+    seriesOption: {
+      option: {
+        series: [],
+        xAxis: {}
+      }
+    },
+    // 数据
+    chartData: {},
+    // 默认配置项展开
+    activeNames: ["1"],
+    // 图表类型
+    type: "bar",
+    pageName: "瀑布图",
+    // 第一次进入页面
+    firstFlag: true
+  }),
+  watch: {
+    seriesOption: {
+      handler: function(newVal, oldVal) {
+        this.$emit("getSeries", this.seriesOption.option);
+      },
+      deep: true
+    },
+    data: {
+      // 父级传来的图表数据
+      handler: function(newVal, oldVal) {
+        this.dataChange();
+      },
+      deep: true
+    }
   },
-  components: {
-    colorPicker
-  },
-  props: ['option', 'data'],
   methods: {
     // 数据处理
     dataChange() {
@@ -90,7 +100,7 @@ export default {
       newData.xAxis = that.seriesOption.option.xAxis;
       if (queryNameKeyX.length) {
         for (let i = 0; i < queryNameKeyX.length; i++) {
-          let arr = ['总计'];
+          let arr = ["总计"];
           for (let j = 0; j < rows.length; j++) {
             arr.push(rows[j][queryNameKeyX[i]]);
           }
@@ -104,7 +114,7 @@ export default {
             }
           }
         });
-        arr.unshift('总计');
+        arr.unshift("总计");
         newData.xAxis.data = arr;
       }
 
@@ -131,27 +141,13 @@ export default {
       }
 
       that.firstFlag = false;
-      Vue.set(this.seriesOption.option, 'grid', seriesDefault.grid);
-      Vue.set(this.seriesOption.option, 'xAxis', newData.xAxis);
-      Vue.set(this.seriesOption.option, 'series', newData.series);
-      that.$emit('getSeries', that.seriesOption.option);
+      that.$set(this.seriesOption.option, "grid", seriesDefault.grid);
+      that.$set(this.seriesOption.option, "xAxis", newData.xAxis);
+      that.$set(this.seriesOption.option, "series", newData.series);
+      that.$emit("getSeries", that.seriesOption.option);
     }
   },
-  watch: {
-    seriesOption: {
-      handler: function(newVal, oldVal) {
-        this.$emit('getSeries', this.seriesOption.option);
-      },
-      deep: true
-    },
-    data: {
-      // 父级传来的图表数据
-      handler: function(newVal, oldVal) {
-        this.dataChange();
-      },
-      deep: true
-    }
-  }
+  props: ["option", "data"]
 };
 </script>
 <style>

@@ -5,11 +5,11 @@
         <div class="grid-content">
           <div class="input_wrap">
             <form action onsubmit="return false">
-              <el-input placeholder="请输入想要接入的数据源" prefix-icon="el-icon-search" v-model="searchContent"></el-input>
+              <el-input placeholder="请输入想要接入的数据源" prefix-icon="el-icon-search" v-model="search"></el-input>
             </form>
           </div>
           <el-row  class="database_list" :gutter="20">
-            <el-col :span="6" v-for="(item,index) in list" :key="index">
+            <el-col :span="6" v-for="(item,index) in list" :key="index" v-if="item.show">
               <div class="database_item rect-100">
                 <!-- <router-link :to="{path:'/chart_editor/'+item.id}"> -->
                 <img :src="vars.src+item.img" alt="">
@@ -28,7 +28,7 @@
         <!--<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>-->
       </el-upload>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary">确 定</el-button>
+        <el-button class="btn-confirm" type="primary">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -37,30 +37,43 @@
   </div>
 </template>
 <script>
-import vars from '../../assets/js/vars';
-import dataSourceDialog from '../../components/dataSource/dataSourceDialog.vue';
-import dataSourceList from '../../vendor/dataSourceList.json';
+import vars from "../../assets/js/vars";
+import dataSourceDialog from "../../components/dataSource/dataSourceDialog.vue";
+import dataSourceList from "../../vendor/dataSourceList.json";
 export default {
   components: {
     dataSourceDialog
   },
   mounted() {
+    for(let i=0;i<dataSourceList.length;i++){
+      dataSourceList[i].show = true
+    }
     this.list = dataSourceList;
   },
-  data() {
-    return {
-      vars:vars,
-      fileList: [],
-      dialogFormVisible: false,
-      pageName: '数据源添加',
-      // 数据源列表
-      list: [],
-      pageType: '',
-      dialogUploadVisible: false,
-      form: {},
-      formLabelWidth: '120px',
-      searchContent:''
-    };
+  data: () => ({
+    vars: vars,
+    fileList: [],
+    dialogFormVisible: false,
+    pageName: "数据源添加",
+    // 数据源列表
+    list: [],
+    pageType: "",
+    dialogUploadVisible: false,
+    form: {},
+    formLabelWidth: "120px",
+    // 搜索
+    search: ""
+  }),
+  watch:{
+    search:function(val){
+      for(let i=0;i<this.list.length;i++){
+        if(this.list[i].name.indexOf(val)<0){
+          this.list[i].show=false;
+        }else{
+          this.list[i].show=true;          
+        }
+      }    
+    }
   },
   methods: {
     onAddSourceClick() {
@@ -69,9 +82,9 @@ export default {
     addDataSource(type, name) {
       this.pageType = type;
       this.form.dbType = name;
-      if (type === 'form') {
+      if (type === "form") {
         this.dialogFormVisible = true;
-      } else if (type === 'upload') {
+      } else if (type === "upload") {
         this.dialogUploadVisible = true;
       }
     },
@@ -85,14 +98,12 @@ export default {
       console.log(file);
     },
     handleExceed(files, fileList) {
-      this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+      this.$message.warning(
+        `当前限制选择 3 个文件，本次选择了 ${
+          files.length
+        } 个文件，共选择了 ${files.length + fileList.length} 个文件`
+      );
     }
-
   }
 };
 </script>
-<style>
-.database_list li {
-  line-height: 26px;
-}
-</style>
