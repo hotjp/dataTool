@@ -27,7 +27,6 @@
       </div>
       <div class="grid-content database_right">
         <div class="top common_top fix">
-
           <a href="javascript:;" class="top_btn menu" @click=""></a>          
           <a href="javascript:;" class="top_btn database_save" @click="">保存修改</a>
         </div>
@@ -48,6 +47,10 @@ export default {
   mounted() {
     this.updateList();
     window.vm = this;
+  },
+  destroyed() {
+    // 销毁后
+    window.vm = null;
   },
   data: () => ({
     //是否可保存

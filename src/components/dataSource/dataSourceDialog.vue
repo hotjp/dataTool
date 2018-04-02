@@ -65,7 +65,7 @@ export default {
           port: that.form.jdbcPort,
           user: that.form.jdbcUser,
           password: that.form.password,
-          database: that.form.jdbcDatabases
+          database: that.form.jdbcDatabase
         },
         function(res) {
           that.loading = false;
@@ -128,7 +128,9 @@ export default {
   font-size: 14px;
   margin-right: 10px;
   color: #409eff;
+  line-height: 32px;
 }
+
 .opcityP {
   opacity: 0;
 }

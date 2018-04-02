@@ -134,7 +134,7 @@ import seriesWordCloudDefault from "../../vendor/seriesWordCloud.json";
 export default {
   components: { IEcharts, dashboardDir, tableView },
   mounted() {
-    let that = this,
+    let that = window.vm = this,
       params = that.$route.params;
     that.loadDashboard();
     // 加载已有chart 列表
@@ -169,6 +169,10 @@ export default {
         }
       }
     );
+  },
+  destroyed() {
+    // 销毁后
+    window.vm = null
   },
   data: () => ({
     // 拖拽区遮罩
@@ -333,19 +337,24 @@ export default {
           that.chartList[i].type = result[i].type;
           that.chartList[i].sql = result[i].tableName.sql;
           that.chartList[i].query = result[i].query;
-          result[i].background
+          
+          that.chartList[i].background = result[i].background
             ? result[i].background
             : {
                 backgroundColor: "#fff",
                 backgroundRepeat: "no-repeat",
                 backgroundImage: ""
               };
-          that.chartList[i].background = result[i].background;
-          that.chartList[i].title = that.chartList[i].option.title
-            ? that.chartList[i].option.title.text
-            : "";
-          // 清空title，把title提出来
-          that.chartList[i].option.title = "";
+              if(that.chartList[i].option){
+                that.chartList[i].title = that.chartList[i].option.title
+                  ? that.chartList[i].option.title.text
+                  : "";
+                  // 清空title，把title提出来
+                that.chartList[i].option.title = "";
+              }else{
+                that.chartList[i].title=''
+              }
+          
           // 手动清空series.data里数据
           if (that.chartList[i].option && that.chartList[i].option.series) {
             for (let j = 0; j < that.chartList[i].option.series.length; j++) {
@@ -383,6 +392,7 @@ export default {
             that.dataHandler(result2[i], i, that.chartList[i].type);
           }
           that.loadGrid();
+
           that.toggleFullScreen();
           if ("function" == typeof callback) {
             callback();
@@ -712,15 +722,18 @@ export default {
     },
     // 左侧列表点击事件
     itemClick(data) {
-      this.$router.push({
-        path: "/empty",
-        query: { link: "/dashboard/" + data }
-      });
+      if(data!= this.dashboardId){
+        this.$router.push({
+          path: "/empty",
+          query: { link: "/dashboard/" + data }
+        });
+      }
+      
     },
     // 删除图表
     onClickDeleteChart(chartId, i, $event) {
       let that = this;
-      that.chartList.splice(i, 1);
+      this.chartList.splice(i, 1);
       setTimeout(() => {
         that.saveDashboard(callback);
       }, 300);
@@ -953,6 +966,9 @@ export default {
         default:
           console.warn("类型错误！");
       }
+      // var a=that.chartList;
+      // that.chartList = a;
+      that.$set(that.chartList,index,that.chartList[index])
     },
     // 选择视图搜索
     filterView(value,data){

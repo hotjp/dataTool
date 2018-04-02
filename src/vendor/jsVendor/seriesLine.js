@@ -16,7 +16,9 @@
       for (var j = 0; j < series.length; j++) {
         series[j].data = []
         for (var i = 0; i < queryNameKeyY.length; i++) {
-          if (series[j].name == queryNameKeyY[i]) {
+          var name;
+            queryNameKeyX.length==1?name =nameY[i]: name =queryNameKeyY[i]
+          if (series[j].name == name) {
             for (var k = 0; k < rows.length; k++) {
               series[j].data.push(rows[k][
                 [queryNameKeyY[i]]

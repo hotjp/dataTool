@@ -12,48 +12,7 @@
     <chartWaterfall v-else-if="type=='waterfall'" :option="option" :data="data" @getSeries="getOption"></chartWaterfall>
     <chartGauge v-else-if="type=='gauge'" :option="option" :data="data" @getSeries="getOption"></chartGauge>
     <chartWordCloud v-else-if="type=='wordCloud'" :option="option" :data="data" @getSeries="getOption"></chartWordCloud>
-
-    <!-- <div class="split_line">图表样式</div>  
-    <div>
-      <el-checkbox v-model="chartsStyle.xAxis.splitLine.show">横向网格</el-checkbox>
-      <div class="fix pl20">
-        <el-dropdown @command="lineType">
-          <span class="el-dropdown-link">
-            {{chartsStyle.xAxis.splitLine.lineStyle.type}}
-            <i class="el-icon-arrow-down el-icon--right"></i>
-          </span>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item command="solid">solid</el-dropdown-item>
-            <el-dropdown-item command="dashed">dashed</el-dropdown-item>
-            <el-dropdown-item command="dotted">dotted</el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
-        <el-dropdown @command="lineWidth">
-          <span class="el-dropdown-link">
-            {{chartsStyle.xAxis.splitLine.lineStyle.width}}
-            <i class="el-icon-arrow-down el-icon--right"></i>
-          </span>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item command="1">1</el-dropdown-item>
-            <el-dropdown-item command="2">2</el-dropdown-item>
-            <el-dropdown-item command="3">3</el-dropdown-item>
-            <el-dropdown-item command="4">4</el-dropdown-item>
-            <el-dropdown-item command="5">5</el-dropdown-item>
-            <el-dropdown-item command="6">6</el-dropdown-item>
-            <el-dropdown-item command="7">7</el-dropdown-item>
-            <el-dropdown-item command="8">8</el-dropdown-item>
-            <el-dropdown-item command="9">9</el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
-        <div class="color_block">
-          <el-color-picker v-model="chartsStyle.xAxis.splitLine.lineStyle.color[0]"></el-color-picker>
-        </div>
-      </div>
-    </div>
-    <div>
-      <el-checkbox v-model="chartsStyle.yAxis.splitLine.show">纵向网格</el-checkbox>
-    </div>  -->
-
+  
   </div>
 </template>
 

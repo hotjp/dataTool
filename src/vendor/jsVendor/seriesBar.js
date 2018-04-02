@@ -28,8 +28,8 @@
           var copy = JSON.parse(JSON.stringify(seriesDefault));          
           var data=[];
           for (var i = 0; i < queryNameKeyY.length; i++) {
-            for(var j=0;j<rows.length;j++){
-              data.push(rows[j][queryNameKeyY[i]]);
+            for(var k=0;k<rows.length;k++){
+              data.push(rows[k][queryNameKeyY[i]]);
             }
           }
           series[j].data = data;

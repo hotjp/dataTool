@@ -36,6 +36,7 @@ export default {
       document.documentElement.fullScreen ||
       document.documentElement.mozFullScreen ||
       document.documentElement.webkitIsFullScreen;
+      
       if(this.$route.path.indexOf('dataview')>0){
         this.titleType = 2
       }else if(this.$route.path.indexOf('database')>0){

@@ -67,6 +67,8 @@
 </template>
 <script>
 import { getJson } from '../../router/utils';
+import { Message } from "element-ui";
+
 export default {
   mounted() {
     // 挂载后
@@ -76,7 +78,7 @@ export default {
     },function(res){
       if (res.success) {
         for(let i=0;i<res.data.length;i++){
-          res.data[i].show = true
+          res.data[i].show = true;
         }
         that.list=res.data;
         let params = that.$route.params;
@@ -86,7 +88,7 @@ export default {
               view:params.viewId
             },function(res){
               if (res.success) {
-                that.src='http://localhost:8080/src/data_editor/index.html?sourceId='+res.data.datasourceId+'&view='+params.viewId;
+                that.src='http://119.180.98.134:8890/res/dataviz/data_editor/index.html?sourceId='+res.data.datasourceId+'&view='+params.viewId;
               }
             });
             break;
@@ -99,7 +101,7 @@ export default {
   
   data: () => ({
     list:[],
-    src:'http://localhost:8080/src/data_editor/index.html',
+    src:'http://119.180.98.134:8890/res/dataviz/data_editor/index.html',
     dialogVisible:false,
     tip:'',
     delId:'',
@@ -122,7 +124,7 @@ export default {
     newName:{
       text:''
     },
-     // 搜索用
+    // 搜索用
     search:'',
     searchView:''
   }),
@@ -149,7 +151,7 @@ export default {
         view:item.id
       },function(res){
         if (res.success) {
-          let src='http://localhost:8080/src/data_editor/index.html?sourceId='+res.data.datasourceId+'&view='+item.id;
+          let src='http://119.180.98.134:8890/res/dataviz/data_editor/index.html?sourceId='+res.data.datasourceId+'&view='+item.id;
           that.src=src;
           that.activeIndex=index;
           that.$router.replace({path: '/dataview/'+item.id});
@@ -206,9 +208,14 @@ export default {
     // 添加数据视图
     addView(){
       let that=this;
-      this.addVisible=false;
       // let src='http://localhost:8080/src/data_editor/index.html?sourceId='+this.sqlId;
       // this.src=src;
+      if(!this.newName.text){
+        Message({ message: "请输入视图名称", type: "success" });
+        return;
+      }
+      this.addVisible=false;
+      
       let data={
         id:'',
         name:this.newName.text,
@@ -232,7 +239,7 @@ export default {
             if (res.success) {
               that.list=res.data;
               that.$router.replace({path: '/dataview/'+ress.data.id});
-              let src='http://localhost:8080/src/data_editor/index.html?sourceId='+that.sqlId+'&view='+ress.data.id;
+              let src='http://119.180.98.134:8890/res/dataviz/data_editor/index.html?sourceId='+that.sqlId+'&view='+ress.data.id;
               that.src=src;
             }
           });
@@ -259,7 +266,7 @@ export default {
     // 选择视图搜索
     filterView(value,data){
       if (!value) return true;
-        return data.name.indexOf(value) !== -1;
+      return data.name.indexOf(value) !== -1;
     }
   }
 };

@@ -527,6 +527,14 @@ export default {
       that.workTableDialogVisible = true;
     }
   },
+  destroyed() {
+    // 销毁后
+    window.vm=null;
+    window.timeLines =null;
+    window.onresize = null;
+    window.screenWidth=null;
+    window.chartsHeight=null;
+  },
   data: () => ({
     // 表格用数据
     chartData:{},

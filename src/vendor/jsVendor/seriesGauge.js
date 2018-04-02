@@ -50,7 +50,7 @@
               }
               return max|| copy.max<data[0]?data[0]:copy.max               
             }else{
-              return copy.axisLine
+              return copy.max
             }
           })(),
           name: nameY[0],

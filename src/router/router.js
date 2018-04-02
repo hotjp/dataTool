@@ -7,10 +7,13 @@ import indexHeader from '../components/indexHeader.vue';
 Vue.component('commonHeader', commonHeader);
 Vue.component('indexHeader', indexHeader);
 
+// 未登录限制访问列表
+import loginConfig from '../vendor/loginConfig.json';
+
 // 声明路由关系
 const routes = [];
-// 页面路由
 
+// 页面路由
 // 用户注册
 import register from '../view/register/index.vue';
 routes.push({
@@ -134,4 +137,23 @@ routes.push({
 const router = new VueRouter({
   routes
 });
+
+router.beforeEach((to, from, next) => {
+  let needLogin= false;
+  for(let i=0;i<loginConfig.list.length;i++){
+    if(to.path.indexOf(loginConfig.list[i])>=0){
+      needLogin=true
+    }
+  }
+
+  if(needLogin){
+    next("/login");
+  }else{
+    next();
+  }
+})
+
+
+
+
 export default router;
