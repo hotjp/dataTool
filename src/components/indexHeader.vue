@@ -1,30 +1,38 @@
 <template>
   <div id="indexHeader" class="fix">
-    <h1 href="javascript:;" class="logo"></h1>
-    <div class="header_right r fix">
-      <a href="javascript:;" class="fullscreen l" :class="{active:isFullscreen}" v-if="isFullscreen" @click="toggleFullScreen()">退出全屏</a>
-      <a href="javascript:;" class="fullscreen l" v-else @click="toggleFullScreen()">全屏</a>
-      <el-dropdown class="user_info l fix"  placement="bottom-start">
-        <span class="el-dropdown-link">
-          <img class="l" src="http://temp.im/30x30" alt="">
-        <span class="user_name l">
-          用户名
-        </span>
-        </span>
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item>
-            <router-link to="">账户设置</router-link>
+    <div class="r">
+      <div class="header_right fix">
+        <a href="javascript:;" class="fullscreen l" :class="{active:isFullscreen}" v-if="isFullscreen" @click="toggleFullScreen()">退出全屏</a>
+        <a href="javascript:;" class="fullscreen l" v-else @click="toggleFullScreen()">全屏</a>
+        <el-dropdown class="user_info l fix"  placement="bottom">
+          <span class="el-dropdown-link">
+            <img class="" src="http://temp.im/30x30" alt="">
+            <span class="user_name">
+              用户名
+            </span>
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item>
+              <router-link to="">账户设置</router-link>
+              </el-dropdown-item>
+            <el-dropdown-item>
+              <router-link to="/login">安全退出</router-link>
             </el-dropdown-item>
-          <el-dropdown-item>
-            <router-link to="/login">安全退出</router-link>
-          </el-dropdown-item>
 
-        </el-dropdown-menu>
-      </el-dropdown>
+          </el-dropdown-menu>
+        </el-dropdown>
+      </div>
+      <a @click="onClickChangeTitleType(3)" href="javascript:;" :class="{head_title:true,r:true,active:(titleType == 3)}">数据源</a>
+      <a @click="onClickChangeTitleType(2)" href="javascript:;" :class="{head_title:true,r:true,active:(titleType == 2)}">数据视图</a>    
+      <a @click="onClickChangeTitleType(1)" href="javascript:;" :class="{head_title:true,r:true,active:(titleType == 1)}">仪表盘</a>
     </div>
-    <a @click="onClickChangeTitleType(3)" href="javascript:;" :class="{head_title:true,r:true,active:(titleType == 3)}">数据源</a>
-    <a @click="onClickChangeTitleType(2)" href="javascript:;" :class="{head_title:true,r:true,active:(titleType == 2)}">数据视图</a>    
-    <a @click="onClickChangeTitleType(1)" href="javascript:;" :class="{head_title:true,r:true,active:(titleType == 1)}">仪表盘</a>
+    <!-- logo分段 -->
+    <h1 href="javascript:;" class="logo1"></h1>
+    <h1 href="javascript:;" class="logo2"></h1>
+    <h1 href="javascript:;" class="logo3"></h1>
+
+    
+    
   </div>
 </template>
 <script>
@@ -36,14 +44,14 @@ export default {
       document.documentElement.fullScreen ||
       document.documentElement.mozFullScreen ||
       document.documentElement.webkitIsFullScreen;
-      
-      if(this.$route.path.indexOf('dataview')>0){
-        this.titleType = 2
-      }else if(this.$route.path.indexOf('database')>0){
-        this.titleType = 3
-      }else{
-        this.titleType = 1        
-      }
+
+    if (this.$route.path.indexOf("dataview") > 0) {
+      this.titleType = 2;
+    } else if (this.$route.path.indexOf("database") > 0) {
+      this.titleType = 3;
+    } else {
+      this.titleType = 1;
+    }
   },
   data: () => ({
     titleType: 1,

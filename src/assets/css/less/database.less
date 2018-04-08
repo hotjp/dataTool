@@ -12,41 +12,22 @@
         width: 180px;
         background-color: #44546e;
         color: #ffffff;
-        .title{
-            padding: 0 10px 0 15px;
-            height: 45px;
-            line-height: 45px;
-            font-size: 14px;
-            color: #a9c6d6;
-            .el-icon-plus,.el-icon-more{
-                margin-top: 16px;
-                margin-left: 5px;
-                color: #c9cdd5;
-            }
-            .search_box:hover{
-                input{
-                    width: 140px;
-                }
-            }
-        }
     }
     .database_list{
         padding-left: 20px;
         li{
-            .centered-line(26px);
+            .centered-line(32px);
             position: relative;
             color: #fff;
             font-size: 12px;
             .database_name{
+                width: 120px;
                 float: left;
             }
             .el-icon-more {
-                float: right;
-                margin-right: 10px;
                 display: none;
-                position: relative;
-                top: 0px;
                 padding: 3px;
+                vertical-align: middle;
             }
             &:hover {
                 .el-icon-more {
@@ -64,7 +45,7 @@
                 background-color: #ffffff;
                 position: absolute;
                 right: 10px;
-                top: 15px;
+                top: 25px;
                 text-align: center;
                 z-index: 10;
                 cursor: default;

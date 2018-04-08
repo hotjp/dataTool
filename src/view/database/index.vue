@@ -2,9 +2,9 @@
   <div id="databaseList" class="full">
     <div id="database">
       <div  class="database_left full">
-        <div class="title">
+        <div class=" dirTreeTitle">
           数据源
-          <!-- <i class="el-icon-more r"></i> -->
+          <i class="el-icon-more r"></i>
           <i class="el-icon-plus r" @click="onAddSourceClick"></i>
           <div class="search_box r">
             <i class="el-icon-search"></i>

@@ -159,6 +159,7 @@ html, body {
 }
 #indexHeader {
     position: fixed;
+    overflow: hidden;
     .margin(0);
     .size(100%, 50px);
     z-index: 104; 
@@ -170,14 +171,25 @@ html, body {
     a{
         text-decoration: none;
     }
-    .logo{
-        .size(500px,100%);
-        position: absolute;
-        left: 0;
-        top: 0;
+    .logo1{
+        .size(150px,100%);
+        float: left;
         font-size: 0;
-        background: url(../images/top_logo.png) no-repeat left center;
+        background: url(../images/top_logo1.png) no-repeat left center;
     }
+    .logo2{
+        .size(170px,100%);
+        float: left;
+        font-size: 0;
+        background: url(../images/top_logo2.png) no-repeat left center;
+    }
+    .logo3{
+        .size(170px,100%);
+        float: left;
+        font-size: 0;
+        background: url(../images/top_logo3.png) no-repeat left center;
+    }
+
     .head_title{
         display: block;
         width: 80px;
@@ -199,6 +211,7 @@ html, body {
     }
     
     .header_right{
+        float: right;
         margin-left: 30px;
         background-color: #3b90ff;
         color: #ffffff;
@@ -206,17 +219,19 @@ html, body {
     .user_info{
         font-size: 14px;
         position: relative;
-        width: 178px;
+        height: 50px;
+        line-height: 50px;
         cursor: pointer;
         &:hover .user_box{
             display: block;
         }
         .user_name{
-            max-width: 110px;
+            display: inline-block;
+            vertical-align: middle;
+            max-width: 100px;
             padding-right: 10px;
             position: relative;
             color: #ffffff;
-            margin-top: 10px;
             .ellipsis();
             &:after{
                 content:'';
@@ -230,10 +245,12 @@ html, body {
         }
         img{        
             .size(30px);
-            margin-top: 10px;
             border-radius: 50%;
             vertical-align: middle;
             margin-right: 10px;
+        }
+        .el-dropdown-link{
+            background-color: transparent;
         }
     }
     .fullscreen{
@@ -334,6 +351,7 @@ html, body {
         border-radius: 3px;
         transition: all .3s ease;
         z-index: 4;
+        padding: 0;
     }
 }
 

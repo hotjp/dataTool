@@ -404,14 +404,14 @@ export default {
     let that = (window.vm = this),
       params = that.$route.params;
     // TODO: 完成历史记录工具
-    window.timeLines = this.timeLine = new TimeLine({
-      treasures: this.chats,
-      backupOpt: {
-        backupCallback: function() {
-          console.log(arguments);
-        }
-      }
-    });
+    // window.timeLines = this.timeLine = new TimeLine({
+    //   treasures: this.chats,
+    //   backupOpt: {
+    //     backupCallback: function() {
+    //       console.log(arguments);
+    //     }
+    //   }
+    // });
 
     if (Object.keys(params).length) {
       that.charts.id = params.viewId;
@@ -487,7 +487,7 @@ export default {
           chart: that.charts.id
         },
         function(res) {
-          if (res.success) {
+          if (res.success&&res.data) {
             that.charts = Object.assign({}, that.charts, res.data);
             that.queryInfo = Object.assign({}, that.queryInfo, res.data.query);
             that.$nextTick(function() {
@@ -1430,7 +1430,7 @@ export default {
           );
         }
         if (that.charts.id == "") {
-          that.charts.query = that.queryInfo;
+          that.charts.query = that.queryInfo||{};
           that.charts.text = that.charts.option.title.text;
           that.charts.layout.type = that.charts.type;
           getJson(

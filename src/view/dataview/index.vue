@@ -9,7 +9,7 @@
       </ul> -->
       <div class="fix dirTreeTitle">
         数据视图
-        <!-- <i class="el-icon-more r"></i> -->
+        <i class="el-icon-more r"></i>
         <i class="el-icon-plus r" @click="addSouch()" ></i>
         <div class="search_box r">
           <i class="el-icon-search"></i>
@@ -88,7 +88,9 @@ export default {
               view:params.viewId
             },function(res){
               if (res.success) {
-                that.src='http://119.180.98.134:8890/res/dataviz/data_editor/index.html?sourceId='+res.data.datasourceId+'&view='+params.viewId;
+                // that.src='http://119.180.98.134:8890/res/dataviz/data_editor/index.html?sourceId='+res.data.datasourceId+'&view='+params.viewId;
+                that.src='http://localhost:8080/src/data_editor/index.html?sourceId='+res.data.datasourceId+'&view='+params.viewId;
+
               }
             });
             break;
@@ -239,7 +241,9 @@ export default {
             if (res.success) {
               that.list=res.data;
               that.$router.replace({path: '/dataview/'+ress.data.id});
-              let src='http://119.180.98.134:8890/res/dataviz/data_editor/index.html?sourceId='+that.sqlId+'&view='+ress.data.id;
+              // let src='http://119.180.98.134:8890/res/dataviz/data_editor/index.html?sourceId='+that.sqlId+'&view='+ress.data.id;
+              let src='http://localhost:8080/src/data_editor/index.html?sourceId='+that.sqlId+'&view='+ress.data.id;
+              
               that.src=src;
             }
           });

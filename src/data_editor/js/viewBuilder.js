@@ -45,7 +45,6 @@ var vb = {
             vb.showView(res.data.structure);
             getNewViewProvider(VIEW_TYPE_USER_COMPOSITE);
             $('#viewName').val(res.data.name);
-            $('.data_editor_header .name').text(res.data.name)
             vb._layout=res.data.layout;
             // vb._folder=res.data.folder;
           }
@@ -890,7 +889,9 @@ vb.viewRefRelationEditor = {
       viewRefRel: viewRefRel
     };
     renderTmp($('#viewRefRelEditor').find('.list').get(0), 'viewRefRelListTpl', data);
-
+    $('select').select2({
+      minimumResultsForSearch: -1 
+    });
   },
   /**
    * 删除当前关系
@@ -1033,6 +1034,7 @@ vb.viewRefEditor = {
       list: this._viewRef.columns
     };
     renderTmp('#t-viewRef', 'viewRefTpl', data);
+    $('#t-viewRef input').trigger('change')
     // 刚进来初始化右侧
     if(data.list.length){
       for(var i=0;i<data.list.length;i++){
@@ -1523,7 +1525,7 @@ vb.diagram = {
         g.isCellMovable = vb.diagram._isCellMovable;
         g.isCellEditable = vb.diagram._isCellEditable;
         g.isCellResizable = vb.diagram._isCellResizable;
-        //g.isCellLocked = vb.diagram._isCellLocked;
+        // g.isCellLocked = vb.diagram._isCellLocked;
 
         // cell连接控制
         g.setConnectable(true);
@@ -1651,7 +1653,6 @@ vb.diagram = {
             evt.consume();
           }
         });
-
 
         mxConstants.RECTANGLE_ROUNDING_FACTOR = 0.05;
 

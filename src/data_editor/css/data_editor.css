@@ -32,9 +32,9 @@ address, caption, cite, code, dfn, em, strong, th, var {
 }
 
 ol, ul {
-    margin: 1em 0;
+    /* margin: 1em 0; */
     /* margin-left: 40px; */
-    padding-left: 0;
+    /* padding-left: 0; */
 }
 
 ul {
@@ -76,7 +76,6 @@ input, textarea {
     width: 10px;
 }
 
-
 /* 垂直滚动条的滑动块 */
 
 ::-webkit-scrollbar-thumb:vertical {
@@ -88,7 +87,7 @@ input, textarea {
 a {
     color: inherit;
     transition: all ease .2s;
-    text-decoration: none;    
+    text-decoration: none;
 }
 
 a:focus {
@@ -131,23 +130,28 @@ a:focus {
 .red {
     color: red;
 }
-.style_icon{
+
+.style_icon {
     display: inline-block;
     width: 14px;
     height: 14px;
     background-size: 14px 14px;
 }
-.column_name{
+
+.column_name {
     display: inline-block;
     line-height: 20px;
 }
-.num_icon{
+
+.num_icon {
     background: url(../images/num_icon.png);
 }
-.text_icon{
+
+.text_icon {
     background: url(../images/text_icon.png);
 }
-.data_icon{
+
+.data_icon {
     background: url(../images/data_icon.png);
 }
 
@@ -164,26 +168,29 @@ a:focus {
     width: 100%;
     z-index: 105;
 }
-.data_editor .data_editor_header .name{
+
+.data_editor .data_editor_header .name {
     padding-left: 15px;
 }
+
 .data_editor .head_input_container {
     padding-left: 15px;
 }
-.data_editor .editor_left .massage_btn{
+
+.data_editor .editor_left .massage_btn {
     padding: 15px 0 20px 0;
 }
+
 .data_editor .head_input {
-    display: block;
+    float: left;
     width: 186px;
-    padding-left: 5px;
+    height: 40px;
+    padding-left: 10px;
     padding-top: 2px;
     padding-bottom: 2px;
     font-size: 12px;
-    margin: 5px 0 20px 0;
     background-color: transparent;
     border: none;
-    border-bottom: 1px solid #a9c6d6;
     color: #a9c6d6;
 }
 
@@ -210,6 +217,7 @@ a:focus {
     position: relative;
     top: 3px;
 }
+
 .data_editor .icon_btn_adv {
     display: inline-block;
     width: 16px;
@@ -219,6 +227,7 @@ a:focus {
     position: relative;
     top: 3px;
 }
+
 .data_editor .close_container {
     height: 16px;
     line-height: 16px;
@@ -236,10 +245,12 @@ a:focus {
     box-sizing: border-box;
     cursor: pointer;
 }
-.data_editor .massage_btn .menu_container{
-    width: 60px;
+
+.data_editor .massage_btn .menu_container {
+    width: 44px;
 }
-.data_editor .menu_container .icon_btn_menu{
+
+.data_editor .menu_container .icon_btn_menu {
     display: inline-block;
     width: 18px;
     height: 16px;
@@ -249,24 +260,26 @@ a:focus {
     top: 3px;
 }
 
-.data_editor .massage_btn .block:hover{
+.data_editor .massage_btn .block:hover {
     background: #4da9ff;
     color: #ffffff;
 }
 
-.data_editor .save_container:hover .icon_btn_save{
+.data_editor .save_container:hover .icon_btn_save {
     background: url(../images/save_hover.png);
     background-size: 16px 16px;
 }
-.data_editor .adv_container:hover .icon_btn_adv{
+
+.data_editor .adv_container:hover .icon_btn_adv {
     background: url(../images/adv_hover.png);
     background-size: 16px 16px;
 }
+
 .data_editor .editor_left {
     position: fixed;
     top: 40px;
     bottom: 0;
-    right:0;
+    right: 0;
     padding-top: 10px;
     overflow-x: hidden;
     overflow-y: hidden;
@@ -282,7 +295,7 @@ a:focus {
     overflow-x: hidden;
     overflow-y: auto;
     position: absolute;
-    top: 100px;
+    top: 40px;
     right: 0;
     bottom: 0;
     left: 0;
@@ -301,7 +314,7 @@ a:focus {
     top: 40px;
     left: 0;
     bottom: 0;
-    right:214px;
+    right: 214px;
     background: #fff;
 }
 
@@ -319,17 +332,28 @@ a:focus {
     padding-left: 15px;
     padding-right: 15px;
 }
-.data_editor .dialog_content .list select{
-    height:24px;
+
+.data_editor .dialog_content .list select {
+    height: 24px;
     line-height: 24px;
     margin-right: 4px;
-    border:1px solid #E4E7ED;
+    border: 1px solid #E4E7ED;
     border-radius: 4px;
     color: #606266;
 }
-#viewRefRelEditor .dialog_content .list li{
-    padding-left:0;
+
+.data_editor .dialog_content .list select.left, .data_editor .dialog_content .list select.right {
+    width: 120px;
 }
+
+.data_editor .dialog_content .list select.op {
+    width: 56px;
+}
+
+#viewRefRelEditor .dialog_content .list li {
+    padding-left: 0;
+}
+
 .data_editor .dialog_content {
     position: relative;
     margin: 100px auto;
@@ -338,43 +362,51 @@ a:focus {
     background: #fff;
     position: relative;
 }
-.data_editor #advViewShow .dialog_content{
-    width:auto;
-    height:auto;
-    margin:0;
-    left:15px;
-    top:15px;
-    right:230px;
-    bottom:15px;
+
+.data_editor #advViewShow .dialog_content {
+    width: auto;
+    height: auto;
+    margin: 0;
+    left: 15px;
+    top: 15px;
+    right: 230px;
+    bottom: 15px;
     position: fixed;
 }
-.data_editor .dialog_content ul {
-    margin-left:7px;
-    padding-right: 15px;
+
+.data_editor .dialog_content .left ul {
+    margin-left: 15px;
+    /* padding-right: 15px; */
     height: 295px;
     overflow-y: auto;
+    background-color: rgba(245, 247, 250, 1);
 }
 
 .data_editor .dialog_content li {
     padding-left: 15px;
     list-style: none;
-    height:32px;
+    height: 32px;
     line-height: 32px;
     border-radius: 3px;
 }
-.data_editor .dialog_content li .check{
+
+.data_editor .dialog_content li .check {
     margin-right: 7px;
     vertical-align: middle;
 }
-.data_editor .dialog_content li.on{
+
+.data_editor .dialog_content li.on {
     background: #eee;
 }
-.data_editor .dialog_content li .text{
-    opacity:.3;
+
+.data_editor .dialog_content li .text {
+    opacity: .3;
 }
-.data_editor .dialog_content li .text.on{
+
+.data_editor .dialog_content li .text.on {
     opacity: 1;
 }
+
 .data_editor .dialog_content .dialog_close {
     position: absolute;
     display: block;
@@ -430,6 +462,7 @@ a:focus {
     font-size: 12px;
     float: right;
 }
+
 .data_editor .dialog_content .dialog-button a:hover {
     opacity: 0.9;
 }
@@ -440,21 +473,24 @@ a:focus {
     margin-left: 10px;
     color: #1989fa;
 }
+
 .data_editor .dialog_content .dialog-button .delete {
     border: 1px solid #fdbbbb;
     background-color: #ffeced;
     margin-left: 10px;
     color: #f56c6c;
 }
+
 .data_editor .dialog_content .dialog-button .cancal {
     border: 1px solid #dcdfe6;
     background-color: #fff;
     color: #606266;
 }
+
 .data_editor .editor_left .icon_btn {
     width: 13px;
     height: 13px;
-    margin-right: 5px;
+    margin-right: 8px;
     margin-top: 3px;
 }
 
@@ -466,21 +502,28 @@ a:focus {
 
 .data_editor .editor_left li {
     height: 52px;
-    padding:6px 0 6px 15px ;
+    padding: 6px 0 6px 15px;
     line-height: 20px;
     cursor: pointer
 }
 
-.data_editor .editor_left li:hover,.data_editor .editor_left li.active{
+.data_editor .editor_left li:nth-child(2n+1) {
     background-color: #364660;
 }
+
+.data_editor .editor_left li:hover, .data_editor .editor_left li.active {
+    opacity: 0.8;
+}
+
 .data_editor .editor_left li:hover .add_icon {
     display: block;
 }
+
 .data_editor .editor_left li:hover .modify_icon {
     display: block;
     margin-top: -7px;
 }
+
 .data_editor .editor_left li .add_icon {
     margin-top: -7px;
 }
@@ -504,156 +547,310 @@ a:focus {
 .data_editor .editor_left .add_icon {
     background: url(../images/add_icon.png)
 }
-#viewRefEditor .left{
-    width:145px;
+
+.data_editor .editor_left .search_icon {
+    background: url(../images/search_icon.png);
+    background-size: 110% 110%;
 }
-#viewRefEditor .right{
-    width:215px;
-    padding-left: 15px;
-    padding-top: 15px;
+
+#viewRefEditor .left {
+    width: 165px;
+}
+
+#viewRefEditor .right {
+    width: 195px;
+    padding: 0 15px 0;
     height: 325px;
     overflow-y: auto;
 }
-#viewRefEditor .name{
+
+#viewRefEditor .name {
     display: inline-block;
-    width:80px;
+    width: 95px;
     font-size: 13px;
 }
-#viewRefEditor .right .values{
+
+#viewRefEditor .right .values {
+    width: 135px;
     display: inline-block;
-    padding-top: 20px;
-    padding-bottom: 20px;
     vertical-align: 2px;
 }
-#viewRefEditor .right .min{
-    width: 100px;
-    height:24px;
+
+#viewRefEditor .right .full .min {
+    width: 135px;
+}
+
+#viewRefEditor .right .min {
+    width: 60px;
+    height: 24px;
+    padding-left: 4px;
     vertical-align: middle;
+    float: left;
 }
-#viewRefEditor .right .max{
-    width: 100px;
-    height:24px;
+
+#viewRefEditor .right input, #viewRefEditor .right select {
+    border: 1px solid #E4E7ED;
+    border-radius: 4px;
 }
-#viewRefEditor .right .orders_inner{
+
+#viewRefEditor .right .max {
+    width: 60px;
+    height: 24px;
+    padding-left: 4px;
+    float: right;
+}
+
+#viewRefEditor .right .orders_inner {
     opacity: 0.3;
-    padding-top: 10px;
-    padding-bottom: 20px;
+    padding-top: 5px;
 }
-#viewRefEditor .right .orders_inner.on{
+
+#viewRefEditor .right .orders_inner.on {
     opacity: 1;
 }
-#viewRefEditor .right .filters_inner.on{
+
+#viewRefEditor .right .filters_inner.on {
     opacity: 1;
 }
-#viewRefEditor .right .filters_inner{
+
+#viewRefEditor .right .filters_inner {
     opacity: 0.3;
 }
-#viewRefEditor .right .dese{
+
+#viewRefEditor .right .dese {
     margin-left: 20px;
 }
-#viewRefEditor .right .use{
+
+#viewRefEditor .right .use {
     line-height: 30px;
 }
-#viewRefEditor .right .use .checkUse{
+
+#viewRefEditor .right .use .checkUse {
     vertical-align: -1px;
     margin-right: 7px;
 }
-#viewRefEditor .right .use .text{
-    height:24px;
+
+#viewRefEditor .right .use .text {
+    height: 24px;
     padding-left: 4px;
-    margin-left: 7px;
+    width: 135px;
 }
-#viewRefEditor .right .filters{
+
+#viewRefEditor .right .filters {
     margin-top: 10px;
 }
-#viewRefEditor .right .orders .checkOrders{
+
+#viewRefEditor .right .orders {
+    margin-top: 10px;
+}
+
+#viewRefEditor .right .orders .checkOrders {
     margin-right: 7px;
 }
-#viewRefEditor .right .orders .orders_inner input{
+
+#viewRefEditor .right .orders .orders_inner input {
     vertical-align: -1px;
 }
-#viewRefEditor .right .orders .orders_inner label{
+
+#viewRefEditor .right .orders .orders_inner label {
     margin-left: 4px;
 }
-#viewRefEditor .right .filters .checkFilters{
+
+#viewRefEditor .right .filters .checkFilters {
     margin-right: 7px;
 }
-#viewRefEditor .right .filters .filters_inner{
+
+#viewRefEditor .right .filters .filters_inner {
     margin-top: 5px;
 }
-#viewRefEditor .right .filters .filters_inner .add{
-    height:24px;
+
+#viewRefEditor .right .filters .filters_inner .add {
+    height: 24px;
     padding-left: 4px;
+    width: 135px;
 }
-#viewRefEditor .right .filters .filters_inner select{
-    height:24px;
+
+#viewRefEditor .right .filters .filters_inner select {
+    height: 24px;
     line-height: 24px;
     margin-bottom: 5px;
+    width: 135px;
 }
-#viewRefEditor .right .in .tip{
+
+#viewRefEditor .right .in .tip {
     position: relative;
     display: inline-block;
     padding: 10px;
     line-height: 1;
     margin-right: 10px;
 }
-#viewRefEditor .right .in .tip span{
+
+#viewRefEditor .right .in .tip span {
     display: none;
     position: absolute;
     right: 0;
     top: 0;
     font-size: 12px;
 }
-#viewRefEditor .right .in .tip:hover span{
+
+#viewRefEditor .right .in .tip:hover span {
     display: block;
 }
-#viewRefEditor .right .in_inner div{
+
+#viewRefEditor .right .in_inner div {
     display: inline-block;
 }
-#viewRefEditor .right .in_inner .in_add{
-    width:43px;
-    height:26px;
+
+#viewRefEditor .right .in_inner .in_add {
+    width: 43px;
+    height: 26px;
     line-height: 24px;
     text-align: center;
-    border:1px solid #ddd;
+    border: 1px solid #ddd;
     border-radius: 3px;
     background: #409EFF;
     font-size: 12px;
-    color:#fff;
+    color: #fff;
     vertical-align: -1px;
     cursor: pointer;
 }
-#viewRefEditor .right .help{
-    font-size: 12px;
-    color:#E6A23C;
-    padding-right: 25px;
-}
-#tableView{
-    width:100%;
-    height:85%;
-    padding:20px 15px 30px 15px;
-    overflow: auto;
 
+#viewRefEditor .right .help {
+    font-size: 12px;
+    color: #E6A23C;
+    padding-right: 28px;
 }
-#tableView td{
+
+#tableView {
+    width: 100%;
+    height: 85%;
+    padding: 20px 15px 30px 15px;
+    overflow: auto;
+}
+
+#tableView td {
     padding: 2px 5px 2px 5px;
     font-size: 13px;
 }
-#tableView thead td{
+
+#tableView thead td {
     font-weight: bold
 }
-#tableView td{
+
+#tableView td {
     text-align: center
 }
 
-.refDel{
+.refDel {
     color: #f56c6c;
+    margin-left: 5px;
+    cursor: pointer;
 }
-#viewNameLog input{
-    border:1px solid #E4E7ED;
+
+#viewNameLog input {
+    border: 1px solid #E4E7ED;
     border-radius: 4px;
     color: #606266;
     margin: 0 15px;
     height: 24px;
     padding: 0 10px;
+}
+
+.search_box {
+    float: right;
+    position: relative;
+    height: 100%;
+}
+
+.search_box:hover input {
+    width: 160px;
+    padding: 0 16px 0 5px;
+}
+
+.search_box:hover .el-icon-search {
+    color: #333333;
+}
+
+.search_box .el-icon-search {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    margin-top: -7px;
+    z-index: 5;
+    color: #c9cdd5;
+}
+
+.search_box .search_input {
+    height: 32px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 24px;
+    margin-top: -3px;
+    width: 0;
+    border: none;
+    outline: none;
+    border-radius: 3px;
+    transition: all .3s ease;
+    z-index: 4;
+    padding: 0;
+}
+
+.loading {
+    display: block !important;
+    text-align: center;
+    margin: 20px auto;
+}
+
+.dialog {
+    border: solid 1px #333
+}
+
+.error {
+    background-color: #ff2200
+}
+
+/* select2 hack */
+
+#viewRefEditor .select2-container {
+    margin-bottom: 6px;
+}
+
+.select2-container--default .select2-selection--single {
+    border: 1px solid #E4E7ED;
+    border-radius: 4px;
+    height: 24px;
+    line-height: 24px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 24px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 24px;
+}
+.radio{
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    vertical-align: middle;
+    box-sizing: border-box;
+    border: 1px solid #D5D8DE;
+}
+.radio.on{
+    border: 5px solid #1989FA;
+}
+.radio input{
+    display: none;
+}
+.checkbox{
+    color: #666666;
+}
+.checkbox.on{
+    color: #409EFF;
+}
+.checkbox input{
+    display: none;
 }

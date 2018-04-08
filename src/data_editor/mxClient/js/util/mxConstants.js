@@ -243,7 +243,7 @@
 	 * 
 	 * Specifies the default valid color. Default is #0000FF.
 	 */
-	DEFAULT_VALID_COLOR: '#00FF00',
+	DEFAULT_VALID_COLOR: 'transparent',
 
 	/**
 	 * Variable: DEFAULT_INVALID_COLOR
@@ -258,7 +258,7 @@
 	 * Specifies the default highlight color for shape outlines.
 	 * Default is #0000FF. This is used in <mxEdgeHandler>.
 	 */
-	OUTLINE_HIGHLIGHT_COLOR: '#00FF00',
+	OUTLINE_HIGHLIGHT_COLOR: 'transparent',
 
 	/**
 	 * Variable: OUTLINE_HIGHLIGHT_COLOR
@@ -346,7 +346,7 @@
 	 * Defines the color to be used for the cell highlighting.
 	 * Use 'none' for no color. Default is #00FF00.
 	 */
-	HIGHLIGHT_COLOR: '#00FF00',
+	HIGHLIGHT_COLOR: 'transparent',
 
 	/**
 	 * Variable: TARGET_HIGHLIGHT_COLOR
@@ -382,7 +382,7 @@
 	 * Defines the color to be used for the coloring valid connection
 	 * previews. Use 'none' for no color. Default is #FF0000.
 	 */
-	VALID_COLOR: '#00FF00',
+	VALID_COLOR: 'transparent',
 
 	/**
 	 * Variable: INVALID_COLOR
@@ -398,7 +398,7 @@
 	 * Defines the color to be used for the selection border of edges. Use
 	 * 'none' for no color. Default is #00FF00.
 	 */
-	EDGE_SELECTION_COLOR: '#00FF00',
+	EDGE_SELECTION_COLOR: 'transparent',
 
 	/**
 	 * Variable: VERTEX_SELECTION_COLOR
@@ -406,7 +406,7 @@
 	 * Defines the color to be used for the selection border of vertices. Use
 	 * 'none' for no color. Default is #00FF00.
 	 */
-	VERTEX_SELECTION_COLOR: '#00FF00',
+	VERTEX_SELECTION_COLOR: 'transparent',
 
 	/**
 	 * Variable: VERTEX_SELECTION_STROKEWIDTH
@@ -492,7 +492,7 @@
 	 * Defines the color to be used for the handle fill color. Use 'none' for
 	 * no color. Default is #00FF00 (green).
 	 */
-	HANDLE_FILLCOLOR: '#00FF00',
+	HANDLE_FILLCOLOR: 'transparent',
 
 	/**
 	 * Variable: HANDLE_STROKECOLOR

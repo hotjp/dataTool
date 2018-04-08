@@ -14,17 +14,33 @@
             <button type="button" class="r edit_switch top_btn" :class="{active:editStatus}" @click="toggleEdit()">设计模式</button>
             <button type="button" class="r add_chart top_btn" @click="toggleAddChartDialog">添加图表</button>             
           </div>
-          <div id="dash" class="grid-stack grid-stack-6" data-gs-animate="yes" >
-            <div v-for="(item,index) in chartList" :key="index" class="grid-stack-item" :data-gs-auto-position="item.isAutoPosition" :data-id="item.id"  :data-gs-x="item.x" :data-gs-y="item.y" :data-gs-width="item.width" :data-gs-height="item.height" data-gs-min-height="3" data-gs-min-width="2" >
-              <div class="_wrap" :style="item.background">
-                <div class="chart_tit">{{item.title}}</div>
-                <div class="edit_bar fix">
-                  <router-link class="edit_bar_btn r el-icon-edit" :to="'/chart_editor/'+item.id" alt="编辑"></router-link>
-                  <span class=" edit_bar_btn r el-icon-refresh" @click="onClickRefreshChartData(item.id,index,$event)" alt="刷新"></span>
-                  <span class="el-icon-delete r edit_bar_btn" @click="onClickDeleteChart(item.id,index,$event)" alt="删除"></span>
+          <!-- 编辑模式下显示的可编辑内容 -->
+          <div class="edit_box" :class="{active:editStatus}">
+            <div class="_top">
+              仪表盘设计
+              <el-radio v-model="model" label="waterfall">瀑布流模式</el-radio>
+              <el-radio v-model="model" label="ppt" disabled >ppt模式</el-radio>
+              <button type="button" class="_save"  @click="toggleEdit()"><i class="fa fa-check-square-o"></i>保存</button>
+            </div>
+            <div class="_items">
+              <!-- <el-checkbox v-model="model1">备选项</el-checkbox> -->
+              <colorPicker :color.sync="dashboardBgcolor" ></colorPicker>仪表盘背景色
+            </div>
+          </div>
+          <!-- 背景放在 dash_wrap上 -->
+          <div class="dash_wrap" :style="{'background-color':dashboardBgcolor}">
+            <div id="dash" class="grid-stack grid-stack-6" data-gs-animate="yes" >
+              <div v-for="(item,index) in chartList" :key="index" :data-index="index" :data-isload="item.isload" class="grid-stack-item" :data-gs-auto-position="item.isAutoPosition" :data-id="item.id"  :data-gs-x="item.x" :data-gs-y="item.y" :data-gs-width="item.width" :data-gs-height="item.height" data-gs-min-height="3" data-gs-min-width="2" >
+                <div class="_wrap" :style="item.background">
+                  <div class="chart_tit">{{item.title}}</div>
+                  <div class="edit_bar fix">
+                    <router-link class="edit_bar_btn r el-icon-edit" :to="'/chart_editor/'+item.id" alt="编辑"></router-link>
+                    <span class=" edit_bar_btn r el-icon-refresh" @click="onClickRefreshChartData(item.id,index,$event)" alt="刷新"></span>
+                    <span class="el-icon-delete r edit_bar_btn" @click="onClickDeleteChart(item.id,index,$event)" alt="删除"></span>
+                  </div>
+                  <tableView v-if="item.type =='table'" class="full table_container" :myMessage="item.chartData"></tableView>
+                  <IEcharts v-else class="full charts_container" :resizable="true" :option="item.option" :loading="item.loading"></IEcharts>
                 </div>
-                <tableView v-if="item.type =='table'" class="full table_container" :myMessage="item.chartData"></tableView>
-                <IEcharts v-else class="full charts_container" :resizable="true" :option="item.option" :loading="item.loading"></IEcharts>
               </div>
             </div>
           </div>
@@ -99,6 +115,8 @@ import IEcharts from "vue-echarts-v3/src/full";
 import "echarts-wordcloud";
 import dashboardDir from "../../components/dashboard/dashboardDir.vue";
 import tableView from "../../components/chartEditor/tableView.vue";
+import colorPicker from '../../components/chartEditor/propSelect/colorPicker.vue';
+
 // 引入拖拽网格
 import "../../assets/css/gridstack.min.css";
 import "../../assets/css/gridstack-extra.min.css";
@@ -132,7 +150,7 @@ import "../../vendor/jsVendor/seriesWordCloud.js";
 import seriesWordCloudDefault from "../../vendor/seriesWordCloud.json";
 
 export default {
-  components: { IEcharts, dashboardDir, tableView },
+  components: { IEcharts, dashboardDir, tableView, colorPicker},
   mounted() {
     let that = window.vm = this,
       params = that.$route.params;
@@ -198,6 +216,8 @@ export default {
     dashboardName: "",
     // 仪表盘id
     dashboardId: "",
+    // 仪表盘背景色
+    dashboardBgcolor:'',    
     // 是否允许拖拽缩放
     editStatus: false,
     // dashboard 列表
@@ -239,7 +259,9 @@ export default {
     // 已有图表搜索
     searchCharts:'',
     // 已有视图搜索    
-    searchView:''
+    searchView:'',
+    // 仪表盘模式 瀑布流(waterfall)/ppt(ppt)  
+    model:'waterfall'
   }),
   watch: {
     editStatus: function(newVal, oldVal) {
@@ -302,6 +324,7 @@ export default {
                 that.chartList = that.dashboardList[i].layout || [];
                 that.dashboardName = that.dashboardList[i].text;
                 that.dashboardId = that.dashboardList[i].id;
+                that.dashboardBgcolor = that.dashboardList[i].dashboardBgcolor||'';
                 that.dashboardList[i].active = true;
               }
             }
@@ -323,6 +346,7 @@ export default {
       for (let i = 0; i < that.chartList.length; i++) {
         resultArr.push(request(that.chartList[i].id, i));
       }
+      
       function request(id, i) {
         return new Promise(function(resolve, reject) {
           that.getChartData(id, i, resolve, reject);
@@ -334,10 +358,9 @@ export default {
           that.chartList[i].option =
             result[i] && result[i].option ? result[i].option : {};
           that.chartList[i].loading = false;
-          that.chartList[i].type = result[i].type;
+          that.chartList[i].type = result[i].type||'';
           that.chartList[i].sql = result[i].tableName.sql;
-          that.chartList[i].query = result[i].query;
-          
+          that.chartList[i].query = result[i].query||{};
           that.chartList[i].background = result[i].background
             ? result[i].background
             : {
@@ -362,6 +385,12 @@ export default {
             }
           }
         }
+
+        that.loadGrid();
+        // TODO: 懒加载
+        // that.lazyload();
+        // return
+
         for (let i = 0; i < that.chartList.length; i++) {
           chartDataPms.push(
             chartDataRequest(
@@ -391,7 +420,6 @@ export default {
             }
             that.dataHandler(result2[i], i, that.chartList[i].type);
           }
-          that.loadGrid();
 
           that.toggleFullScreen();
           if ("function" == typeof callback) {
@@ -436,6 +464,12 @@ export default {
           if (data.success) {
             resolve(data);
           }
+          // if (data.success) {
+          //   if (data.data.dataError || !data.data.data) {
+          //     return;
+          //   }
+          //   that.dataHandler(data, index, type);
+          // }
         },
         function() {
           reject();
@@ -461,6 +495,7 @@ export default {
         },
         function(data) {
           if (data.success && data.data) {
+            that.chartList[i].isload=false;
             that.chartList[i].option =
               data.data && data.data.option ? data.data.option : {};
             that.chartList[i].loading = false;
@@ -568,6 +603,7 @@ export default {
         list = {
           id: that.dashboardId,
           text: that.dashboardName,
+          dashboardBgcolor:that.dashboardBgcolor,
           layout: []
         };
       // 获取各图表x,y,w,h
@@ -974,6 +1010,27 @@ export default {
     filterView(value,data){
       if (!value) return true;
         return data.label.indexOf(value) !== -1;
+    },
+    // 懒加载
+    lazyload(){
+      let that = this;
+      $('.grid-content').on('scroll',function(){
+        // 滚动的距离
+        let scrollTop = Math.abs($('#dash').position().top);
+        var h = $('.grid-content').height();
+        $('.grid-stack-item').each(function(){
+          let position =  $(this).position().top;
+          let isload = $(this).attr('data-isload');
+          let id = $(this).attr('data-id');
+          let index = $(this).attr('data-index');
+          if(position < scrollTop+h && !isload){
+            that.chartList[index].isload=true;
+            let type = that.chartList[index].type ;
+            let queryInfo = JSON.stringify(that.chartList[index].query )
+            that.getChartSeriesData(id, queryInfo, index, type);
+          }
+        })
+      }).trigger('scroll');
     }
   }
 };

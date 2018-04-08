@@ -2,8 +2,18 @@
  * @Author: hotjp 
  * @Date: 2017-11-06 13:40:14 
  * @Last Modified by: hotjp
- * @Last Modified time: 2018-02-11 13:24:26
+ * @Last Modified time: 2018-04-08 11:59:05
  */
+
+import Stats from 'stats.js';
+let stats = window.stats = new Stats();
+document.body.appendChild(stats.dom);
+stats.showPanel(3);
+function animate(){
+  stats.update();
+  requestAnimationFrame( animate );
+}
+requestAnimationFrame( animate );
 
 import Vue from 'vue';
 
