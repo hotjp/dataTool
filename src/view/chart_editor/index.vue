@@ -350,23 +350,23 @@
   </div>
 </template>
 <script>
-import { getJson } from "../../router/utils";
-import _ from "lodash";
-import IEcharts from "vue-echarts-v3/src/full";
-import 'echarts-wordcloud'
-import tableView from "../../components/chartEditor/tableView.vue";
-import chartTypeOption from "../../components/chartEditor/chartTypeOption.vue";
+import { getJson } from '../../router/utils';
+import _ from 'lodash';
+import IEcharts from 'vue-echarts-v3/src/full';
+import 'echarts-wordcloud';
+import tableView from '../../components/chartEditor/tableView.vue';
+import chartTypeOption from '../../components/chartEditor/chartTypeOption.vue';
 // 属性面板
-import chartConfig from "../../components/chartEditor/chartConfig.vue";
+import chartConfig from '../../components/chartEditor/chartConfig.vue';
 // 序列风格
-import seriesStyles from "../../components/chartEditor/seriesStyles.vue";
+import seriesStyles from '../../components/chartEditor/seriesStyles.vue';
 // 图表类型
-import chartsTypes from "../../components/chartEditor/chartsTypes.vue";
+import chartsTypes from '../../components/chartEditor/chartsTypes.vue';
 //引入echarts皮肤
-import { Message } from "element-ui";
+import { Message } from 'element-ui';
 //import 'echarts/theme/dark.js'
 //import 'echarts/theme/infographic.js'
-import "echarts/theme/macarons.js";
+import 'echarts/theme/macarons.js';
 //import 'echarts/theme/roma.js'
 //import 'echarts/theme/shine.js'
 //import 'echarts/theme/vintage.js'
@@ -374,17 +374,17 @@ import "echarts/theme/macarons.js";
 //import '../../assets/js/dark.js';
 
 // 维度 设置字段弹窗
-import settingXfield from "../../components/chartEditor/xAxis/settingXField.vue";
+import settingXfield from '../../components/chartEditor/xAxis/settingXField.vue';
 // 数值 设置字段弹窗
-import settingYfield from "../../components/chartEditor/yAxis/settingYField.vue";
+import settingYfield from '../../components/chartEditor/yAxis/settingYField.vue';
 // 数值 结果筛选器弹窗
-import resultScreen from "../../components/chartEditor/yAxis/resultScreen.vue";
+import resultScreen from '../../components/chartEditor/yAxis/resultScreen.vue';
 // 数值 数值显示弹窗
-import numShow from "../../components/chartEditor/yAxis/numShow.vue";
-import chartTitle from "../../components/chartEditor/title.vue";
+import numShow from '../../components/chartEditor/yAxis/numShow.vue';
+import chartTitle from '../../components/chartEditor/title.vue';
 
 // 历史记录工具
-import TimeLine from "../../assets/js/objectTimeLine";
+import TimeLine from '../../assets/js/objectTimeLine';
 
 export default {
   components: {
@@ -401,17 +401,17 @@ export default {
     numShow
   },
   mounted() {
-    let that = (window.vm = this),
+    let that = window.vm = this,
       params = that.$route.params;
     // TODO: 完成历史记录工具
-    // window.timeLines = this.timeLine = new TimeLine({
-    //   treasures: this.chats,
-    //   backupOpt: {
-    //     backupCallback: function() {
-    //       console.log(arguments);
-    //     }
-    //   }
-    // });
+    this.timeLine = new TimeLine({
+      treasures: this.chats,
+      backupOpt: {
+        backupCallback: function() {
+          console.log('自动备份');
+        }
+      }
+    });
 
     if (Object.keys(params).length) {
       that.charts.id = params.viewId;
@@ -423,12 +423,12 @@ export default {
     this.menuStatus = _.debounce(function() {
       this.$set(
         this.queryInfo.categoryColumns[this._index],
-        "selectedItemSwitch",
+        'selectedItemSwitch',
         false
       );
       this.$set(
         this.queryInfo.categoryColumns[this._index],
-        "selectedChildrenSwitch",
+        'selectedChildrenSwitch',
         false
       );
     }, 200);
@@ -436,19 +436,19 @@ export default {
       // this.$set(this.queryInfo.categoryColumns[this._index], 'selectedItemSwitch', false);
       this.$set(
         this.queryInfo.categoryColumns[this._index],
-        "selectedChildrenSwitch",
+        'selectedChildrenSwitch',
         -1
       );
     }, 200);
     this.valMenuStatus = _.debounce(function() {
       this.$set(
         this.queryInfo.valueColumns[this.val_index],
-        "selectedItemSwitch",
+        'selectedItemSwitch',
         false
       );
       this.$set(
         this.queryInfo.valueColumns[this.val_index],
-        "selectedChildrenSwitch",
+        'selectedChildrenSwitch',
         false
       );
     }, 200);
@@ -457,7 +457,7 @@ export default {
       // this.$set(this.queryInfo.valueColumns[this.val_index], 'selectedItemSwitch', false);
       this.$set(
         this.queryInfo.valueColumns[this.val_index],
-        "selectedChildrenSwitch",
+        'selectedChildrenSwitch',
         -1
       );
     }, 200);
@@ -467,10 +467,10 @@ export default {
 
     // 选择表
     getJson(
-      "/dataview/list.do",
+      '/dataview/list.do',
       {
         params: {
-          folder: "",
+          folder: '',
           dataview: true
         }
       },
@@ -480,9 +480,9 @@ export default {
         }
       }
     );
-    if (that.charts.id != "") {
+    if (that.charts.id != '') {
       getJson(
-        "/chart/info.do",
+        '/chart/info.do',
         {
           chart: that.charts.id
         },
@@ -492,11 +492,11 @@ export default {
             that.queryInfo = Object.assign({}, that.queryInfo, res.data.query);
             that.$nextTick(function() {
               that.getTopHeight();
-              vm.getChartDataChangeView();
+              that.getChartDataChangeView();
             });
           }
           getJson(
-            "/dataview/info.do",
+            '/dataview/info.do',
             {
               view: that.charts.tableName.sql
             },
@@ -507,13 +507,13 @@ export default {
                 that.texts = [];
                 that.columns = res.data.columns;
                 for (let i = 0; i < res.data.columns.length; i++) {
-                  if (res.data.columns[i].type == "Number") {
+                  if (res.data.columns[i].type == 'Number') {
                     that.nums.push(res.data.columns[i]);
                   }
-                  if (res.data.columns[i].type == "Date") {
+                  if (res.data.columns[i].type == 'Date') {
                     that.dates.push(res.data.columns[i]);
                   }
-                  if (res.data.columns[i].type == "String") {
+                  if (res.data.columns[i].type == 'String') {
                     that.texts.push(res.data.columns[i]);
                   }
                   res.data.columns[i].show = true;
@@ -529,8 +529,6 @@ export default {
   },
   destroyed() {
     // 销毁后
-    window.vm=null;
-    window.timeLines =null;
     window.onresize = null;
     window.screenWidth=null;
     window.chartsHeight=null;
@@ -541,9 +539,9 @@ export default {
     // 数值 显示格式弹出框
     YnumOption: {
       valueDisplayFormat: false,
-      numericUnit: "",
+      numericUnit: '',
       // 数值 显示格式弹出框单选框
-      valueFormatRadio: "1",
+      valueFormatRadio: '1',
       // 数值 显示格式弹出框单选框 千位分隔符
       thousandsSeparator: true
     },
@@ -554,7 +552,7 @@ export default {
     // 数值 结果筛选器
     ScreenOption: {
       summaryFilter: false,
-      filterValue: "",
+      filterValue: '',
       // 使用下方筛选条件
       useFilter: false,
       index: 0
@@ -565,96 +563,96 @@ export default {
     },
     // 左侧列表拖拽暂存值
     dragObj: {},
-    val_index: "",
+    val_index: '',
     //        数值下拉元素
     valueSelectOptions: [
       {
-        value: "求和",
-        label: "sum"
+        value: '求和',
+        label: 'sum'
       },
       {
-        value: "平均值",
-        label: "avg"
+        value: '平均值',
+        label: 'avg'
       },
       {
-        value: "计数",
-        label: "count"
+        value: '计数',
+        label: 'count'
       },
       {
-        value: "更多",
-        label: "more",
+        value: '更多',
+        label: 'more',
         children: [
           {
-            value: "最大值",
-            label: "max"
+            value: '最大值',
+            label: 'max'
           },
           {
-            value: "最小值",
-            label: "min"
+            value: '最小值',
+            label: 'min'
           },
           {
-            value: "无",
-            label: "无"
+            value: '无',
+            label: '无'
           }
         ]
       },
       {
-        value: "数值显示格式",
-        label: "数值显示格式",
+        value: '数值显示格式',
+        label: '数值显示格式',
         popup: {
-          src: "YnumOption",
-          name: "valueDisplayFormat"
+          src: 'YnumOption',
+          name: 'valueDisplayFormat'
         }
       },
       {
-        value: "设置字段",
-        label: "设置字段",
+        value: '设置字段',
+        label: '设置字段',
         popup: {
-          src: "YfieldOption",
-          name: "valueSetColums"
+          src: 'YfieldOption',
+          name: 'valueSetColums'
         }
       },
       {
-        value: "结果筛选器",
-        label: "结果筛选器",
+        value: '结果筛选器',
+        label: '结果筛选器',
         // summary
         popup: {
-          src: "ScreenOption",
-          name: "summaryFilter"
+          src: 'ScreenOption',
+          name: 'summaryFilter'
         }
       }
     ],
     //        维度下拉菜单索引
-    _index: "",
+    _index: '',
     //        维度下拉元素
     dimensionalitySelectOptions: [
       {
-        value: "设置字段",
-        label: "设置字段",
+        value: '设置字段',
+        label: '设置字段',
         popup: {
-          src: "XfieldOption",
-          name: "categorySetColums"
+          src: 'XfieldOption',
+          name: 'categorySetColums'
         }
       },
       {
-        value: "排序",
-        label: "排序",
+        value: '排序',
+        label: '排序',
         children: [
           {
-            value: "默认",
-            label: "默认"
+            value: '默认',
+            label: '默认'
           },
           {
-            value: "升序",
-            label: "升序"
+            value: '升序',
+            label: '升序'
           },
           {
-            value: "降序",
-            label: "降序"
+            value: '降序',
+            label: '降序'
           },
           {
-            value: "自定义排序",
-            label: "自定义排序"
+            value: '自定义排序',
+            label: '自定义排序'
           }
         ]
       }
@@ -662,55 +660,55 @@ export default {
     //        添加分组字段 分组方式选择器
     addGroupColumsMethodOptions: [
       {
-        value: "选项1",
-        label: "常规"
+        value: '选项1',
+        label: '常规'
       },
       {
-        value: "选项2",
-        label: "年内"
+        value: '选项2',
+        label: '年内'
       },
       {
-        value: "选项3",
-        label: "表达式"
+        value: '选项3',
+        label: '表达式'
       }
     ],
-    addGroupColumsMethodValue: "",
+    addGroupColumsMethodValue: '',
     //        添加分组字段 分组字段选择器
     addGroupColumsSelectOptions: [
       {
-        value: "选项1",
-        label: "日期"
+        value: '选项1',
+        label: '日期'
       },
       {
-        value: "选项2",
-        label: "数值"
+        value: '选项2',
+        label: '数值'
       },
       {
-        value: "选项3",
-        label: "文本"
+        value: '选项3',
+        label: '文本'
       }
     ],
-    addGroupColumsSelectValue: "",
+    addGroupColumsSelectValue: '',
     //        添加分组字段
     addGroupColumsDialogVisible: false,
     //        添加计算字段
     addComputedColumsDialogVisible: false,
-    addComputedColumsTextarea: "",
+    addComputedColumsTextarea: '',
     addComputedColumnsOptions: [
       {
-        value: "选项1",
-        label: "文本"
+        value: '选项1',
+        label: '文本'
       },
       {
-        value: "选项2",
-        label: "数值"
+        value: '选项2',
+        label: '数值'
       },
       {
-        value: "选项3",
-        label: "日期"
+        value: '选项3',
+        label: '日期'
       }
     ],
-    value: "",
+    value: '',
 
     // 批量添加维度字段
     checkAllCategoryDates: false,
@@ -726,21 +724,21 @@ export default {
     // 批量添加数值字段批量添加数值字段批量添加数值字段
     checkAllDates: false,
     checkedDates: [],
-    dates: [{ name: "date", text: "日期", type: "Date" }],
+    dates: [{ name: 'date', text: '日期', type: 'Date' }],
     isIndeterminateDates: true,
     checkAllTexts: false,
     checkedTexts: [],
     texts: [
-      { name: "name", text: "名称", type: "String" },
-      { name: "type", text: "类型", type: "String" },
-      { name: "status", text: "状态", type: "String" }
+      { name: 'name', text: '名称', type: 'String' },
+      { name: 'type', text: '类型', type: 'String' },
+      { name: 'status', text: '状态', type: 'String' }
     ],
     isIndeterminateTexts: true,
     checkAllNums: false,
     checkedNums: [],
     nums: [
-      { name: "qty", text: "数量", type: "Number" },
-      { name: "price", text: "价格", type: "Number" }
+      { name: 'qty', text: '数量', type: 'Number' },
+      { name: 'price', text: '价格', type: 'Number' }
     ],
     isIndeterminateNums: true,
     //批量添加数值字段
@@ -748,17 +746,17 @@ export default {
     //排序弹出框 下拉菜单
     selectSortOptions: [
       {
-        value: "选项1",
-        label: "升序"
+        value: '选项1',
+        label: '升序'
       },
       {
-        value: "选项2",
-        label: "降序"
+        value: '选项2',
+        label: '降序'
       }
     ],
-    selectSortValue: "",
+    selectSortValue: '',
     //排序单选按钮 默认1 需要调整
-    radio: "1",
+    radio: '1',
     //排序弹出层显示隐藏开关
     sortDialogVisible: false,
     //添加字段显示隐藏标志
@@ -782,30 +780,30 @@ export default {
     // 当前报表数据列
     columns: [],
     charts: {
-      id: "",
-      text: "",
+      id: '',
+      text: '',
       tableName: {
-        name: "",
-        sql: ""
+        name: '',
+        sql: ''
       },
-      type: "",
+      type: '',
       loading: false,
       resizable: true,
       option: {
         color: [
-          "#d87c7c",
-          "#919e8b",
-          "#d7ab82",
-          "#6e7074",
-          "#61a0a8",
-          "#efa18d",
-          "#787464",
-          "#cc7e63",
-          "#724e58",
-          "#4b565b"
+          '#d87c7c',
+          '#919e8b',
+          '#d7ab82',
+          '#6e7074',
+          '#61a0a8',
+          '#efa18d',
+          '#787464',
+          '#cc7e63',
+          '#724e58',
+          '#4b565b'
         ],
         title: {
-          text: "未命名图表",
+          text: '未命名图表',
           textStyle: {
             fontSize: 14
           }
@@ -815,16 +813,16 @@ export default {
         // 数值列
         valueColumns: [
           {
-            name: "price", // 列名
-            aggr: "conunt" // 聚合方式(sum/min/max/avg)
+            name: 'price', // 列名
+            aggr: 'conunt' // 聚合方式(sum/min/max/avg)
           },
           {
-            name: "price",
-            aggr: "conunt"
+            name: 'price',
+            aggr: 'conunt'
           },
           {
-            name: "qty",
-            aggr: "conunt"
+            name: 'qty',
+            aggr: 'conunt'
           }
         ],
         // 维度列
@@ -833,56 +831,56 @@ export default {
         // 其他类型按字面值分组
         categoryColumns: [
           {
-            name: "date", // 列名
+            name: 'date', // 列名
             //          gran: "trunc_month",   // 粒度：按月
             //          gran: "trunc_date",    // 粒度：按日叠加
             //          gran: "quarter",       // 粒度：按季度叠加
-            gran: "trunc_quarter", // 粒度：按季度
-            sort: "asc" // 排序
+            gran: 'trunc_quarter', // 粒度：按季度
+            sort: 'asc' // 排序
           },
           {
-            name: "type"
+            name: 'type'
           }
         ],
         // 过滤条件
         // 表达式树，与千里马的表达式编辑器类似
         filters: [
           {
-            conj: "and", // 条件关系，同级别条件的关系运算符应相同，第一个表达式的条件没有作用
-            name: "price", // 列名
-            op: "gt", // 操作符(gt/gte/lt/lte/eq/ne/in/not_in/between)
+            conj: 'and', // 条件关系，同级别条件的关系运算符应相同，第一个表达式的条件没有作用
+            name: 'price', // 列名
+            op: 'gt', // 操作符(gt/gte/lt/lte/eq/ne/in/not_in/between)
             values: [1] // 目标值列表，数量根据操作符决定
           },
           {
-            conj: "and",
-            name: "qty",
-            op: "lt",
+            conj: 'and',
+            name: 'qty',
+            op: 'lt',
             values: [99999]
           },
           {
-            conj: "and",
+            conj: 'and',
             exprs: [
               {
-                conj: "or",
-                name: "type",
-                op: "eq",
-                values: ["requirement"]
+                conj: 'or',
+                name: 'type',
+                op: 'eq',
+                values: ['requirement']
               },
               {
-                conj: "or",
-                name: "status",
-                op: "in",
-                values: ["closed", "done"]
+                conj: 'or',
+                name: 'status',
+                op: 'in',
+                values: ['closed', 'done']
               }
             ]
           }
         ]
       },
       layout: {
-        title: "标题",
-        subtitle: "副标题",
-        palette: ["0xf90", "0xccc", "0x9f0", "0x09f"],
-        type: "scatter"
+        title: '标题',
+        subtitle: '副标题',
+        palette: ['0xf90', '0xccc', '0x9f0', '0x09f'],
+        type: 'scatter'
       },
       // 图表背景
       background:{
@@ -899,16 +897,16 @@ export default {
     listFolders: {
       list: [
         {
-          name: "",
+          name: '',
           children: []
         }
       ],
       defaultProps: {
-        children: "",
-        label: "name"
+        children: '',
+        label: 'name'
       },
       // 选择的id
-      checkId: ""
+      checkId: ''
     },
     // 搜索
     search:''
@@ -917,12 +915,13 @@ export default {
     // 如果 charts 改变，函数运行
     charts: {
       handler: function(newCharts) {
-        this.timeLine.snapshoot(newCharts);
+        // FIXME:监听对象变动没法做撤销重做的功能，需要在用户操作里记录
+        // this.timeLine.snapshoot(newCharts);
       },
       deep: true
     },
     search:function(val,oldVal){
-      for(let i=0;i<this.columns.length;i++){
+      for(let i = 0; i < this.columns.length; i++){
         if(this.columns[i].text.indexOf(val)<0){
           this.columns[i].show=false;
         }else{
@@ -935,7 +934,7 @@ export default {
     // IEcharts组件会返回实例
     onChartReady(instance) {
       this.charts.loading = false;
-      this.instance = instance
+      this.instance = instance;
     },
     // 删除某一维度,操作queryInfo.categoryColumns
     // TODO:考虑和删除数值是否需要合并
@@ -947,7 +946,7 @@ export default {
       }
       this.$nextTick(function() {
         that.getTopHeight();
-        vm.getChartDataChangeView();
+        that.getChartDataChangeView();
       });
     },
     // 删除某一数值,操作queryInfo.categoryColumns
@@ -959,15 +958,14 @@ export default {
       }
       this.$nextTick(function() {
         that.getTopHeight();
-        vm.getChartDataChangeView();
+        that.getChartDataChangeView();
       });
     },
     getChartData() {
-      let that = this,
-        params = that.$route.params;
+      let that = this;
       // 查询图表源 数据
       getJson(
-        "/query.do",
+        '/query.do',
         {
           view: that.charts.tableName.sql,
           query: JSON.stringify(that.queryInfo)
@@ -992,27 +990,27 @@ export default {
     //通用填值
     fetchVal(item, type) {
       let temVal = {};
-      if (type == "category") {
-        if (item.type == "Date") {
-          temVal["gran"] = "trunc_quarter";
-          temVal["sort"] = "asc";
+      if (type == 'category') {
+        if (item.type == 'Date') {
+          temVal['gran'] = 'trunc_quarter';
+          temVal['sort'] = 'asc';
         }
-      } else if (type == "value") {
-        temVal["aggr"] = "count";
-        temVal["selectedChildrenSwitch"] = false;
-        temVal["selectedItemSwitch"] = false;
-        temVal["sort"] = "计数";
-        temVal["filter"] = {};
-        temVal["filter"]["values"] = [];
+      } else if (type == 'value') {
+        temVal['aggr'] = 'count';
+        temVal['selectedChildrenSwitch'] = false;
+        temVal['selectedItemSwitch'] = false;
+        temVal['sort'] = '计数';
+        temVal['filter'] = {};
+        temVal['filter']['values'] = [];
       }
-      temVal["name"] = item.name;
-      temVal["text"] = item.text;
-      temVal["type"] = item.type;
+      temVal['name'] = item.name;
+      temVal['text'] = item.text;
+      temVal['type'] = item.type;
       return temVal;
     },
     //获取维度数值高度
     getTopHeight() {
-      let nowTopHeight = document.getElementsByClassName("query")[0]
+      let nowTopHeight = document.getElementsByClassName('query')[0]
         .offsetHeight;
       // grid-content的padding + el-card__body的padding + top的高度
       let padding = 45 + 40 + 90;
@@ -1030,7 +1028,7 @@ export default {
         that.getTopHeight();
       });
       this.$nextTick(function() {
-        vm.getChartDataChangeView();
+        that.getChartDataChangeView();
       });
       that.charts.query = Object.assign({}, that.queryInfo);
     },
@@ -1054,7 +1052,7 @@ export default {
         that.getTopHeight();
       });
       this.$nextTick(function() {
-        vm.getChartDataChangeView();
+        that.getChartDataChangeView();
       });
       that.charts.query = Object.assign({}, that.queryInfo);
     },
@@ -1066,15 +1064,15 @@ export default {
       that.charts.text = that.charts.option.title.text;
       that.charts.layout.type = that.charts.type;
       getJson(
-        "/chart/save.do",
+        '/chart/save.do',
         {
-          folder: "/",
+          folder: '/',
           config: JSON.stringify(that.charts)
         },
         function(data) {
           if (data.success) {
             that.charts.id = data.data.id;
-            Message({ message: "保存成功", type: "success" });
+            Message({ message: '保存成功', type: 'success' });
           }
         }
       );
@@ -1155,7 +1153,7 @@ export default {
       this.echartsShow = data;
     },
     onClickSetItemSort(index, val) {
-      this.$set(this.queryInfo.categoryColumns[index], "sort", val);
+      this.$set(this.queryInfo.categoryColumns[index], 'sort', val);
       this.toggleSelectedItem(index);
     },
     //维度下拉框
@@ -1167,7 +1165,7 @@ export default {
       let val = !selectedItemSwitch;
       this.$set(
         this.queryInfo.categoryColumns[index],
-        "selectedItemSwitch",
+        'selectedItemSwitch',
         val
       );
     },
@@ -1184,17 +1182,17 @@ export default {
       }
       this.$set(
         this.queryInfo.categoryColumns[index],
-        "selectedChildrenSwitch",
+        'selectedChildrenSwitch',
         val
       );
     },
     closeSelectedItem(index) {
       this._index = index;
-      vm.menuStatus();
+      this.menuStatus();
     },
     closeSelectedChildren(index) {
       this._index = index;
-      vm.menuChildrenStatus();
+      this.menuChildrenStatus();
     },
     // 维度设置字段弹窗
     Xfield: function(data) {
@@ -1216,7 +1214,7 @@ export default {
         ? this.queryInfo.valueColumns[index].selectedItemSwitch
         : false;
       let val = !selectedItemSwitch;
-      this.$set(this.queryInfo.valueColumns[index], "selectedItemSwitch", val);
+      this.$set(this.queryInfo.valueColumns[index], 'selectedItemSwitch', val);
     },
     toggleValueSelectedChildren(index, indexItem) {
       let selectedChildrenSwitch = this.queryInfo.valueColumns[index]
@@ -1231,29 +1229,29 @@ export default {
       }
       this.$set(
         this.queryInfo.valueColumns[index],
-        "selectedChildrenSwitch",
+        'selectedChildrenSwitch',
         val
       );
     },
     closeValueSelectedItem(index) {
       this.val_index = index;
-      vm.valMenuStatus();
+      this.valMenuStatus();
     },
     closeValueSelectedChildren(index) {
       this.val_index = index;
-      vm.valMenuChildrenStatus();
+      this.valMenuChildrenStatus();
     },
     onClickSetValueItemSort(index, item) {
       let that = this;
-      if (that.queryInfo.valueColumns[index].type != "Number") {
+      if (that.queryInfo.valueColumns[index].type != 'Number') {
         this.$message({
-          message: "您选择的非数值型字段不允许" + item.value + "聚合",
-          type: "warning"
+          message: '您选择的非数值型字段不允许' + item.value + '聚合',
+          type: 'warning'
         });
         return false;
       }
       for (var i = 0; i < that.queryInfo.valueColumns.length; i++) {
-        if (that.queryInfo.valueColumns[i].type == "Number") {
+        if (that.queryInfo.valueColumns[i].type == 'Number') {
           if (
             that.queryInfo.valueColumns[i].name ==
             that.queryInfo.valueColumns[index].name
@@ -1262,11 +1260,11 @@ export default {
           }
         }
       }
-      this.$set(this.queryInfo.valueColumns[index], "sort", item.value);
+      this.$set(this.queryInfo.valueColumns[index], 'sort', item.value);
       this.toggleValueSelectedItem(index);
 
       this.$nextTick(function() {
-        vm.getChartDataChangeView();
+        that.getChartDataChangeView();
       });
     },
     itemOnSelectstart() {
@@ -1296,7 +1294,7 @@ export default {
     categoryOnDrop() {
       //          拖拽元素进入目标元素头上，同时鼠标松开的时候,目标元素
       //          this.$set(this.charts.option.series[0].data, 0, a);
-      this.onAddColumnClick(this.dragObj, "category");
+      this.onAddColumnClick(this.dragObj, 'category');
       return false;
     },
     valueOnDragover(ev) {
@@ -1313,16 +1311,16 @@ export default {
     valueOnDrop() {
       //          拖拽元素进入目标元素头上，同时鼠标松开的时候,目标元素
       //          this.$set(this.charts.option.series[0].data, 0, a);
-      this.onAddValueClick(this.dragObj, "value");
+      this.onAddValueClick(this.dragObj, 'value');
       return false;
     },
     onClickPopup(popup, index, value) {
-      if (popup.src != "") {
+      if (popup.src != '') {
         this[popup.src][popup.name] = true;
       } else {
         this[popup.name] = true;
       }
-      if (popup.name == "summaryFilter") {
+      if (popup.name == 'summaryFilter') {
         this.ScreenOption.index = index;
       }
     },
@@ -1415,9 +1413,9 @@ export default {
     workTableDialog(e) {
       let that = this;
       if (e) {
-        if (that.charts.tableName.sql != "") {
+        if (that.charts.tableName.sql != '') {
           getJson(
-            "/dataview/info.do",
+            '/dataview/info.do',
             {
               view: that.charts.tableName.sql
             },
@@ -1429,27 +1427,27 @@ export default {
             }
           );
         }
-        if (that.charts.id == "") {
+        if (that.charts.id == '') {
           that.charts.query = that.queryInfo||{};
           that.charts.text = that.charts.option.title.text;
           that.charts.layout.type = that.charts.type;
           getJson(
-            "/chart/save.do",
+            '/chart/save.do',
             {
-              folder: "/",
+              folder: '/',
               config: JSON.stringify(that.charts)
             },
             function(data) {
               if (data.success) {
                 that.charts.id = data.data.id;
-                that.$router.push("/chart_editor/" + data.data.id);
+                that.$router.push('/chart_editor/' + data.data.id);
               }
             }
           );
         }
       } else {
-        this.charts.tableName.sql = "";
-        this.charts.tableName.name = "";
+        this.charts.tableName.sql = '';
+        this.charts.tableName.name = '';
         that.workTableDialogVisible = false;
       }
     },
@@ -1460,7 +1458,7 @@ export default {
           that.getTopHeight();
         });
         this.$nextTick(function() {
-          vm.getChartDataChangeView();
+          that.getChartDataChangeView();
         });
       }
     },
@@ -1470,10 +1468,10 @@ export default {
     onresizeWindow: function() {
       let that = this;
       let pathStr = that.$route.path;
-      let pathArr = pathStr.split("/");
+      let pathArr = pathStr.split('/');
       // console.log(pathArr);
 
-      if (pathArr[1] === "chart_editor") {
+      if (pathArr[1] === 'chart_editor') {
         _.debounce(function() {
           window.screenWidth = document.body.clientWidth;
           that.screenWidth = window.screenWidth;
@@ -1481,7 +1479,7 @@ export default {
           // console.log('---------tip-------------');
           // console.log(document.getElementsByClassName('query')[0]);
           // if(document.getElementsByClassName('query')[0]!=undefined){
-          let nowTopHeight = document.getElementsByClassName("query")[0]
+          let nowTopHeight = document.getElementsByClassName('query')[0]
             .offsetHeight;
           // grid-content的padding + el-card__body的padding + top的高度
           let padding = 45 + 40 + 90;

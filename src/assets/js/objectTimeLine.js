@@ -1,6 +1,6 @@
 /**
  * 自动保存对象历史的工具类
- * 0.0.1
+ * 0.0.2
  */
 import merge from 'lodash/merge';
 import debounce from 'lodash/debounce';
@@ -68,6 +68,7 @@ export default class TimeLine {
       this.timeLine.shift();
     }
     // 增加
+    console.warn('增加记录');
     this.timeLine.push(merge({}, obj));
     // 初始状态
     if(!this.inited){
@@ -77,24 +78,7 @@ export default class TimeLine {
   }
   constructor(opt) {
     makeTimeLine.call(this, opt);
-    if (this.options.backupOpt.autoBackup) {
-      this.clearBackup = function () {
-        localStorage.removeItem(this.options.backupOpt._initKey);
-        localStorage.removeItem(this.options.backupOpt._backupKey);
-      };
-      
-      // 离开网页提示
-      // if (window.attachEvent) {
-      //   window.attachEvent('onbeforeunload', addOnBeforeUnload);
-      // } else {
-      //   window.addEventListener('beforeunload', addOnBeforeUnload, false);
-      // }
-    }
   }
-}
-function addOnBeforeUnload(e) {
-  var ev = e || event;
-  ev && (ev.returnValue = '确定要离开？');
 }
 function noop() { }
 function makeTimeLine(opt) {
@@ -105,6 +89,10 @@ function makeTimeLine(opt) {
   this.options._initTime = +new Date();
   
   if (this.options.backupOpt.autoBackup) {
+    this.clearBackup = function () {
+      localStorage.removeItem(this.options.backupOpt._initKey);
+      localStorage.removeItem(this.options.backupOpt._backupKey);
+    };
     this.initBackup();
   }
   this.snapshoot = debounce(this.snapshootAct, this.options.timeLineOpt.debounceInterval,true);
@@ -119,7 +107,7 @@ const options = {
   // 时间线
   timeLineOpt: {
     // 历史记录最大值
-    maxLength: 3,
+    maxLength: 10,
     // 历史记录保存防抖间隔
     debounceInterval: 5*1e2,
     // 是否去重

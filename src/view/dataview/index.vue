@@ -67,7 +67,7 @@
 </template>
 <script>
 import { getJson } from '../../router/utils';
-import { Message } from "element-ui";
+import { Message } from 'element-ui';
 
 export default {
   mounted() {
@@ -213,7 +213,7 @@ export default {
       // let src='http://localhost:8080/src/data_editor/index.html?sourceId='+this.sqlId;
       // this.src=src;
       if(!this.newName.text){
-        Message({ message: "请输入视图名称", type: "success" });
+        Message({ message: '请输入视图名称', type: 'success' });
         return;
       }
       this.addVisible=false;

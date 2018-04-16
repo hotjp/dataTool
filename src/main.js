@@ -2,7 +2,7 @@
  * @Author: hotjp 
  * @Date: 2017-11-06 13:40:14 
  * @Last Modified by: hotjp
- * @Last Modified time: 2018-04-08 11:59:05
+ * @Last Modified time: 2018-04-08 13:11:26
  */
 
 import Stats from 'stats.js';
@@ -41,5 +41,4 @@ const app = new Vue({
 
 // 设置版本
 import {version} from '../package.json';
-var body = document.getElementsByTagName('body')[0];
-body.setAttribute('data-version',version);
+document.body.setAttribute('data-version',version);
