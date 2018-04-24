@@ -1,11 +1,13 @@
 <template>
   <div class="echarts" v-bind:class="{hideTable:hideTable}">
-    <form action onsubmit="return false">
-      <el-switch v-model="switchNull" active-color="#13ce66" inactive-color="#888" active-text="显示空值" inactive-text="不显示空值" :change="nullTest()" class="switch"></el-switch>
+    <!-- <form action onsubmit="return false"> -->
+      <div class="switch">
+        <el-switch v-model="switchNull" active-color="#13ce66" inactive-color="#888" active-text="显示空值" inactive-text="不显示空值" :change="nullTest()" ></el-switch>
+      </div>
       <el-table border style="width: 100%" height="100%" :data="tableData.rows" :row-class-name="addClass" :span-method="add">
           <el-table-column v-for="(item,index) in tableData.columns" :key="index" :prop="item.name" :label="item.source.text" ></el-table-column>
       </el-table>
-    </form>
+    <!-- </form> -->
   </div>
 </template>
 <script type="text/babel">
@@ -16,6 +18,12 @@ export default {
     this.init();
   },
   data: () => ({
+    // 页面控制
+    // switch的左右切换标识
+    switchNull: true,
+    // 类切换的标识
+    hideTable: false,
+    // 数据流
     // 初始数据
     chartData: {
       data: {
@@ -23,10 +31,6 @@ export default {
         rows: []
       }
     },
-    // switch的左右切换标识
-    switchNull: true,
-    // 类切换的标识
-    hideTable: false,
     // 合并相同数据
     order: []
   }),
@@ -104,7 +108,9 @@ export default {
 
     init() {
       let that = this;
-      Object.assign(this.chartData.data, this.myMessage.data);
+      if(this.myMessage){ 
+        Object.assign(this.chartData.data, this.myMessage.data);
+      }
       // 合并数据;
       let data = this.chartData.data;
       let length = data.columns.length;
@@ -195,9 +201,9 @@ export default {
   display: none;
 }
 .switch {
-  margin-bottom: 30px;
+  height: 50px;
 }
 .el-table {
-  height: 90%;
+  height: calc(100% - 50px);
 }
 </style>

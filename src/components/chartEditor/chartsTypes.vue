@@ -11,7 +11,7 @@
                 <span>数值 {{rule.values.text}}</span>
               </div>
             </div>
-            <el-button class="chart_type" @click="onClickType(type,option.chartTypes[type].allowUse)" :class="[option.chartTypes[type].allowUse? 'isAllow':'',type]">
+            <el-button class="chart_type" @click="onClickType(type,option.chartTypes[type].allowUse)" :class="[option.chartTypes[type].allowUse? 'isAllow':'', type, thisChartsTypes == type?'active':'']">
               <i class="chart_type_icon"></i>
             </el-button>
           </el-tooltip>
@@ -48,7 +48,7 @@ export default{
       return chartTypes[a].sort - chartTypes[b].sort;
     });
     this.weightArr=Object.keys(chartTypes).sort(function(a,b){
-      return chartTypes[a].weight - chartTypes[b].weight;
+      return chartTypes[b].weight - chartTypes[a].weight ;
     });
   },
   data:()=>({
@@ -180,7 +180,7 @@ export default{
           that.option.tableShow=false;
           that.option.echartsShow=true;
         }
-      }      
+      }
       that.$emit('getCharts',this.chart);      
       that.$emit('gettableShow',this.option.tableShow);
       that.$emit('getechartsShow',this.option.echartsShow);
@@ -192,18 +192,21 @@ export default{
     // 点击切换图表
     onClickType(typeName, typeAllowUse) {
       // TODO:图表的点击切换
+      if (!typeAllowUse){
+        return false;
+      }
+
       this.thisChartsTypes=typeName;
       Object.assign(this.chart,this.charts);
       if (typeName === 'table') {
-        if (!typeAllowUse) return;
         this.option.echartsShow = false;
         this.option.tableShow = true;
       }else{
-        if (!typeAllowUse) return;
         this.option.echartsShow = true;
         this.option.tableShow = false;
       }
       this.chart.type=typeName;
+      
       if(typeName=='pie'||typeName=='area'||typeName=='funnel'||typeName=='rosePie'||typeName=='radar'||typeName=='treemap'||typeName=='gauge'||typeName=='wordCloud'){
         this.chart.option.xAxis.show = false;
         this.chart.option.yAxis.show = false;
@@ -255,11 +258,11 @@ export default{
   background-size: 500px;
 }
 .line{
-  background: url('../../assets/images/icon.png') -26px -26px no-repeat;
+  background: url('../../assets/images/icon.png') -25px -26px no-repeat;
   background-size: 500px;
 }
 .pie{
-  background: url('../../assets/images/icon.png') -51px -26px no-repeat;
+  background: url('../../assets/images/icon.png') -50px -26px no-repeat;
   background-size: 500px;
 }
 .table{
@@ -267,42 +270,49 @@ export default{
   background-size: 500px;
 }
 .area{
-  background: url('../../assets/images/icon.png') -101px -26px no-repeat;
+  background: url('../../assets/images/icon.png') -100px -26px no-repeat;
   background-size: 500px;
 }
 .stackbar{
-  background: url('../../assets/images/icon.png') -126px -26px no-repeat;
+  background: url('../../assets/images/icon.png') -125px -26px no-repeat;
   background-size: 500px;
 }
 .funnel{
-  background: url('../../assets/images/icon.png') -151px -26px no-repeat;
+  background: url('../../assets/images/icon.png') -150px -26px no-repeat;
   background-size: 500px;
 }
 .rosePie{
-  background: url('../../assets/images/icon.png') -176px -26px no-repeat;
+  background: url('../../assets/images/icon.png') -175px -26px no-repeat;
   background-size: 500px;
 }
 .radar{
-  background: url('../../assets/images/icon.png') -201px -26px no-repeat;
+  background: url('../../assets/images/icon.png') -200px -26px no-repeat;
   background-size: 500px;
 }
 .treemap{
-  background: url('../../assets/images/icon.png') -226px -26px no-repeat;
+  background: url('../../assets/images/icon.png') -225px -26px no-repeat;
   background-size: 500px;
 }
 .waterfall{
-  background: url('../../assets/images/icon.png') -251px -26px no-repeat;
+  background: url('../../assets/images/icon.png') -250px -26px no-repeat;
   background-size: 500px;
 }
 .gauge{
-  background: url('../../assets/images/icon.png') -276px -26px no-repeat;
+  background: url('../../assets/images/icon.png') -275px -26px no-repeat;
   background-size: 500px;
 }
 .wordCloud{
-  background: url('../../assets/images/icon.png') -301px -26px no-repeat;
+  background: url('../../assets/images/icon.png') -300px -26px no-repeat;
   background-size: 500px;
+}
+.percentStackbar{
+  background: url('../../assets/images/icon.png') -325px -26px no-repeat;
+  background-size: 500px;   
 }
 .isAllow{
   background-position-y:-1px; 
+}
+.active{
+  box-shadow: 0 0 0 1px #3b90ff;
 }
 </style>

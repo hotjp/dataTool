@@ -67,7 +67,6 @@
 </template>
 <script>
 import { getJson } from '../../router/utils';
-import { Message } from 'element-ui';
 
 export default {
   mounted() {
@@ -82,15 +81,23 @@ export default {
         }
         that.list=res.data;
         let params = that.$route.params;
+        if(!params.viewId){
+          // 获取不到当前id时默认取第一个
+            that.$router.replace({
+              path: "/empty",
+              query: { link: "/dataview/" + res.data[0].id }
+            });
+          return
+        }
         for(let i=0;i<res.data.length;i++){
           if(res.data[i].id==params.viewId){
             getJson('/dataview/design/info.do',{
               view:params.viewId
             },function(res){
               if (res.success) {
-                // that.src='http://119.180.98.134:8890/res/dataviz/data_editor/index.html?sourceId='+res.data.datasourceId+'&view='+params.viewId;
+                that.activeIndex=i;
+                // that.src= vars.src + '/data_editor/index.html?sourceId='+res.data.datasourceId+'&view='+params.viewId;
                 that.src='http://localhost:8080/src/data_editor/index.html?sourceId='+res.data.datasourceId+'&view='+params.viewId;
-
               }
             });
             break;
@@ -102,13 +109,17 @@ export default {
   },
   
   data: () => ({
-    list:[],
-    src:'http://119.180.98.134:8890/res/dataviz/data_editor/index.html',
+    // 页面控制
+    // 删除视图弹窗
     dialogVisible:false,
+    // 添加数据视图弹窗
+    addVisible:false,
+    // 数据流
+    list:[],
+    src: vars.src + '/data_editor/index.html',
     tip:'',
     delId:'',
     hoverIndex:null,
-    addVisible:false,
     listFolders: {
       list: [{
         name: '',
@@ -153,7 +164,7 @@ export default {
         view:item.id
       },function(res){
         if (res.success) {
-          let src='http://119.180.98.134:8890/res/dataviz/data_editor/index.html?sourceId='+res.data.datasourceId+'&view='+item.id;
+          let src= vars.src + '/data_editor/index.html?sourceId='+res.data.datasourceId+'&view='+item.id;
           that.src=src;
           that.activeIndex=index;
           that.$router.replace({path: '/dataview/'+item.id});
@@ -213,7 +224,7 @@ export default {
       // let src='http://localhost:8080/src/data_editor/index.html?sourceId='+this.sqlId;
       // this.src=src;
       if(!this.newName.text){
-        Message({ message: '请输入视图名称', type: 'success' });
+        that.$message({ message: '请输入视图名称', type: 'success' });
         return;
       }
       this.addVisible=false;
@@ -241,7 +252,7 @@ export default {
             if (res.success) {
               that.list=res.data;
               that.$router.replace({path: '/dataview/'+ress.data.id});
-              // let src='http://119.180.98.134:8890/res/dataviz/data_editor/index.html?sourceId='+that.sqlId+'&view='+ress.data.id;
+              // let src= vars.src + '/data_editor/index.html?sourceId='+that.sqlId+'&view='+ress.data.id;
               let src='http://localhost:8080/src/data_editor/index.html?sourceId='+that.sqlId+'&view='+ress.data.id;
               
               that.src=src;

@@ -36,9 +36,7 @@ export default {
     activeNames: ["1"],
     // 图表类型
     type: "funnel",
-    pageName: "漏斗图",
-    // 第一次进入页面
-    firstFlag: true
+    pageName: "漏斗图"
   }),
   watch: {
     seriesOption: {
@@ -85,28 +83,16 @@ export default {
       });
 
       // series.data的数据
-      if (that.firstFlag) {
-        that.seriesOption.option.series = seriesFunnel(
-          columns,
-          rows,
-          queryNameKeyX,
-          queryNameKeyY,
-          seriesDefault,
-          that.option.series,
-          true
-        );
-      } else {
-        // 新建
-        that.seriesOption.option.series = seriesFunnel(
-          columns,
-          rows,
-          queryNameKeyX,
-          queryNameKeyY,
-          seriesDefault
-        );
-      }
+      that.seriesOption.option.series = seriesFunnel(
+        columns,
+        rows,
+        queryNameKeyX,
+        queryNameKeyY,
+        seriesDefault,
+        that.option.series,
+        true
+      );
 
-      that.firstFlag = false;
       that.$set(this.seriesOption.option, "grid", seriesDefault.grid);
       this.$emit("getSeries", that.seriesOption.option);
     }

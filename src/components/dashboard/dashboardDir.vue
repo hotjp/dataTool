@@ -4,7 +4,6 @@
       仪表盘
       <i class="el-icon-more r"></i>
       <i class="el-icon-plus r"  @click="showAddDialog"></i>
-      <!-- TODO: 搜索 -->
       <div class="search_box r">
         <i class="el-icon-search"></i>
         <input type="text" v-model="search" class="search_input">

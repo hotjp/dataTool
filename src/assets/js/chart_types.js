@@ -51,7 +51,7 @@ export default {
       }
     ],
     sort:9,
-    weight:1
+    weight:19
   },
   area: {
     allowUse:false,
@@ -332,8 +332,8 @@ export default {
         }
       }
     ],
-    sort:11,
-    weight:10
+    sort:13,
+    weight:11
   },
   wordCloud:{
     allowUse:false,
@@ -354,6 +354,39 @@ export default {
       }
     ],
     sort:12,
-    weight:10
+    weight:12
+  },
+  percentStackbar: {
+    allowUse:false,
+    type: 'bar',
+    name: '百分比堆叠柱状图',
+    rules: [
+      {
+        columns: {
+          rule: '==',
+          num: 1,
+          text: '1个'
+        },
+        values: {
+          rule: '>=',
+          num: 2,
+          text: '2个以上'
+        }
+      },
+      {
+        columns: {
+          rule: '==',
+          num: 2,
+          text: '2个'
+        },
+        values: {
+          rule: '>=',
+          num: 2,
+          text: '2个以上'
+        }
+      }
+    ],
+    sort:11,
+    weight:2
   }
 };

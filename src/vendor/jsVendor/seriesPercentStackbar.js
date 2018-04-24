@@ -2,7 +2,7 @@
 (function(factory) {
   factory()
 })(function() {
-  function seriesLine(columns, rows,queryNameKeyX, queryNameKeyY, seriesDefault, series,isChartEditor) {
+  function seriesPercentStackbar(columns, rows, queryNameKeyY, seriesDefault, series,isChartEditor) {
     var nameY = []
     for (var i = 0; i < queryNameKeyY.length; i++) {
       for (var j = 0; j < columns.length; j++) {
@@ -11,20 +11,28 @@
         }
       }
     }
-    if (series && arguments.length == 6) {
+    if (series && arguments.length == 5) {
       // 只组织data
       for (var j = 0; j < series.length; j++) {
-        series[j].data = []
         for (var i = 0; i < queryNameKeyY.length; i++) {
-          var name;
-            queryNameKeyX.length==1?name =nameY[i]: name =queryNameKeyY[i]
-          if (series[j].name == name) {
-            for (var k = 0; k < rows.length; k++) {
-              series[j].data.push(rows[k][
-                [queryNameKeyY[i]]
-              ])
+          if (series[j].name == nameY[i]) {
+            series[j].data = rows.map(function(x) {
+              return x[queryNameKeyY[i]]
+            });
+            series[j].type = 'bar';
+            series[j].tooltip = {
+              formatter: '{c}%'
             }
           }
+        }
+      }
+      for (var i = 0; i < rows.length; i++) {
+        var sum = 0
+        for (var j = 0; j < series.length; j++) {
+          sum += series[j].data[i]
+        }
+        for (var j = 0; j < series.length; j++) {
+          series[j].data[i] = Math.round(series[j].data[i] / sum * 100)
         }
       }
       return series
@@ -37,10 +45,10 @@
             data: rows.map(function(x) {
               return x[queryNameKeyY[i]]
             }),
-            type: 'line',
+            type: 'bar',
             itemStyle: (function() {
               if (series && series.length) {
-                var itemStyle;                
+                var itemStyle;
                 for (var j = 0; j < series.length; j++) {
                   if (series[j].name) {
                     if (series[j].name == nameY[i]) {
@@ -48,32 +56,31 @@
                     }
                   }
                 }
-                return itemStyle || copy.itemStyle                
+                return itemStyle || copy.itemStyle
               } else {
                 return copy.itemStyle
               }
             })(),
             name: nameY[i],
-            smooth: (function() {
-              if (series && series.length) {
-                var smooth;                
-                for (var j = 0; j < series.length; j++) {
-                  if (series[j].name) {
-                    if (series[j].name == nameY[i]) {
-                      smooth = series[j].smooth
-                    }
-                  }
-                }
-                return smooth || copy.smooth                
-              } else {
-                return copy.smooth
-              }
-            })(),
+            stack: '总量',
+            tooltip: {
+              formatter: '{c}%'
+            }
           });
         }
+        for (var i = 0; i < rows.length; i++) {
+          var sum = 0
+          for (var j = 0; j < arr.length; j++) {
+            sum += arr[j].data[i]
+          }
+          for (var j = 0; j < arr.length; j++) {
+            arr[j].data[i] = Math.round(arr[j].data[i] / sum * 100)
+          }
+        }
+      
       return arr
     }
   }
-  window.seriesLine = seriesLine;
-  return seriesLine
+  window.seriesPercentStackbar = seriesPercentStackbar;
+  return seriesPercentStackbar
 })

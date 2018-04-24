@@ -24,6 +24,9 @@ function getChartList(chartId) {
     }, function(res) {
       if (res.success) {
         $('.top .title').text(res.data.text);
+        if(res.data.dashboardBgcolor){
+          $('.dash_wrap').css('background',res.data.dashboardBgcolor)
+        }
         var data = {
           xData: res.data.layout
         };
@@ -272,7 +275,14 @@ function dataHandler(data, series, type) {
       seriesWordCloud(columns, rows, queryNameKeyX, queryNameKeyY, {}, series)
     );
     return series;
+  }else if (type == 'percentStackbar') {
+    series = Object.assign(
+      [],
+      seriesPercentStackbar(columns, rows, queryNameKeyY, {}, series)
+    );
+    return series;
   }
+  
 }
 
 // 禁用栅格

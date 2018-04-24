@@ -34,14 +34,17 @@
     </div>
 </template>
 <script type="text/babel">
-import vars from "../../assets/js/vars";
 import { getJson } from "../../router/utils";
 export default {
   data: () => ({
+    // 页面控制
+    // 保存状态
     saveFlag: false,
+    // 数据源操作弹窗
     dialogFormVisible: true,
-    formLabelWidth: "120px",
-    loading: false
+    loading: false,    
+    // 数据流
+    formLabelWidth: "120px"
   }),
   watch: {
     dialogFormVisible: function(val) {

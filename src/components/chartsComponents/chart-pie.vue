@@ -2,7 +2,7 @@
 <el-collapse v-model="activeNames" id="chartsComponents">
   <el-collapse-item title="饼图" name="1">
     <div class="comp_group fix">
-      半径：
+      半径（百分比）：
       <el-slider v-model="radius" @change="radiusChange"></el-slider>
     </div>
   </el-collapse-item>
@@ -50,8 +50,6 @@ export default {
     // 图表类型
     type: "pie",
     pageName: "饼图",
-    // 第一次进入页面
-    firstFlag: true,
     // 半径
     radius: null
   }),
@@ -119,35 +117,23 @@ export default {
         newData.xAxis.data = arr;
       }
       // series.data的数据
-      if (that.firstFlag) {
-        // 第一次进入页面
-        if (this.option.series) {
-          for (let i = 0; i < this.option.series.length; i++) {
-            this.option.series[i].radius = this.radius
-              ? this.radius + "%"
-              : seriesDefault.radius;
-          }
+      if (this.option.series) {
+        for (let i = 0; i < this.option.series.length; i++) {
+          this.option.series[i].radius = this.radius
+            ? this.radius + "%"
+            : seriesDefault.radius;
         }
-        that.seriesOption.option.series = seriesPie(
-          columns,
-          rows,
-          queryNameKeyX,
-          queryNameKeyY,
-          seriesDefault,
-          that.option.series,
-          true
-        );
-      } else {
-        that.seriesOption.option.series = seriesPie(
-          columns,
-          rows,
-          queryNameKeyX,
-          queryNameKeyY,
-          seriesDefault
-        );
       }
+      that.seriesOption.option.series = seriesPie(
+        columns,
+        rows,
+        queryNameKeyX,
+        queryNameKeyY,
+        seriesDefault,
+        that.option.series,
+        true
+      );
 
-      that.firstFlag = false;
       that.$set(this.seriesOption.option, "grid", seriesDefault.grid);
       that.$set(this.seriesOption.option, "xAxis", newData.xAxis);
       this.$emit("getSeries", that.seriesOption.option);

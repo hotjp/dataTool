@@ -39,7 +39,7 @@
                     <span class="el-icon-delete r edit_bar_btn" @click="onClickDeleteChart(item.id,index,$event)" alt="删除"></span>
                   </div>
                   <tableView v-if="item.type =='table'" class="full table_container" :myMessage="item.chartData"></tableView>
-                  <IEcharts v-else class="full charts_container" :resizable="true" :option="item.option" :loading="item.loading"></IEcharts>
+                  <IEcharts v-else class="full charts_container"  :notMerge="true" :resizable="true" :option="item.option" :loading="item.loading"></IEcharts>
                 </div>
               </div>
             </div>
@@ -106,9 +106,6 @@
 </template>
 <script>
 // 引入公用配置
-import vars from "../../assets/js/vars";
-import { Message } from "element-ui";
-import { Loading } from "element-ui";
 import { getJson } from "../../router/utils";
 // 引入组件
 import IEcharts from "vue-echarts-v3/src/full";
@@ -148,6 +145,7 @@ import "../../vendor/jsVendor/seriesGauge.js";
 import seriesGaugeDefault from "../../vendor/seriesGauge.json";
 import "../../vendor/jsVendor/seriesWordCloud.js";
 import seriesWordCloudDefault from "../../vendor/seriesWordCloud.json";
+import "../../vendor/jsVendor/seriesPercentStackbar.js";
 
 export default {
   components: { IEcharts, dashboardDir, tableView, colorPicker},
@@ -193,15 +191,9 @@ export default {
     window.vm = null
   },
   data: () => ({
+    // 页面控制
     // 拖拽区遮罩
     fullscreenLoading: true,
-    // 栅格配置项
-    dashOptions: {
-      draggable: true,
-      cellHeight: 80,
-      verticalMargin: 0,
-      width: 6
-    },
     // 添加新图表弹窗
     addChartVisible: false,
     // 添加新图表-新建图表弹窗
@@ -210,6 +202,16 @@ export default {
     dashboardDialogVisible: false,
     // 编辑仪表盘弹窗
     editDialogVisible: false,
+    // 是否允许拖拽缩放
+    editStatus: false,
+    // 数据流
+    // 栅格配置项
+    dashOptions: {
+      draggable: true,
+      cellHeight: 80,
+      verticalMargin: 0,
+      width: 6
+    },
     // 拖拽栅格
     dash: null,
     // 仪表盘名称
@@ -218,8 +220,6 @@ export default {
     dashboardId: "",
     // 仪表盘背景色
     dashboardBgcolor:'',    
-    // 是否允许拖拽缩放
-    editStatus: false,
     // dashboard 列表
     dashboardList: [],
     // chart列表
@@ -260,7 +260,7 @@ export default {
     searchCharts:'',
     // 已有视图搜索    
     searchView:'',
-    // 仪表盘模式 瀑布流(waterfall)/ppt(ppt)  
+    // 仪表盘模式 瀑布流(waterfall)/ppt(ppt)  TODO: ppt模式
     model:'waterfall'
   }),
   watch: {
@@ -387,10 +387,10 @@ export default {
         }
 
         that.loadGrid();
-        // TODO: 懒加载
-        // that.lazyload();
-        // return
-
+        that.toggleFullScreen();        
+        that.lazyload();
+        return
+        // 以下为不用懒加载的方式
         for (let i = 0; i < that.chartList.length; i++) {
           chartDataPms.push(
             chartDataRequest(
@@ -452,34 +452,34 @@ export default {
       );
     },
     // 获取图表数据，手动组织series.data
-    getChartSeriesData(id, queryInfo, index, type, resolve, reject) {
+    getChartSeriesData(sql, queryInfo, index, type, resolve, reject) {
       let that = this;
       getJson(
         "/query.do",
         {
-          view: id,
+          view: sql,
           query: queryInfo
         },
         function(data) {
-          if (data.success) {
-            resolve(data);
-          }
           // if (data.success) {
-          //   if (data.data.dataError || !data.data.data) {
-          //     return;
-          //   }
-          //   that.dataHandler(data, index, type);
+          //   resolve(data);
           // }
+          if (data.success) {
+            if (data.data.dataError || !data.data.data) {
+              return;
+            }
+            that.dataHandler(data, index, type);
+          }
         },
         function() {
-          reject();
+          // reject();
         }
       );
     },
     onClickRefreshChartData(chartId, i, $event) {
       let that = this,
         loadingInstance;
-      loadingInstance = Loading.service({
+      loadingInstance = that.$loading({
         target: $($event.target).closest("._wrap")[0]
       });
       // TODO: loading使用elementUI的，但是关闭事件用了延时
@@ -627,7 +627,7 @@ export default {
             if (callback) {
               callback();
             } else {
-              Message({ message: "保存成功", type: "success" });
+              that.$message({ message: "保存成功", type: "success" });
             }
             that.editStatus = false;
           }
@@ -638,7 +638,7 @@ export default {
     addDashboard() {
       let that = this;
       if (!that.newDashboardName) {
-        Message({ message: "请输入仪表名", type: "error" });
+        that.$message({ message: "请输入仪表名", type: "error" });
         return;
       }
       let list = {
@@ -653,7 +653,7 @@ export default {
         },
         function(res) {
           if (res.success) {
-            Message({ message: "新建成功", type: "success" });
+            that.$message({ message: "新建成功", type: "success" });
             that.dashboardDialogVisible = false;
             // that.$router.replace({ path: '/dashboard/'+resData.data.id });
             that.$router.replace({
@@ -722,12 +722,12 @@ export default {
       }
       for (let i = 0; i < that.chartList.length; i++) {
         if (chartId == that.chartList[i].id) {
-          Message({ message: "不能添加相同的图表", type: "warning" });
+          that.$message({ message: "不能添加相同的图表", type: "warning" });
           return false;
         }
       }
       if (!chartId) {
-        Message({ message: "没有选中的图表", type: "warning" });
+        that.$message({ message: "没有选中的图表", type: "warning" });
       } else {
         that.addChartVisible = false;
         that.toggleFullScreen(true);
@@ -774,7 +774,7 @@ export default {
         that.saveDashboard(callback);
       }, 300);
       function callback() {
-        Message({ message: "删除成功", type: "success" });
+        that.$message({ message: "删除成功", type: "success" });
       }
     },
     // 编辑标题弹窗显示
@@ -801,7 +801,7 @@ export default {
         function(res) {
           var resData = res.data;
           if (res.success) {
-            Message({ message: "保存成功", type: "success" });
+            that.$message({ message: "保存成功", type: "success" });
             if (that.editId == that.$route.params.viewId) {
               list.active = true;
               that.dashboardName = that.editTitle;
@@ -996,14 +996,25 @@ export default {
             )
           );
           break;
+        case "percentStackbar":
+          that.chartList[index].option.series = Object.assign(
+            [],
+            seriesPercentStackbar(
+              columns,
+              rows,
+              queryNameKeyY,
+              seriesWaterfallDefault,
+              that.chartList[index].option.series
+            )
+          );
+          break;
         case "table":
-          this.chartList[index].chartData = data;
+          this.chartList[index].chartData = data.data;
           break;
         default:
           console.warn("类型错误！");
       }
-      // var a=that.chartList;
-      // that.chartList = a;
+      that.chartList[index].option = Object.assign({},that.chartList[index].option)
       that.$set(that.chartList,index,that.chartList[index])
     },
     // 选择视图搜索
@@ -1020,14 +1031,15 @@ export default {
         var h = $('.grid-content').height();
         $('.grid-stack-item').each(function(){
           let position =  $(this).position().top;
-          let isload = $(this).attr('data-isload');
+          let index = $(this).attr('data-index');          
+          let isload = that.chartList[index].isload;
           let id = $(this).attr('data-id');
-          let index = $(this).attr('data-index');
           if(position < scrollTop+h && !isload){
             that.chartList[index].isload=true;
             let type = that.chartList[index].type ;
-            let queryInfo = JSON.stringify(that.chartList[index].query )
-            that.getChartSeriesData(id, queryInfo, index, type);
+            let queryInfo = JSON.stringify(that.chartList[index].query );
+            let sql =that.chartList[index].sql
+            that.getChartSeriesData(sql, queryInfo, index, type);
           }
         })
       }).trigger('scroll');

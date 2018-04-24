@@ -2,7 +2,7 @@
 (function(factory) {
   factory()
 })(function() {
-  function seriesWaterfall(columns, rows, queryNameKeyX, queryNameKeyY, seriesDefault, series, flag) {
+  function seriesWaterfall(columns, rows, queryNameKeyX, queryNameKeyY, seriesDefault, series,isChartEditor) {
     if (series && arguments.length == 6) {
       // 只组织data
       var data = [],
@@ -92,37 +92,28 @@
         },
         data: helpdata
       })
-      if (flag) {
-        arr.push({
-          data: data,
-          type: 'bar',
-          itemStyle: (function(){
-            if(series && series.length){
-              var itemStyle;              
-              for(var j=0;j<series.length;j++){
-                if(series[j].name){
-                  if(series[j].name == queryNameKeyY[i] || series[j].name == '瀑布图'){
-                    itemStyle = series[j].itemStyle
-                  }
+      arr.push({
+        data: data,
+        type: 'bar',
+        itemStyle: (function() {
+          if (series && series.length) {
+            var itemStyle;
+            for (var j = 0; j < series.length; j++) {
+              if (series[j].name) {
+                if (series[j].name == queryNameKeyY[i] || series[j].name == '瀑布图') {
+                  itemStyle = series[j].itemStyle
                 }
               }
-              return itemStyle||copy.itemStyle              
-            }else{
-              return copy.itemStyle
             }
-          })(),
-          name: '瀑布图',
-          stack: '总量',
-        });
-      } else {
-        arr.push({
-          data: data,
-          type: 'bar',
-          itemStyle: copy.itemStyle,
-          name: '瀑布图',
-          stack: '总量',
-        });
-      }
+            return itemStyle || copy.itemStyle
+          } else {
+            return copy.itemStyle
+          }
+        })(),
+        name: '瀑布图',
+        stack: '总量',
+      });
+
       return arr
     }
   }

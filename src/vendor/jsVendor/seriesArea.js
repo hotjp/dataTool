@@ -1,7 +1,7 @@
-!(function(factory) {
+;(function(factory) {
   factory();
 })(function() {
-  function seriesArea(columns, rows, queryNameKeyX,queryNameKeyY, seriesDefault, series, flag) {
+  function seriesArea(columns, rows, queryNameKeyX,queryNameKeyY, seriesDefault, series,isChartEditor) {
     var nameY = [];
     for (var i = 0; i < queryNameKeyY.length; i++) {
       for (var j = 0; j < columns.length; j++) {
@@ -30,7 +30,6 @@
     } else {
       // chart_eitor组件用
       var arr = [];
-      if (flag) {
         for (var i = 0; i < queryNameKeyY.length; i++) {
           var copy = JSON.parse(JSON.stringify(seriesDefault));
           arr.push({
@@ -70,11 +69,11 @@
                             'y2': 0,
                             'colorStops': [{
                               'offset': 0,
-                              'color': series[j].itemStyle && series[j].itemStyle.normal.color ? series[j].itemStyle.normal.color : '#00ccff'
+                              'color': series[j].areaStyle && series[j].areaStyle.normal.color&&series[j].areaStyle.normal.color.colorStops ? series[j].areaStyle.normal.color.colorStops[0] : '#00ccff'
                             },
                             {
                               'offset': 1,
-                              'color': series[j].itemStyle && series[j].itemStyle.normal.color ? series[j].itemStyle.normal.color : '#3366ff'
+                              'color': series[j].areaStyle && series[j].areaStyle.normal.color&&series[j].areaStyle.normal.color.colorStops  ? series[j].areaStyle.normal.color.colorStops[1] : '#3366ff'
                             }
                             ],
                             'globalCoord': false
@@ -124,21 +123,7 @@
             })()
           });
         }
-      } else {
-        for (var i = 0; i < queryNameKeyY.length; i++) {
-          var copy = JSON.parse(JSON.stringify(seriesDefault));
-          arr.push({
-            data: rows.map(function(x) {
-              return x[queryNameKeyY[i]];
-            }),
-            type: 'line',
-            itemStyle: copy.itemStyle,
-            smooth: copy.smooth,
-            areaStyle: copy.areaStyle,
-            name: nameY[i]
-          });
-        }
-      }
+      
       return arr;
     }
   }

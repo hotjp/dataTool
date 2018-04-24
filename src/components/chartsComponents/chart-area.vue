@@ -6,7 +6,7 @@
           <div v-for="(item,index) in seriesOption.option.series" :key="index" class="colums_list">
             <div class="fix lh30">
               <colorPicker class="color_picker" :color.sync="item.itemStyle.normal.color" ></colorPicker>
-              {{item.name}}
+              <p class="l item_name">{{item.name}}</p>
             </div>
             <div class="fix lh30">
               <colorPicker class="color_picker" :color.sync="item.areaStyle.normal.color.colorStops[0].color" ></colorPicker>
@@ -61,9 +61,7 @@ export default {
     type: "line",
     pageName: "面积图",
     // 是否平滑曲线
-    smooth: false,
-    // 第一次进入页面
-    firstFlag: true
+    smooth: false
   }),
   watch: {
     seriesOption: {
@@ -79,6 +77,7 @@ export default {
       },
       deep: true
     }
+
   },
   methods: {
     // 平滑曲线
@@ -133,28 +132,17 @@ export default {
         newData.xAxis.data = arr;
       }
       // series.data的数据
-      if (that.firstFlag) {
-        // 第一次进入页面
-        newData.series = seriesArea(
-          columns,
-          rows,
-          queryNameKeyX,
-          queryNameKeyY,
-          seriesDefault,
-          that.option.series,
-          true
-        );
-      } else {
-        newData.series = seriesArea(
-          columns,
-          rows,
-          queryNameKeyX,
-          queryNameKeyY,
-          seriesDefault
-        );
-      }
 
-      that.firstFlag = false;
+      newData.series = seriesArea(
+        columns,
+        rows,
+        queryNameKeyX,
+        queryNameKeyY,
+        seriesDefault,
+        that.option.series,
+        true
+      );
+
       that.$set(this.seriesOption.option, "grid", seriesDefault.grid);
       that.$set(this.seriesOption.option, "xAxis", newData.xAxis);
       that.$set(this.seriesOption.option, "series", newData.series);

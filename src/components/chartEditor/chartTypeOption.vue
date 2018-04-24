@@ -12,6 +12,7 @@
     <chartWaterfall v-else-if="type=='waterfall'" :option="option" :data="data" @getSeries="getOption"></chartWaterfall>
     <chartGauge v-else-if="type=='gauge'" :option="option" :data="data" @getSeries="getOption"></chartGauge>
     <chartWordCloud v-else-if="type=='wordCloud'" :option="option" :data="data" @getSeries="getOption"></chartWordCloud>
+    <chartPercentStackbar v-else-if="type=='percentStackbar'" :option="option" :data="data" @getSeries="getOption"></chartPercentStackbar>
   
   </div>
 </template>
@@ -30,12 +31,14 @@ import chartTreemap from '../chartsComponents/chart-treemap.vue';
 import chartWaterfall from '../chartsComponents/chart-waterfall.vue';
 import chartGauge from '../chartsComponents/chart-gauge.vue';
 import chartWordCloud from '../chartsComponents/chart-wordCloud.vue';
+import chartPercentStackbar from '../chartsComponents/chart-percentStackbar.vue';
 
 
 export default {
   components: {
     chartBar, chartLine, chartPie, chartArea, chartStackbar, chartFunnel, 
-    chartRosePie, chartRadar,chartTreemap,chartWaterfall,chartGauge,chartWordCloud
+    chartRosePie, chartRadar,chartTreemap,chartWaterfall,chartGauge,chartWordCloud,
+    chartPercentStackbar
   },
   mounted() {
   },

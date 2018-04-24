@@ -53,12 +53,15 @@ export default {
     window.vm = null;
   },
   data: () => ({
+    // 页面控制
+    //显示隐藏dataSourceDialog组件
+    dialogFormVisible: false,
+    // 数据流
     //是否可保存
     pageName: "数据源添加",
     // 数据源列表
     list: [],
     pageType: "index",
-    dialogFormVisible: false,
     form: {},
     formLabelWidth: "120px",
     hoverIndex: null,

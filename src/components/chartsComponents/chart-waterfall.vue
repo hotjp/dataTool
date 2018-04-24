@@ -42,9 +42,7 @@ export default {
     activeNames: ["1"],
     // 图表类型
     type: "bar",
-    pageName: "瀑布图",
-    // 第一次进入页面
-    firstFlag: true
+    pageName: "瀑布图"
   }),
   watch: {
     seriesOption: {
@@ -57,6 +55,17 @@ export default {
       // 父级传来的图表数据
       handler: function(newVal, oldVal) {
         this.dataChange();
+      },
+      deep: true
+    },
+    "seriesOption.option.series": {
+      // 父级传来的图表数据
+      handler: function(newVal, oldVal) {
+        for (let i = 0; i < newVal.length; i++) {
+          if (newVal[i].itemStyle.normal.color == "transparent") {
+            this.seriesOption.option.series[i].itemStyle.normal.color = null;
+          }
+        }
       },
       deep: true
     }
@@ -119,28 +128,16 @@ export default {
       }
 
       // series.data的数据
-      if (that.firstFlag) {
-        // 第一次进入页面
-        newData.series = seriesWaterfall(
-          columns,
-          rows,
-          queryNameKeyX,
-          queryNameKeyY,
-          seriesDefault,
-          that.option.series,
-          true
-        );
-      } else {
-        newData.series = seriesWaterfall(
-          columns,
-          rows,
-          queryNameKeyX,
-          queryNameKeyY,
-          seriesDefault
-        );
-      }
+      newData.series = seriesWaterfall(
+        columns,
+        rows,
+        queryNameKeyX,
+        queryNameKeyY,
+        seriesDefault,
+        that.option.series,
+        true
+      );
 
-      that.firstFlag = false;
       that.$set(this.seriesOption.option, "grid", seriesDefault.grid);
       that.$set(this.seriesOption.option, "xAxis", newData.xAxis);
       that.$set(this.seriesOption.option, "series", newData.series);

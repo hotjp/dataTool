@@ -2,7 +2,7 @@
 (function(factory) {
   factory()
 })(function() {
-  function seriesRosePie(columns, rows, queryNameKeyX, queryNameKeyY, seriesDefault, series, flag) {
+  function seriesRosePie(columns, rows, queryNameKeyX, queryNameKeyY, seriesDefault, series,isChartEditor) {
     var nameY = []
     for (var i = 0; i < queryNameKeyY.length; i++) {
       for (var j = 0; j < columns.length; j++) {
@@ -55,7 +55,6 @@
     } else {
       // chart_eitor组件用
       var arr = [];
-      if (flag) {
         if (queryNameKeyX.length) {
           // 一个维度一个数值
           // 一个数值
@@ -125,45 +124,7 @@
             });
           }
         }
-      } else {
-        if (queryNameKeyX.length) {
-          // 一个维度一个数值
-          // 一个数值
-          var copy = JSON.parse(JSON.stringify(seriesDefault));
-          var data = [];
-          for (var i = 0; i < rows.length; i++) {
-            data.push({
-              name: rows[i][queryNameKeyX[0]],
-              value: rows[i][queryNameKeyY[0]]
-            });
-          }
-          arr.push({
-            data: data,
-            type: 'pie',
-            roseType: copy.radius,
-            radius: copy.radius
-          });
-        } else {
-          // 0个维度多个数值，，，多个数值相加
-          if (queryNameKeyY.length > 1) {
-            // 多个数值
-            var copy = JSON.parse(JSON.stringify(seriesDefault));
-            var data = [];
-            for (var i = 0; i < queryNameKeyY.length; i++) {
-              data.push({
-                value: rows[0][queryNameKeyY[i]],
-                name: nameY[i]
-              });
-            }
-            arr.push({
-              data: data,
-              type: 'pie',
-              roseType: copy.radius,
-              radius: copy.radius
-            });
-          }
-        }
-      }
+      
       return arr
     }
   }

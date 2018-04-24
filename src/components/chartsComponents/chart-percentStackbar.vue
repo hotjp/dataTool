@@ -1,24 +1,21 @@
 <template>
-<el-collapse v-model="activeNames" id="chartsComponents">
-  <form action onsubmit="return false">
-  <el-collapse-item title="折线图" name="1">
+<el-collapse  v-model="activeNames" id="chartsComponents">
+  <el-collapse-item title="百分比堆叠柱状图" name="1">
     <div class="comp_group fix">
       <div v-for="(item,index) in seriesOption.option.series" :key="index" class="colums_list">
         <colorPicker class="color_picker" :color.sync="item.itemStyle.normal.color" ></colorPicker>
         <p class="l item_name">{{item.name}}</p>
       </div>
     </div>
-    <div class="comp_group fix">
-      <el-switch v-model="smooth" active-color="#5182E4" @change="smoothChange" inactive-color="#cccccc"></el-switch> 平滑曲线
-    </div>
   </el-collapse-item>
-</form>  
 </el-collapse>
 </template>
 
 <script>
-import seriesDefault from "../../vendor/seriesLine.json";
-import "../../vendor/jsVendor/seriesLine.js";
+import axios from "axios";
+
+import seriesDefault from "../../vendor/seriesBar.json";
+import "../../vendor/jsVendor/seriesPercentStackbar.js";
 
 import colorPicker from "../chartEditor/propSelect/colorPicker.vue";
 
@@ -32,17 +29,13 @@ export default {
   mounted() {
     let that = this;
     (() => Object.assign(that.chartData, that.data))();
-    if (that.option.series) {
-      if (that.option.series[0] && that.option.series[0].smooth) {
-        that.smooth = that.option.series[0].smooth;
-      }
-    }
   },
   data: () => ({
     // 返回父级的数据，包括series和xAxis与yAxis的data部分
     seriesOption: {
       option: {
-        series: []
+        series: [],
+        xAxis: {}
       }
     },
     // 数据
@@ -50,10 +43,8 @@ export default {
     // 默认配置项展开
     activeNames: ["1"],
     // 图表类型
-    type: "line",
-    pageName: "折线图",
-    // 是否平滑曲线
-    smooth: false
+    type: "bar",
+    pageName: "百分比堆叠柱状图"
   }),
   watch: {
     seriesOption: {
@@ -69,28 +60,19 @@ export default {
       },
       deep: true
     },
-    'seriesOption.option.series':{
+    "seriesOption.option.series": {
       // 父级传来的图表数据
       handler: function(newVal, oldVal) {
-        for(let i=0;i<newVal.length;i++){
-          if(newVal[i].itemStyle.normal.color == 'transparent'){
-            this.seriesOption.option.series[i].itemStyle.normal.color=null
+        for (let i = 0; i < newVal.length; i++) {
+          if (newVal[i].itemStyle.normal.color == "transparent") {
+            this.seriesOption.option.series[i].itemStyle.normal.color = null;
           }
         }
-        
       },
       deep: true
     }
   },
   methods: {
-    // 平滑曲线
-    smoothChange(data) {
-      for (let i = 0; i < this.seriesOption.option.series.length; i++) {
-        this.seriesOption.option.series[i].smooth = data;
-      }
-      this.seriesOption.option = Object.assign({}, this.seriesOption.option);
-      this.$emit("getSeries", this.seriesOption.option);
-    },
     // 数据处理
     dataChange() {
       let that = this;
@@ -123,9 +105,9 @@ export default {
       that.seriesOption.option.series = [];
 
       // xAxis数据 数组
-      that.seriesOption.option.xAxis
-        ? (that.seriesOption.option.xAxis.data = [])
-        : (that.seriesOption.option.xAxis = {});
+      // that.seriesOption.option.xAxis
+      //   ? (that.seriesOption.option.xAxis.data = [])
+      //   : (that.seriesOption.option.xAxis = {});
       newData.xAxis = that.seriesOption.option.xAxis;
       for (let i = 0; i < queryNameKeyX.length; i++) {
         let arr = [];
@@ -134,17 +116,17 @@ export default {
         }
         newData.xAxis.data = arr;
       }
+
       // series.data的数据
-        newData.series = seriesLine(
-          columns,
-          rows,
-          queryNameKeyX,
-          queryNameKeyY,
-          seriesDefault,
-          that.option.series,
-          true
-        );
-      
+      newData.series = seriesPercentStackbar(
+        columns,
+        rows,
+        queryNameKeyY,
+        seriesDefault,
+        that.option.series,
+        true
+      );
+
       that.$set(this.seriesOption.option, "grid", seriesDefault.grid);
       that.$set(this.seriesOption.option, "xAxis", newData.xAxis);
       that.$set(this.seriesOption.option, "series", newData.series);
@@ -154,3 +136,6 @@ export default {
   props: ["option", "data"]
 };
 </script>
+<style>
+
+</style>

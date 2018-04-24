@@ -2,7 +2,10 @@
 <el-collapse  v-model="activeNames" id="chartsComponents">
   <el-collapse-item title="字云" name="1">
     <div class="comp_group fix">
-      
+      文字倾斜角度
+      <div v-for="(item,index) in seriesOption.option.series" :key="index" class="colums_list">
+        <el-slider v-model="item.rotationRange" range :min="-90" :max="90"></el-slider>
+      </div>
     </div>
   </el-collapse-item>
   
@@ -14,7 +17,6 @@ import axios from "axios";
 
 import seriesDefault from "../../vendor/seriesWordCloud.json";
 import "../../vendor/jsVendor/seriesWordCloud.js";
-
 
 export default {
   created() {
@@ -38,9 +40,7 @@ export default {
     activeNames: ["1"],
     // 图表类型
     pageName: "计量图",
-    type: "wordCloud",
-    // 第一次进入页面
-    firstFlag: true
+    type: "wordCloud"
   }),
   watch: {
     seriesOption: {
@@ -104,28 +104,16 @@ export default {
       newData.xAxis.data = arr;
 
       // series.data的数据
-      if (that.firstFlag) {
-        newData.series = seriesWordCloud(
-          columns,
-          rows,
-          queryNameKeyX,
-          queryNameKeyY,
-          seriesDefault,
-          that.option.series,
-          true
-        );
-      } else {
-        // 新建
-        newData.series = seriesWordCloud(
-          columns,
-          rows,
-          queryNameKeyX,
-          queryNameKeyY,
-          seriesDefault
-        );
-      }
+      newData.series = seriesWordCloud(
+        columns,
+        rows,
+        queryNameKeyX,
+        queryNameKeyY,
+        seriesDefault,
+        that.option.series,
+        true
+      );
 
-      that.firstFlag = false;
       that.$set(this.seriesOption.option, "xAxis", newData.xAxis);
       that.$set(this.seriesOption.option, "series", newData.series);
       that.$emit("getSeries", that.seriesOption.option);
@@ -137,5 +125,8 @@ export default {
 <style scoped>
 .item_name {
   margin-left: 0;
+}
+.colums_list {
+  padding: 0 10px;
 }
 </style>

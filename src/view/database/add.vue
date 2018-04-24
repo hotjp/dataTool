@@ -38,7 +38,6 @@
   </div>
 </template>
 <script>
-import vars from "../../assets/js/vars";
 import dataSourceDialog from "../../components/dataSource/dataSourceDialog.vue";
 import dataSourceList from "../../vendor/dataSourceList.json";
 export default {
@@ -52,14 +51,18 @@ export default {
     this.list = dataSourceList;
   },
   data: () => ({
+    // 页面控制
+    //显示隐藏dataSourceDialog组件
+    dialogFormVisible: false,
+    // 上传文件弹窗
+    dialogUploadVisible: false,
+    // 数据流
     vars: vars,
     fileList: [],
-    dialogFormVisible: false,
     pageName: "数据源添加",
     // 数据源列表
     list: [],
     pageType: "",
-    dialogUploadVisible: false,
     form: {},
     formLabelWidth: "120px",
     // 搜索

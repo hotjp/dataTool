@@ -1,5 +1,4 @@
 import { ajax } from 'jquery';
-import vars from '../assets/js/vars';
 // 把变量存入cookie
 function setCookie(c_name, value, expiredays) {
   var exdate = new Date();

@@ -59,9 +59,7 @@ export default {
     activeNames: ["1"],
     // 图表类型
     pageName: "计量图",
-    type: "gauge",
-    // 第一次进入页面
-    firstFlag: true
+    type: "gauge"
   }),
   watch: {
     seriesOption: {
@@ -74,6 +72,21 @@ export default {
       // 父级传来的图表数据
       handler: function(newVal, oldVal) {
         this.dataChange();
+      },
+      deep: true
+    },
+    "seriesOption.option.series": {
+      // 父级传来的图表数据
+      handler: function(newVal, oldVal) {
+        for (let i = 0; i < newVal.length; i++) {
+          for (let j = 0; j < newVal[i].axisLine.lineStyle.color.length; j++) {
+            if (newVal[i].axisLine.lineStyle.color[j][1] == "transparent") {
+              this.seriesOption.option.series[i].axisLine.lineStyle.color[
+                j
+              ][1] = null;
+            }
+          }
+        }
       },
       deep: true
     }
@@ -125,28 +138,16 @@ export default {
       newData.xAxis.data = arr;
 
       // series.data的数据
-      if (that.firstFlag) {
-        newData.series = seriesGauge(
-          columns,
-          rows,
-          queryNameKeyX,
-          queryNameKeyY,
-          seriesDefault,
-          that.option.series,
-          true
-        );
-      } else {
-        // 新建
-        newData.series = seriesGauge(
-          columns,
-          rows,
-          queryNameKeyX,
-          queryNameKeyY,
-          seriesDefault
-        );
-      }
+      newData.series = seriesGauge(
+        columns,
+        rows,
+        queryNameKeyX,
+        queryNameKeyY,
+        seriesDefault,
+        that.option.series,
+        true
+      );
 
-      that.firstFlag = false;
       that.$set(this.seriesOption.option, "grid", seriesDefault.grid);
       that.$set(this.seriesOption.option, "xAxis", newData.xAxis);
       that.$set(this.seriesOption.option, "series", newData.series);

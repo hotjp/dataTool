@@ -22,11 +22,11 @@
         小数位数
         <input type="text" placeholder="2">
       </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button class="btn-confirm" type="primary" @click="valueDisplayFormat(1)">确 定</el-button>
-        <el-button class="btn-cancel" @click="valueDisplayFormat(0)">取 消</el-button>
-      </span>
     </form>
+    <span slot="footer" class="dialog-footer">
+      <el-button class="btn-confirm" type="primary" @click="valueDisplayFormat(1)">确 定</el-button>
+      <el-button class="btn-cancel" @click="valueDisplayFormat(0)">取 消</el-button>
+    </span>
   </el-dialog>
 </template>
 <script type="text/babel">

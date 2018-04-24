@@ -10,7 +10,8 @@ export default {
     title: {
       text: '',
       textStyle:{
-        fontSize:14
+        fontSize:14,
+        color:'#333'
       }
     },
     // 默认配置项展开
@@ -20,7 +21,7 @@ export default {
     setTitle: {
       handler: function(val, oldval) {
         // 发数据
-        Object.assign(this.title, val);
+        this.title=Object.assign({},this.title, val);
       },
       deep: true
     }

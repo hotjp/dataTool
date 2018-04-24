@@ -1,7 +1,5 @@
 <template>
   <div id="chartEditor" class="full">
-    <!--TODO:test方法尝试更新数组数据-->
-    <!--<a href="javascript:;" @click="test">点我</a>-->
     <div class="full">
       <div class="full chart_left">
         <div class="grid-content full">
@@ -50,7 +48,6 @@
       </div>
       <div class="common_top top fix">
           <chartTitle class="l name" @titleText="getTitle" :setTitle="charts.option.title"></chartTitle>
-          <!-- <span class="name l ">11111111111</span> -->
           <button type="button" class="r menu top_btn" @click=""></button>     
           <button type="button" class="r preview top_btn" @click="preview()">预览分享</button>
           <button type="button" class="r save top_btn" @click="saveChartData">保存视图</button>
@@ -174,7 +171,7 @@
           <!-- 图表类型 -->
           <chartsTypes ref="chartsTypes" :charts="charts" :echartsShow="echartsShow" :tableShow="tableShow" @gettableShow="gettableShow" @getechartsShow="getechartsShow" @getCharts="getCharts" :setqueryInfo="queryInfo"></chartsTypes>
           <!-- 序列风格 -->
-          <seriesStyles :charts="charts" @seriesStyles="seriesStyles"></seriesStyles>
+          <seriesStyles v-if="charts.type!='table'" :charts="charts" @seriesStyles="seriesStyles"></seriesStyles>
           <!-- 面板属性 -->
           <chartConfig @getProp="getProp" :setProp="graphData" :charts="charts"></chartConfig>
 
@@ -258,7 +255,7 @@
         <!--数值-->
         <div>
           <el-checkbox :indeterminate="isIndeterminateCategoryNums" v-model="checkAllCategoryNums" @change="handleCheckAllCategoryChangeNums">
-            <i class="el-icon-more"></i>数值</el-checkbox>
+            <i class="el-icon-edit-outline"></i>数值</el-checkbox>
           <el-checkbox-group v-model="checkedCategoryNums" @change="handleCheckedCategoryNumsChange">
             <el-checkbox v-for="num in nums" :label="num" :key="num.text">{{num.text}}</el-checkbox>
           </el-checkbox-group>
@@ -299,7 +296,7 @@
         <!--数值-->
         <div>
           <el-checkbox :indeterminate="isIndeterminateNums" v-model="checkAllNums" @change="handleCheckAllChangeNums">
-            <i class="el-icon-more"></i>数值</el-checkbox>
+            <i class="el-icon-edit-outline"></i>数值</el-checkbox>
           <el-checkbox-group v-model="checkedNums" @change="handleCheckedNumsChange">
             <el-checkbox v-for="num in nums" :label="num" :key="num.text">{{num.text}}</el-checkbox>
           </el-checkbox-group>
@@ -363,7 +360,6 @@ import seriesStyles from '../../components/chartEditor/seriesStyles.vue';
 // 图表类型
 import chartsTypes from '../../components/chartEditor/chartsTypes.vue';
 //引入echarts皮肤
-import { Message } from 'element-ui';
 //import 'echarts/theme/dark.js'
 //import 'echarts/theme/infographic.js'
 import 'echarts/theme/macarons.js';
@@ -534,6 +530,18 @@ export default {
     window.chartsHeight=null;
   },
   data: () => ({
+    // 页面控制
+    //排序弹出层显示隐藏开关
+    sortDialogVisible: false,
+    //添加字段显示隐藏标志
+    // addColFlag: false,
+    //工作表弹出框显示开关
+    workTableDialogVisible: false,
+    //echarts显示
+    echartsShow: false,
+    //table显示
+    tableShow: false,
+    // 数据流
     // 表格用数据
     chartData:{},
     // 数值 显示格式弹出框
@@ -564,7 +572,7 @@ export default {
     // 左侧列表拖拽暂存值
     dragObj: {},
     val_index: '',
-    //        数值下拉元素
+    // TODO:  数值下拉元素
     valueSelectOptions: [
       {
         value: '求和',
@@ -624,7 +632,7 @@ export default {
     ],
     //        维度下拉菜单索引
     _index: '',
-    //        维度下拉元素
+    // TODO: 维度下拉元素
     dimensionalitySelectOptions: [
       {
         value: '设置字段',
@@ -657,7 +665,7 @@ export default {
         ]
       }
     ],
-    //        添加分组字段 分组方式选择器
+    // TODO:  添加分组字段 分组方式选择器
     addGroupColumsMethodOptions: [
       {
         value: '选项1',
@@ -673,7 +681,7 @@ export default {
       }
     ],
     addGroupColumsMethodValue: '',
-    //        添加分组字段 分组字段选择器
+    // TODO:  添加分组字段 分组字段选择器
     addGroupColumsSelectOptions: [
       {
         value: '选项1',
@@ -689,9 +697,9 @@ export default {
       }
     ],
     addGroupColumsSelectValue: '',
-    //        添加分组字段
+    // TODO: 添加分组字段
     addGroupColumsDialogVisible: false,
-    //        添加计算字段
+    // TODO: 添加计算字段
     addComputedColumsDialogVisible: false,
     addComputedColumsTextarea: '',
     addComputedColumnsOptions: [
@@ -709,7 +717,6 @@ export default {
       }
     ],
     value: '',
-
     // 批量添加维度字段
     checkAllCategoryDates: false,
     checkedCategoryDates: [],
@@ -724,26 +731,19 @@ export default {
     // 批量添加数值字段批量添加数值字段批量添加数值字段
     checkAllDates: false,
     checkedDates: [],
-    dates: [{ name: 'date', text: '日期', type: 'Date' }],
+    dates: [],
     isIndeterminateDates: true,
     checkAllTexts: false,
     checkedTexts: [],
-    texts: [
-      { name: 'name', text: '名称', type: 'String' },
-      { name: 'type', text: '类型', type: 'String' },
-      { name: 'status', text: '状态', type: 'String' }
-    ],
+    texts: [],
     isIndeterminateTexts: true,
     checkAllNums: false,
     checkedNums: [],
-    nums: [
-      { name: 'qty', text: '数量', type: 'Number' },
-      { name: 'price', text: '价格', type: 'Number' }
-    ],
+    nums: [],
     isIndeterminateNums: true,
     //批量添加数值字段
     batchAddColumsDialogVisible: false,
-    //排序弹出框 下拉菜单
+    // TODO: 排序弹出框 下拉菜单
     selectSortOptions: [
       {
         value: '选项1',
@@ -757,19 +757,9 @@ export default {
     selectSortValue: '',
     //排序单选按钮 默认1 需要调整
     radio: '1',
-    //排序弹出层显示隐藏开关
-    sortDialogVisible: false,
-    //添加字段显示隐藏标志
-    // addColFlag: false,
-    //工作表弹出框显示开关
-    workTableDialogVisible: false,
     // 屏幕宽度默认值
     screenWidth: document.body.clientWidth,
     chartsHeight: document.body.clientHeight - 150,
-    //echarts显示
-    echartsShow: false,
-    //table显示
-    tableShow: false,
     // 当前查询
     queryInfo: {
       // 现有图表类型
@@ -815,14 +805,6 @@ export default {
           {
             name: 'price', // 列名
             aggr: 'conunt' // 聚合方式(sum/min/max/avg)
-          },
-          {
-            name: 'price',
-            aggr: 'conunt'
-          },
-          {
-            name: 'qty',
-            aggr: 'conunt'
           }
         ],
         // 维度列
@@ -837,9 +819,6 @@ export default {
             //          gran: "quarter",       // 粒度：按季度叠加
             gran: 'trunc_quarter', // 粒度：按季度
             sort: 'asc' // 排序
-          },
-          {
-            name: 'type'
           }
         ],
         // 过滤条件
@@ -850,41 +829,19 @@ export default {
             name: 'price', // 列名
             op: 'gt', // 操作符(gt/gte/lt/lte/eq/ne/in/not_in/between)
             values: [1] // 目标值列表，数量根据操作符决定
-          },
-          {
-            conj: 'and',
-            name: 'qty',
-            op: 'lt',
-            values: [99999]
-          },
-          {
-            conj: 'and',
-            exprs: [
-              {
-                conj: 'or',
-                name: 'type',
-                op: 'eq',
-                values: ['requirement']
-              },
-              {
-                conj: 'or',
-                name: 'status',
-                op: 'in',
-                values: ['closed', 'done']
-              }
-            ]
           }
         ]
       },
       layout: {
-        title: '标题',
-        subtitle: '副标题',
-        palette: ['0xf90', '0xccc', '0x9f0', '0x09f'],
-        type: 'scatter'
+        title: '',
+        subtitle: '',
+        palette: [],
+        type: ''
       },
-      // 图表背景
+      // 图表背景 
       background:{
         backgroundColor:'#fff',
+        // TODO: 背景图
         backgroundRepeat:'no-repeat',
         backgroundImage:''
       }
@@ -961,9 +918,9 @@ export default {
         that.getChartDataChangeView();
       });
     },
+    // 查询图表源 数据    
     getChartData() {
       let that = this;
-      // 查询图表源 数据
       getJson(
         '/query.do',
         {
@@ -1056,10 +1013,9 @@ export default {
       });
       that.charts.query = Object.assign({}, that.queryInfo);
     },
-    //
-    saveChartData() {
+    // 保存图表数据
+    saveChartData(callback) {
       let that = this;
-      // 保存图表 数据
       that.charts.query = that.queryInfo;
       that.charts.text = that.charts.option.title.text;
       that.charts.layout.type = that.charts.type;
@@ -1072,11 +1028,16 @@ export default {
         function(data) {
           if (data.success) {
             that.charts.id = data.data.id;
-            Message({ message: '保存成功', type: 'success' });
+            if('function'==typeof callback){
+              callback();
+            }else{
+              that.$message({ message: '保存成功', type: 'success' });
+            }
           }
         }
       );
     },
+    // 图表背景
     getBackground: function(data){
       this.instance?this.instance.clear():'';      
       this.charts.background = Object.assign({}, this.charts.background, data);
@@ -1086,7 +1047,7 @@ export default {
       this.instance?this.instance.clear():'';      
       this.charts.option = Object.assign({}, this.charts.option, data);
     },
-    //      弹出框选择日期型
+    // 弹出框选择日期型
     handleCheckAllChangeDates(val) {
       this.checkedDates = val ? this.dates : [];
       this.isIndeterminateDates = false;
@@ -1097,7 +1058,7 @@ export default {
       this.isIndeterminateDates =
         checkedCount > 0 && checkedCount < this.dates.length;
     },
-    //      弹出框选择文本型
+    // 弹出框选择文本型
     handleCheckAllChangeTexts(val) {
       this.checkedTexts = val ? this.texts : [];
       this.isIndeterminateTexts = false;
@@ -1108,7 +1069,7 @@ export default {
       this.isIndeterminateTexts =
         checkedCount > 0 && checkedCount < this.texts.length;
     },
-    //      弹出框选择数值型
+    // 弹出框选择数值型
     handleCheckAllChangeNums(val) {
       this.checkedNums = val ? this.nums : [];
       this.isIndeterminateNums = false;
@@ -1138,8 +1099,6 @@ export default {
         colorName: data.name
       });
     },
-    // 图表类型
-    chartsShape: function(data) {},
     getCharts: function(data) {
       this.charts.type = data.type;
       this.instance?this.instance.clear():''; 
@@ -1410,6 +1369,7 @@ export default {
       this.charts.tableName.sql = data.id;
       this.charts.tableName.name = data.name;
     },
+    // 选择工作表
     workTableDialog(e) {
       let that = this;
       if (e) {
@@ -1479,8 +1439,7 @@ export default {
           // console.log('---------tip-------------');
           // console.log(document.getElementsByClassName('query')[0]);
           // if(document.getElementsByClassName('query')[0]!=undefined){
-          let nowTopHeight = document.getElementsByClassName('query')[0]
-            .offsetHeight;
+          let nowTopHeight = document.getElementsByClassName('query')[0].offsetHeight;
           // grid-content的padding + el-card__body的padding + top的高度
           let padding = 45 + 40 + 90;
           let Dvalue = nowTopHeight + padding;
@@ -1496,7 +1455,17 @@ export default {
     getTitle: function(data) {
       this.instance?this.instance.clear():''; 
       Object.assign(this.charts.option.title, data);
-    }
+    },
+    // 预览跳转
+    preview() {
+      // 预览前先保存
+      let that = this;
+      var href = vars.src + "/viewer/chart.html?id=" + that.charts.id;
+      that.saveChartData(openPrevView);
+      function openPrevView() {
+        window.open(href);
+      }
+    },
   }
 };
 </script>

@@ -500,6 +500,12 @@ audio:not([controls]),
 .chart_add_dialog .tit .search_box .el-icon-search {
   right: 3px;
 }
+.chart_add_dialog .el-tree-node__content:hover {
+  background-color: #eef1f6;
+}
+.chart_add_dialog .el-tree-node.is-current .el-tree-node__content {
+  background-color: #eef1f6;
+}
 .ovh {
   width: 100%;
   height: 100%;

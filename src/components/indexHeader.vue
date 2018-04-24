@@ -36,7 +36,6 @@
   </div>
 </template>
 <script>
-import vars from "../assets/js/vars";
 
 export default {
   mounted() {
@@ -54,7 +53,10 @@ export default {
     }
   },
   data: () => ({
+    // 页面控制
+    // 当前页面
     titleType: 1,
+    // 是否全屏
     isFullscreen: false
   }),
   methods: {

@@ -7,11 +7,11 @@
       <input type="text" class="set_unit" placeholder="单位">
       <p>字段描述</p>
       <input type="text" class="field_description" placeholder="字段描述">
-      <span slot="footer" class="dialog-footer">
-        <el-button class="btn-confirm" type="primary" @click="valueSetColums(1)">确 定</el-button>
-        <el-button class="btn-cancel" @click="valueSetColums(0)">取 消</el-button>
-      </span>
     </form>
+    <span slot="footer" class="dialog-footer">
+      <el-button class="btn-confirm" type="primary" @click="valueSetColums(1)">确 定</el-button>
+      <el-button class="btn-cancel" @click="valueSetColums(0)">取 消</el-button>
+    </span>
   </el-dialog>
 </template>
 <script type="text/babel">

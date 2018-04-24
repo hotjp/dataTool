@@ -2,7 +2,7 @@
 (function(factory) {
   factory()
 })(function() {
-  function seriesTreemap(query,rows, queryNameKeyX, queryNameKeyY, seriesDefault, series, flag) {
+  function seriesTreemap(query,rows, queryNameKeyX, queryNameKeyY, seriesDefault, series,isChartEditor) {
     function compareArr(arr,nameKey){
       for(var j=0;j<arr.length;j++){
         if(arr[j].name == nameKey){
@@ -50,7 +50,6 @@
       // chart_eitor组件用
       var arr = [];
 
-      if (flag) {
         var copy = JSON.parse(JSON.stringify(seriesDefault));        
         // 有数值时按数值分匹配百分比，只有维度时平分
         var arrData = setData(0);
@@ -60,22 +59,7 @@
           itemStyle: copy.itemStyle,
           name: '全部',
         });
-
-      } else {
-        var copy = JSON.parse(JSON.stringify(seriesDefault));        
-        // 有数值时按数值分匹配百分比，只有维度时平分
-        arr.push({
-          data: setData(0),
-          type: 'treemap',
-          itemStyle: series[0].radius || copy.radius,
-          label:{
-            normal:{
-              formatter: '{b}: {c}'
-            }
-          },
-          name: '全部',
-        });
-      }
+      
       return arr
     }
   }

@@ -34,7 +34,7 @@ var vb = {
     var view=page.url.get('view') ? page.url.get('view') : 0;
     if(view){
       $.ajax({
-        url: 'http://119.180.98.134:8880/dataviz/api/dataview/design/info.do',
+        url: vars.api + '/dataview/design/info.do',
         method: 'GET',
         dataType: 'JSON',
         data: {

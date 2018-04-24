@@ -4,29 +4,23 @@
       <el-collapse v-model="activeNames">
         <el-collapse-item title="坐标X轴" name="1">
           <div>
-            <div>
-              <el-checkbox v-model="xaxis.show">显示坐标轴</el-checkbox>
-            </div>
-            <div class="fix ">
-              <lineStyle :color.sync="xaxis.axisLine.lineStyle.color" :type.sync="xaxis.axisLine.lineStyle.type" :width.sync="xaxis.axisLine.lineStyle.width" ></lineStyle>
-            </div>
+            <el-checkbox v-model="xaxis.show">显示坐标轴</el-checkbox>
+          </div>
+          <div class="fix ">
+            <lineStyle :color.sync="xaxis.axisLine.lineStyle.color" :type.sync="xaxis.axisLine.lineStyle.type" :width.sync="xaxis.axisLine.lineStyle.width" ></lineStyle>
           </div>
           <div>
-            <div>
-              <el-checkbox v-model="xaxis.axisLabel.show">显示标签</el-checkbox>
-            </div>
-            <div class="fix ">
-              <font :color.sync="xaxis.axisLabel.color" :fontFamily.sync="xaxis.axisLabel.fontFamily" :fontSize.sync="xaxis.axisLabel.fontSize"  ></font>
-            </div>
+            <el-checkbox v-model="xaxis.axisLabel.show">显示标签</el-checkbox>
+          </div>
+          <div class="fix ">
+            <font :color.sync="xaxis.axisLabel.color" :fontFamily.sync="xaxis.axisLabel.fontFamily" :fontSize.sync="xaxis.axisLabel.fontSize"  ></font>
           </div>
 
           <div>
-            <div>
-              <el-checkbox v-model="xaxis.splitLine.show">纵向网格线</el-checkbox>
-            </div>
-            <div class="fix ">
-              <lineStyle :color.sync="xaxis.splitLine.lineStyle.color" :type.sync="xaxis.splitLine.lineStyle.type" :width.sync="xaxis.splitLine.lineStyle.width" ></lineStyle>
-            </div>
+            <el-checkbox v-model="xaxis.splitLine.show">纵向网格线</el-checkbox>
+          </div>
+          <div class="fix ">
+            <lineStyle :color.sync="xaxis.splitLine.lineStyle.color" :type.sync="xaxis.splitLine.lineStyle.type" :width.sync="xaxis.splitLine.lineStyle.width" ></lineStyle>
           </div>
         </el-collapse-item>
       </el-collapse>

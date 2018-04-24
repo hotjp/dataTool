@@ -2,7 +2,7 @@
 (function(factory) {
   factory()
 })(function() {
-  function seriesRadar(columns,rows, queryNameKeyX, queryNameKeyY, seriesDefault, series, flag) {
+  function seriesRadar(columns,rows, queryNameKeyX, queryNameKeyY, seriesDefault, series,isChartEditor) {
     var queryY=[]
     for(var i=0;i<queryNameKeyY.length;i++){
       for(var j=0;j<columns.length;j++){
@@ -31,7 +31,6 @@
     } else {
       // chart_eitor组件用
       var arr = [];
-      if (flag) {
         for (var i = 0; i < queryNameKeyY.length; i++) {
           var copy = JSON.parse(JSON.stringify(seriesDefault));
           var data = [];
@@ -62,24 +61,6 @@
             name: queryY[i],
           });
         }
-      } else {
-        for (var i = 0; i < queryNameKeyY.length; i++) {
-          var copy = JSON.parse(JSON.stringify(seriesDefault));
-          var data = [];
-          data.push({
-            name: queryY[i],
-            value: rows.map(function(x) {
-              return x[queryNameKeyY[i]]
-            })
-          })
-          arr.push({
-            data: data,
-            type: 'radar',
-            itemStyle: copy.itemStyle,
-            name: queryY[i],
-          });
-        }
-      }
       return arr
     }
   }

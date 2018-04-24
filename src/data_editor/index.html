@@ -39,13 +39,13 @@
         <aside>
             <div class="fix editor_left_title">
                 视图模型
-                <!-- <a href="javascript:;" class="r icon_btn modify_icon block"></a>
-                <a href="javascript:;" class="r icon_btn scale_icon block"></a> -->
+                <!-- <a href="javascript:;" class="r icon_btn modify_icon block"></a> -->
+                <!-- <a href="javascript:;" class="r icon_btn scale_icon block"></a> -->
                 <a href="javascript:;" class="r icon_btn refresh_icon block"></a>
                 <a href="javascript:;" class="r icon_btn add_icon block"></a>
                 <div class="search_box r">
                     <i class="el-icon-search icon_btn search_icon block"></i>
-                    <input type="text" v-model="search" class="search_input">
+                    <input type="text" class="search_input">
                 </div>
             </div>
             <ul id="tableList">
@@ -68,8 +68,8 @@
                                 <i class="r icon_btn add_icon  hide" data-table="<%=stringify(tableList[i])%>"></i>
                             </a>
                         </li>
-                        <%}%>
-                            <%}%>
+                    <%}%>
+                <%}%>
             </script>
             <!-- <script id="tableListTpl" type="text/html">
                 <%if(tableList){%>
@@ -298,10 +298,11 @@
             </div>
         </div>
     </div>
-    <script src="./js/jquery.js"></script>
-    <script src="js/select2.full.min.js"></script>
+    <script src="./js/jquery.js"></script>      
+    <script src="./js/select2.full.min.js"></script>
     <script src="./js/urlparas.js"></script>
     <script src="./js/template-native.js"></script>
+    <script src="../assets/js/vars.js"></script> 
     <script type="text/javascript">
     mxBasePath = './mxClient';
     </script>
@@ -338,7 +339,7 @@
     function loadDatatables() {
         datasourceId = page.url.get('datasource');
         $.ajax({
-            url: 'http://119.180.98.134:8880/dataviz/api/datasource/metadata/listTables.do',
+            url: vars.api + '/datasource/metadata/listTables.do',
             // url: 'http://192.168.50.200:8880/dataviz/api/dataview/list.do',
             method: 'GET',
             dataType: 'JSON',
@@ -363,18 +364,12 @@
                 //   $('#tables').append(li);
                 // });
 
-                // $('select.select').select();
                 $('select').select2({
                     minimumResultsForSearch: -1
                 });
 
-
             }
         });
-
-
-
-
     }
 
     function addTableToGraph(sourceId, table) {
@@ -384,7 +379,7 @@
             refTables.push(vb._view.tables[i].name);
         }
         $.ajax({
-            url: 'http://119.180.98.134:8880/dataviz/api/datasource/metadata/table.do',
+            url: vars.api + '/api/datasource/metadata/table.do',
             data: {
                 datasource: sourceId,
                 table: table['name'],
@@ -398,7 +393,7 @@
             }
         });
     }
-
+    // FIXME: 以下方法，变量没有用到
     function extractViewLayout() {
         var layout = {
             tables: [{
@@ -646,7 +641,7 @@
                 layout: vb._layout
             };
             $.ajax({
-                url: 'http://119.180.98.134:8880/dataviz/api/dataview/design/save.do',
+                url: vars.api + '/api/dataview/design/save.do',
                 method: 'get',
                 dataType: 'json',
                 data: {
@@ -847,16 +842,13 @@
             $('#advViewShow').show();
             $.ajax({
                 type: 'POST',
-                url: 'http://119.180.98.134:8880/dataviz/api/preview.do',
+                url: vars.api + '/preview.do',
                 data: {
-                    // datasource: 'mysql2',
-                    // view: '{"tables":[{"name":"bd_job","alias":"t_1","columns":[{"name":"job_id","text":"任务ID","type":"Number","alias":"t_1_c_1"},{"name":"job_name","text":"任务名称","type":"String","alias":"t_1_c_2"},{"name":"job_def","type":"String"},{"name":"job_params","type":"String"},{"name":"job_group_name","text":"任务分组","type":"String","alias":"t_1_c_3"},{"name":"scheduled_time","text":"计划时间","type":"Date","alias":"t_1_c_4"},{"name":"job_priority","text":"优先级","type":"Number","alias":"t_1_c_5"},{"name":"job_status","text":"状态","type":"Number","alias":"t_1_c_6"},{"name":"retry_count","type":"Number"},{"name":"last_run_time","type":"Date"}]},{"name":"bd_job_log","alias":"t_2","columns":[{"name":"log_id","text":"日志ID","type":"Number","alias":"t_2_c_1"},{"name":"job_id","type":"Number"},{"name":"run_time","text":"上次运行","type":"Date","alias":"t_2_c_2"},{"name":"run_elapsed_ms","text":"运行耗时","type":"Number","alias":"t_2_c_3"},{"name":"run_status","text":"运行状态","type":"Number","alias":"t_2_c_4"},{"name":"run_out_file","type":"String"}]}],"joins":[{"left":"t_1","right":"t_2","type":"INNER","columns":[{"left":"job_id","right":"job_id","op":"="}]}],"filters":[{"conj":"AND","table":"t_1","column":"t_1_c_3","op":"LIKE","values":["注册登录"]},{"conj":"AND","table":"t_2","column":"t_2_c_4","op":"IN","values":[1,2]}],"orders":[{"table":"t_2","column":"t_2_c_3","order":"DESC"},{"table":"t_2","column":"t_2_c_4","order":"ASC"}]}'
                     datasource: page.url.get('sourceId'),
                     view: JSON.stringify(vb._view)
                 },
                 dataType: 'json',
                 success: function(res) {
-                    console.log(res)
                     var data = {
                         xData: res.data.data
                     }
@@ -888,6 +880,18 @@
                 check.prop('checked',true).trigger('change');
             }
         });
+
+        // 搜索
+        $('body').on('input','.search_input',function(){
+            var val = $(this).val();
+            $('#tableList li').each(function (i,e) {
+                if($(e).find('.tableList_text').text().indexOf(val)>-1){
+                    $(e).show()
+                }else{
+                    $(e).hide()
+                }
+            })
+        })
 
     }
     $(function() {

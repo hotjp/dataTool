@@ -5,11 +5,12 @@
       <input type="text" class="set_alias" placeholder="别名">
       <p>字段描述</p>
       <input type="text" class="field_description" placeholder="字段描述">
-      <span slot="footer" class="dialog-footer">
-        <el-button class="btn-confirm" type="primary" @click="categorySetColums(1)">确 定</el-button>
-        <el-button class="btn-cancel" @click="categorySetColums(0)">取 消</el-button>
-      </span>
     </form>
+      
+    <span slot="footer" class="dialog-footer">
+      <el-button class="btn-confirm" type="primary" @click="categorySetColums(1)">确 定</el-button>
+      <el-button class="btn-cancel" @click="categorySetColums(0)">取 消</el-button>
+    </span>
   </el-dialog>
 </template>
 <script type="text/babel">
@@ -49,6 +50,8 @@ export default {
 };
 </script>
 <style scoped>
-
+.el-dialog .el-dialog__body{
+  padding-bottom: 20px;
+}
 </style>
 

@@ -3,7 +3,8 @@
     "title": {
       "text": "未命名图表",
       "textStyle":{
-        "fontSize":14
+        "fontSize":14,
+        "color":"#333"
       }
     },
     "xAxis": {

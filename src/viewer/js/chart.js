@@ -36,7 +36,7 @@ if (!id || !id.length) {
 var WIDTH = 'string' == typeof options.width ? initSize(options.width) : '100%';
 var HEIGHT = 'string' == typeof options.height ? initSize(options.height) : '100%';
 
-$(scr).after('<div id="chartWrap" style="height:' + HEIGHT + ';width:' + WIDTH + '" ></div>');
+$(scr).after('<div class="chart_wrap"><div id="chartWrap" style="height:' + HEIGHT + ';width:' + WIDTH + '" ></div></div>');
 getChartData(id);
 
 // 获取单一图表数据
@@ -45,6 +45,9 @@ function getChartData(chartId) {
   getJson('/chart/info.do', {
     chart: chartId
   }, function(res) {
+    if (res.data.background) {
+      $('.chart_wrap').css('background',res.data.background.backgroundColor)
+    }
     if (res.data.option) {
       // TODO: 缺少table
       resize();
@@ -54,7 +57,7 @@ function getChartData(chartId) {
           viewId = res.data.tableName.sql
         $.ajax({
           type: "post",
-          url: "http://119.180.98.134:8880/dataviz/api/query.do",
+          url: vars.api + "/query.do",
           data: {
             view: viewId,
             query: queryInfo

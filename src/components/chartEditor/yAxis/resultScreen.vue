@@ -12,11 +12,11 @@
         <input class="interval_input" type="number" @input="input(0,$event)" placeholder="请输入数值">~
         <input class="interval_input" type="number" @input="input(1,$event)" placeholder="请输入数值">
       </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button class="btn-confirm" type="primary" @click="summaryFilter(1)">确 定</el-button>
-        <el-button class="btn-cancel" @click="summaryFilter(0)">取 消</el-button>
-      </span>
     </form>
+    <span slot="footer" class="dialog-footer">
+      <el-button class="btn-confirm" type="primary" @click="summaryFilter(1)">确 定</el-button>
+      <el-button class="btn-cancel" @click="summaryFilter(0)">取 消</el-button>
+    </span>
   </el-dialog>
 </template>
 <script type="text/babel">

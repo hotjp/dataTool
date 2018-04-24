@@ -21,7 +21,7 @@ body{
 .grid-stack {
     margin: 20px;
 }
-._wrap div{
+._wrap>div{
     height: 100%;
 }
 .chart_box_top{

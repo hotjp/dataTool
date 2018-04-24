@@ -4,47 +4,45 @@
       <el-collapse v-model="activeNames">
         <el-collapse-item title="图例设置" name="1">
           <div>
-            <div>
-              <el-checkbox v-model="legend.show">图例设置</el-checkbox>
-            </div>
-            <div class="fix">
-              <a class="legend_icon legend_icon1" href="javascript:;" @click="rightLegend" title="右侧图例"></a>
-              <a class="legend_icon legend_icon2" href="javascript:;" @click="bottomLegend" title="底部图例"></a>
-              <a class="legend_icon legend_icon3" href="javascript:;" @click="topLegend" title="顶部图例"></a>
-            </div>
-            <div>
-              <el-checkbox v-model="legend.selectedMode">图例是否可选择</el-checkbox>
-            </div>
-            <div class="fix">图例布局</div>
-            <div class="fix">
-              <el-dropdown @command="legendOrient" class="l">
-                <span class="el-dropdown-link">
-                  <span class="font_family_menu">{{legend.orient}}</span>
-                  <i class="el-icon-arrow-down el-icon--right"></i>
+            <el-checkbox v-model="legend.show">图例设置</el-checkbox>
+          </div>
+          <div class="fix">
+            <a class="legend_icon legend_icon1" href="javascript:;" @click="rightLegend" title="右侧图例"></a>
+            <a class="legend_icon legend_icon2" href="javascript:;" @click="bottomLegend" title="底部图例"></a>
+            <a class="legend_icon legend_icon3" href="javascript:;" @click="topLegend" title="顶部图例"></a>
+          </div>
+          <div>
+            <el-checkbox v-model="legend.selectedMode">图例是否可选择</el-checkbox>
+          </div>
+          <div class="fix">图例布局</div>
+          <div class="fix">
+            <el-dropdown @command="legendOrient" class="l">
+              <span class="el-dropdown-link">
+                <span class="font_family_menu">{{legend.orient}}</span>
+                <i class="el-icon-arrow-down el-icon--right"></i>
+              </span>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item command="horizontal">horizontal</el-dropdown-item>
+                <el-dropdown-item command="vertical">vertical</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+            <el-dropdown @command="legendAlign" class="l">
+              <span class="el-dropdown-link">
+                <span class="font_family_menu">
+                  {{legend.align}}
                 </span>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item command="horizontal">horizontal</el-dropdown-item>
-                  <el-dropdown-item command="vertical">vertical</el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-              <el-dropdown @command="legendAlign" class="l">
-                <span class="el-dropdown-link">
-                  <span class="font_family_menu">
-                    {{legend.align}}
-                  </span>
-                  <i class="el-icon-arrow-down el-icon--right"></i>
-                </span>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item command="auto">auto</el-dropdown-item>
-                  <el-dropdown-item command="left">left</el-dropdown-item>
-                  <el-dropdown-item command="right">right</el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-            </div>
-            <div class="fix">标签样式</div>
-            <div class="fix">
-              <font :color.sync="legend.textStyle.color" :fontFamily.sync="legend.textStyle.fontFamily" :fontSize.sync="legend.textStyle.fontSize"></font>
-            </div>
+                <i class="el-icon-arrow-down el-icon--right"></i>
+              </span>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item command="auto">auto</el-dropdown-item>
+                <el-dropdown-item command="left">left</el-dropdown-item>
+                <el-dropdown-item command="right">right</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </div>
+          <div class="fix">标签样式</div>
+          <div class="fix">
+            <font :color.sync="legend.textStyle.color" :fontFamily.sync="legend.textStyle.fontFamily" :fontSize.sync="legend.textStyle.fontSize"></font>
           </div>
           
         </el-collapse-item>

@@ -36,9 +36,7 @@ export default {
     activeNames: ["1"],
     // 图表类型
     type: "treemap",
-    pageName: "面积图",
-    // 第一次进入页面
-    firstFlag: true
+    pageName: "面积图"
   }),
   watch: {
     seriesOption: {
@@ -100,28 +98,16 @@ export default {
         newData.xAxis.data = arr;
       }
       // series.data的数据
-      if (that.firstFlag) {
-        // 第一次进入页面
-        newData.series = seriesTreemap(
-          columns,
-          rows,
-          queryNameKeyX,
-          queryNameKeyY,
-          seriesDefault,
-          that.option.series,
-          true
-        );
-      } else {
-        newData.series = seriesTreemap(
-          columns,
-          rows,
-          queryNameKeyX,
-          queryNameKeyY,
-          seriesDefault
-        );
-      }
+      newData.series = seriesTreemap(
+        columns,
+        rows,
+        queryNameKeyX,
+        queryNameKeyY,
+        seriesDefault,
+        that.option.series,
+        true
+      );
 
-      that.firstFlag = false;
       that.$set(this.seriesOption.option, "grid", seriesDefault.grid);
       that.$set(this.seriesOption.option, "xAxis", newData.xAxis);
       that.$set(this.seriesOption.option, "series", newData.series);

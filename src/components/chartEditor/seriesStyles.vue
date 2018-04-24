@@ -17,8 +17,12 @@
 <script type="text/babel">
 export default{
   data:()=>({
+    // 页面控制
+    // 是否展开所有序列风格
+    isAllStyleShow:false,
     // 默认配置项展开
     activeNames:['1'],
+    // 数据流
     // 系列风格    
     seriesColors: [
       {
@@ -77,9 +81,7 @@ export default{
         active:1,
         show:1        
       }
-    ],
-    // 是否展开所有序列风格
-    isAllStyleShow:false
+    ]
   }),
   watch:{
     charts: {

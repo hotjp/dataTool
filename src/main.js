@@ -2,7 +2,7 @@
  * @Author: hotjp 
  * @Date: 2017-11-06 13:40:14 
  * @Last Modified by: hotjp
- * @Last Modified time: 2018-04-08 13:11:26
+ * @Last Modified time: 2018-04-24 09:38:01
  */
 
 import Stats from 'stats.js';
@@ -30,6 +30,9 @@ Vue.use(ElementUI);
 // 路由
 import router from './router/router';
 import App from './App.vue';
+
+import './assets/js/vars';
+
 
 // 绑定vue
 const app = new Vue({

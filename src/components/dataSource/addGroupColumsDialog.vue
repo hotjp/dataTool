@@ -40,11 +40,13 @@ export default {
   mounted() {
   },
   data: () => ({
+    // 页面控制
     //添加字段显示隐藏标志
     addColFlag: false,
-    addGroupColumsSelectValue: '',
-    //        添加分组字段
+    // 添加分组字段
     addGroupColumsDialogVisible: false,
+    // 数据流
+    addGroupColumsSelectValue: '',
     addGroupColumsSelectOptions: [{
       value: '选项1',
       label: '日期'

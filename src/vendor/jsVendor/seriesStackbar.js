@@ -1,7 +1,7 @@
 ;(function(factory) {
   factory()
 })(function() {
-  function seriesStackbar(columns,rows, queryNameKeyY, seriesDefault, series, flag) {
+  function seriesStackbar(columns,rows, queryNameKeyY, seriesDefault, series,isChartEditor) {
     var nameY = []
     for (var i = 0; i < queryNameKeyY.length; i++) {
       for(var j=0;j<columns.length;j++){
@@ -26,7 +26,6 @@
     } else {
       // chart_eitor组件用
       var arr = [];
-      if(flag){
         for (var i = 0; i < queryNameKeyY.length; i++) {
           var copy = JSON.parse(JSON.stringify(seriesDefault));
           arr.push({
@@ -35,7 +34,6 @@
             }),
             type: 'bar',
             itemStyle: (function(){
-              // TODO: if(series)最好每个类型都加
               if(series && series.length){
                 var itemStyle;                
                 for(var j=0;j<series.length;j++){
@@ -54,20 +52,7 @@
             stack: '总量'
           });
         }
-      }else{
-        for (var i = 0; i < queryNameKeyY.length; i++) {
-          var copy = JSON.parse(JSON.stringify(seriesDefault));
-          arr.push({
-            data: rows.map(function(x){
-              return x[queryNameKeyY[i]]
-            }),
-            type: 'bar',
-            itemStyle: copy.itemStyle,
-            name: nameY[i],
-            stack: '总量'
-          });
-        } 
-      }
+      
       return arr
     }
   }

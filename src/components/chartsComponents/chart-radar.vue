@@ -3,8 +3,8 @@
   <el-collapse-item title="雷达图" name="1">
     <div class="comp_group fix">
       <div v-for="(item,index) in seriesOption.option.series" :key="index" class="colums_list">
-        {{item.name}}
         <colorPicker class="color_picker" :color.sync="item.itemStyle.normal.color" ></colorPicker>
+        <p class="l item_name">{{item.name}}</p>
       </div>
     </div>
   </el-collapse-item>
@@ -41,9 +41,7 @@ export default {
     activeNames: ["1"],
     // 图表类型
     type: "radar",
-    pageName: "雷达图",
-    // 第一次进入页面
-    firstFlag: true
+    pageName: "雷达图"
   }),
   watch: {
     seriesOption: {
@@ -56,6 +54,17 @@ export default {
       // 父级传来的图表数据
       handler: function(newVal, oldVal) {
         this.dataChange();
+      },
+      deep: true
+    },
+    "seriesOption.option.series": {
+      // 父级传来的图表数据
+      handler: function(newVal, oldVal) {
+        for (let i = 0; i < newVal.length; i++) {
+          if (newVal[i].itemStyle.normal.color == "transparent") {
+            this.seriesOption.option.series[i].itemStyle.normal.color = null;
+          }
+        }
       },
       deep: true
     }
@@ -105,27 +114,16 @@ export default {
         // that.seriesOption.option.xAxis.data = arr;
       }
       // series.data的数据
-      if (that.firstFlag) {
-        // 第一次进入页面
-        newData.series = seriesRadar(
-          columns,
-          rows,
-          queryNameKeyX,
-          queryNameKeyY,
-          seriesDefault,
-          that.option.series,
-          true
-        );
-      } else {
-        // 新建
-        newData.series = seriesRadar(
-          columns,
-          rows,
-          queryNameKeyX,
-          queryNameKeyY,
-          seriesDefault
-        );
-      }
+      newData.series = seriesRadar(
+        columns,
+        rows,
+        queryNameKeyX,
+        queryNameKeyY,
+        seriesDefault,
+        that.option.series,
+        true
+      );
+
       newData.radar = {
         // shape: 'circle',
         indicator: null
@@ -148,7 +146,6 @@ export default {
         });
       }
 
-      that.firstFlag = false;
       that.$set(this.seriesOption.option, "grid", seriesDefault.grid);
       that.$set(this.seriesOption.option, "xAxis", newData.xAxis);
       that.$set(this.seriesOption.option, "series", newData.series);

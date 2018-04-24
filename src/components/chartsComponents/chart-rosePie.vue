@@ -2,10 +2,10 @@
 <el-collapse v-model="activeNames" id="chartsComponents">
   <el-collapse-item title="南丁格尔玫瑰图" name="1">
     <div class="comp_group fix">
-      内径：
+      内径（百分比）：
       <el-slider v-model="radius[0]" @change="radiusInside"></el-slider>
       <br>
-      外径：
+      外径（百分比）：
       <el-slider v-model="radius[1]" @change="radiusOutside"></el-slider>
     </div>
     <div class="comp_group fix">
@@ -63,8 +63,6 @@ export default {
     // 图表类型
     type: "pie",
     pageName: "南丁格尔玫瑰图",
-    // 第一次进入页面
-    firstFlag: true,
     // 玫瑰图类型
     roseType: seriesDefault.roseType,
     // 半径
@@ -115,35 +113,23 @@ export default {
       });
 
       // series.data的数据
-      if (that.firstFlag) {
-        // 第一次进入页面
-        if (this.option.series) {
-          for (let i = 0; i < this.option.series.length; i++) {
-            this.option.series[i].radius = this.radius
-              ? this.radius
-              : seriesDefault.radius;
-          }
+      if (this.option.series) {
+        for (let i = 0; i < this.option.series.length; i++) {
+          this.option.series[i].radius = this.radius
+            ? this.radius
+            : seriesDefault.radius;
         }
-        that.seriesOption.option.series = seriesRosePie(
-          columns,
-          rows,
-          queryNameKeyX,
-          queryNameKeyY,
-          seriesDefault,
-          that.option.series,
-          true
-        );
-      } else {
-        that.seriesOption.option.series = seriesRosePie(
-          columns,
-          rows,
-          queryNameKeyX,
-          queryNameKeyY,
-          seriesDefault
-        );
       }
+      that.seriesOption.option.series = seriesRosePie(
+        columns,
+        rows,
+        queryNameKeyX,
+        queryNameKeyY,
+        seriesDefault,
+        that.option.series,
+        true
+      );
 
-      that.firstFlag = false;
       that.$set(this.seriesOption.option, "grid", seriesDefault.grid);
       this.$emit("getSeries", that.seriesOption.option);
     },
