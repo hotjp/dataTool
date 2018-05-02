@@ -23,9 +23,14 @@ function getCookie(c_name) {
 function getJson(url, param, success, error) {
   ajax({
     type: 'POST',
-    url: vars.api + url,
+    url: vars.api + url + '?origin='+location.origin,
     data: param,
+    xhrFields: {  
+      withCredentials: true  
+    },
     dataType: 'json',
+    // jsonp:'_jsonp',
+    // jsonpCallback: 'jsonp'+Math.floor(Math.random() * 99999999),
     success: function (data) {
       if (typeof success == 'function') {
         success(data);

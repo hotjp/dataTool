@@ -220,6 +220,7 @@ audio:not([controls]),
 }
 #dashboard .dashboard_main .dash_wrap {
   overflow: hidden;
+  padding-bottom: 80px;
 }
 #dashboard .dashboard_main .grid-content {
   position: relative;

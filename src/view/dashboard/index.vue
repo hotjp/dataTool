@@ -34,9 +34,10 @@
                 <div class="_wrap" :style="item.background">
                   <div class="chart_tit">{{item.title}}</div>
                   <div class="edit_bar fix">
-                    <router-link class="edit_bar_btn r el-icon-edit" :to="'/chart_editor/'+item.id" alt="编辑"></router-link>
-                    <span class=" edit_bar_btn r el-icon-refresh" @click="onClickRefreshChartData(item.id,index,$event)" alt="刷新"></span>
-                    <span class="el-icon-delete r edit_bar_btn" @click="onClickDeleteChart(item.id,index,$event)" alt="删除"></span>
+                    <!-- TODO: 普通图表和3D图表判断，跳转不同页面 -->
+                    <router-link class="edit_bar_btn r el-icon-edit" :to="'/chart_editor/'+item.id" title="编辑"></router-link>
+                    <span class=" edit_bar_btn r el-icon-refresh" @click="onClickRefreshChartData(item.id,index,$event)" title="刷新"></span>
+                    <span class="el-icon-delete r edit_bar_btn" @click="onClickDeleteChart(item.id,index,$event)" title="删除"></span>
                   </div>
                   <tableView v-if="item.type =='table'" class="full table_container" :myMessage="item.chartData"></tableView>
                   <IEcharts v-else class="full charts_container"  :notMerge="true" :resizable="true" :option="item.option" :loading="item.loading"></IEcharts>
@@ -50,7 +51,7 @@
 
     <el-dialog class="common_dialog chart_add_dialog" title="添加新图表" :visible.sync="addChartVisible">
       <a class="add_new" href="javascript:;" @click="onClickAddNewChart"><i class="el-icon-plus"></i>新建图表</a>
-      <!-- <router-link class="new_built" to="/chart_editor/" alt="新建图表"><i class="el-icon-plus"></i>新建图表</router-link> -->
+      <!-- <router-link class="new_built" to="/chart_editor/" title="新建图表"><i class="el-icon-plus"></i>新建图表</router-link> -->
       <div class="tit fix">选择已有图表
         <div class="search_box r">
           <i class="el-icon-search"></i>
@@ -68,7 +69,7 @@
       </span>
     </el-dialog>
 
-    <el-dialog class="common_dialog chart_add_dialog" title="选择数据视图" :visible.sync="addNewChartVisible" >
+    <el-dialog class="common_dialog chart_add_dialog" title="新建图表-选择数据视图" :visible.sync="addNewChartVisible" >
       <div class="add_new" href="javascript:;" ><router-link to="/dataview">新建数据视图</router-link></div>
       <div class="tit fix">选择已有视图
         <div class="search_box r">
@@ -106,46 +107,47 @@
 </template>
 <script>
 // 引入公用配置
-import { getJson } from "../../router/utils";
+import { getJson } from '../../router/utils';
 // 引入组件
-import IEcharts from "vue-echarts-v3/src/full";
-import "echarts-wordcloud";
-import dashboardDir from "../../components/dashboard/dashboardDir.vue";
-import tableView from "../../components/chartEditor/tableView.vue";
+import IEcharts from 'vue-echarts-v3/src/full';
+import 'echarts-wordcloud';
+import 'echarts-gl';
+import dashboardDir from '../../components/dashboard/dashboardDir.vue';
+import tableView from '../../components/chartEditor/tableView.vue';
 import colorPicker from '../../components/chartEditor/propSelect/colorPicker.vue';
 
 // 引入拖拽网格
-import "../../assets/css/gridstack.min.css";
-import "../../assets/css/gridstack-extra.min.css";
-import "../../assets/js/jquery-1.11.0";
-import "../../assets/js/jquery-ui.min";
-import "../../assets/js/gridstack";
-import "../../assets/js/gridstack.jQueryUI";
+import '../../assets/css/gridstack.min.css';
+import '../../assets/css/gridstack-extra.min.css';
+import '../../assets/js/jquery-1.11.0';
+import '../../assets/js/jquery-ui.min';
+import '../../assets/js/gridstack';
+import '../../assets/js/gridstack.jQueryUI';
 // 引入图表类型
-import "../../vendor/jsVendor/seriesBar.js";
-import seriesBarDefault from "../../vendor/seriesBar.json";
-import "../../vendor/jsVendor/seriesLine.js";
-import seriesLineDefault from "../../vendor/seriesLine.json";
-import "../../vendor/jsVendor/seriesArea.js";
-import seriesAreaDefault from "../../vendor/seriesArea.json";
-import "../../vendor/jsVendor/seriesPie.js";
-import seriesPieDefault from "../../vendor/seriesPie.json";
-import "../../vendor/jsVendor/seriesStackbar.js";
-import "../../vendor/jsVendor/seriesFunnel.js";
-import seriesFunnelDefault from "../../vendor/seriesFunnel.json";
-import "../../vendor/jsVendor/seriesRosePie.js";
-import seriesRosePieDefault from "../../vendor/seriesRosePie.json";
-import "../../vendor/jsVendor/seriesRadar.js";
-import seriesRadarDefault from "../../vendor/seriesRadar.json";
-import "../../vendor/jsVendor/seriesTreemap.js";
-import seriesTreemapDefault from "../../vendor/seriesTreemap.json";
-import "../../vendor/jsVendor/seriesWaterfall.js";
-import seriesWaterfallDefault from "../../vendor/seriesWaterfall.json";
-import "../../vendor/jsVendor/seriesGauge.js";
-import seriesGaugeDefault from "../../vendor/seriesGauge.json";
-import "../../vendor/jsVendor/seriesWordCloud.js";
-import seriesWordCloudDefault from "../../vendor/seriesWordCloud.json";
-import "../../vendor/jsVendor/seriesPercentStackbar.js";
+import '../../vendor/jsVendor/seriesBar.js';
+import seriesBarDefault from '../../vendor/seriesBar.json';
+import '../../vendor/jsVendor/seriesLine.js';
+import seriesLineDefault from '../../vendor/seriesLine.json';
+import '../../vendor/jsVendor/seriesArea.js';
+import seriesAreaDefault from '../../vendor/seriesArea.json';
+import '../../vendor/jsVendor/seriesPie.js';
+import seriesPieDefault from '../../vendor/seriesPie.json';
+import '../../vendor/jsVendor/seriesStackbar.js';
+import '../../vendor/jsVendor/seriesFunnel.js';
+import seriesFunnelDefault from '../../vendor/seriesFunnel.json';
+import '../../vendor/jsVendor/seriesRosePie.js';
+import seriesRosePieDefault from '../../vendor/seriesRosePie.json';
+import '../../vendor/jsVendor/seriesRadar.js';
+import seriesRadarDefault from '../../vendor/seriesRadar.json';
+import '../../vendor/jsVendor/seriesTreemap.js';
+import seriesTreemapDefault from '../../vendor/seriesTreemap.json';
+import '../../vendor/jsVendor/seriesWaterfall.js';
+import seriesWaterfallDefault from '../../vendor/seriesWaterfall.json';
+import '../../vendor/jsVendor/seriesGauge.js';
+import seriesGaugeDefault from '../../vendor/seriesGauge.json';
+import '../../vendor/jsVendor/seriesWordCloud.js';
+import seriesWordCloudDefault from '../../vendor/seriesWordCloud.json';
+import '../../vendor/jsVendor/seriesPercentStackbar.js';
 
 export default {
   components: { IEcharts, dashboardDir, tableView, colorPicker},
@@ -155,9 +157,9 @@ export default {
     that.loadDashboard();
     // 加载已有chart 列表
     getJson(
-      "/chart/list.do",
+      '/chart/list.do',
       {
-        folder: "/"
+        folder: '/'
       },
       function(res) {
         if (res.success) {
@@ -174,9 +176,9 @@ export default {
     );
     // 选择表
     getJson(
-      "/dataview/list.do",
+      '/dataview/list.do',
       {
-        folder: "",
+        folder: '',
         dataview: true
       },
       function(res) {
@@ -188,7 +190,7 @@ export default {
   },
   destroyed() {
     // 销毁后
-    window.vm = null
+    window.vm = null;
   },
   data: () => ({
     // 页面控制
@@ -215,9 +217,9 @@ export default {
     // 拖拽栅格
     dash: null,
     // 仪表盘名称
-    dashboardName: "",
+    dashboardName: '',
     // 仪表盘id
-    dashboardId: "",
+    dashboardId: '',
     // 仪表盘背景色
     dashboardBgcolor:'',    
     // dashboard 列表
@@ -227,33 +229,33 @@ export default {
     // 已有chart,添加时用
     charts: [],
     // 新建仪表盘名称
-    newDashboardName: "",
+    newDashboardName: '',
     // 编辑仪表盘名称
-    editTitle: "",
+    editTitle: '',
     // 编辑仪表盘ID
-    editId: "",
+    editId: '',
     // 编辑仪表盘索引
-    editIndex: "",
+    editIndex: '',
     // 数据表
     listFolders: {
       list: [
         {
-          name: "",
+          name: '',
           children: []
         }
       ],
       defaultProps: {
-        children: "",
-        label: "name"
+        children: '',
+        label: 'name'
       },
       // 选择的id
-      checkId: ""
+      checkId: ''
     },
     // 新建图表数据
     newCharts: {
       tableName: {
-        sql: "",
-        name: ""
+        sql: '',
+        name: ''
       }
     },
     // 已有图表搜索
@@ -289,8 +291,8 @@ export default {
     // 设置图表禁止和允许拖拽缩放
     toggleGridEdit(e) {
       if (e) {
-        this.dash.movable(".grid-stack-item", true);
-        this.dash.resizable(".grid-stack-item", true);
+        this.dash.movable('.grid-stack-item', true);
+        this.dash.resizable('.grid-stack-item', true);
       } else {
         this.dash.disable();
       }
@@ -298,22 +300,22 @@ export default {
     // 加载拖拽栅格
     loadGrid() {
       let that = this;
-      $("#dash").gridstack(that.dashOptions);
-      that.dash = $("#dash").data("gridstack");
+      $('#dash').gridstack(that.dashOptions);
+      that.dash = $('#dash').data('gridstack');
       that.toggleGridEdit();
     },
     // 加载 dashboard 列表
     loadDashboard() {
       let that = this,
         params = that.$route.params;
-      getJson("/dashboard/list.do", {}, function(res) {
+      getJson('/dashboard/list.do', {}, function(res) {
         if (res.success) {
           that.dashboardList = Object.assign([], res.data);
           if (!params.viewId) {
             // 获取不到当前仪表盘id时默认取第一个
             that.$router.replace({
-              path: "/empty",
-              query: { link: "/dashboard/" + that.dashboardList[0].id }
+              path: '/empty',
+              query: { link: '/dashboard/' + that.dashboardList[0].id }
             });
             return;
           } else {
@@ -364,19 +366,19 @@ export default {
           that.chartList[i].background = result[i].background
             ? result[i].background
             : {
-                backgroundColor: "#fff",
-                backgroundRepeat: "no-repeat",
-                backgroundImage: ""
-              };
-              if(that.chartList[i].option){
-                that.chartList[i].title = that.chartList[i].option.title
-                  ? that.chartList[i].option.title.text
-                  : "";
-                  // 清空title，把title提出来
-                that.chartList[i].option.title = "";
-              }else{
-                that.chartList[i].title=''
-              }
+              backgroundColor: '#fff',
+              backgroundRepeat: 'no-repeat',
+              backgroundImage: ''
+            };
+          if(that.chartList[i].option){
+            that.chartList[i].title = that.chartList[i].option.title
+              ? that.chartList[i].option.title.text
+              : '';
+            // 清空title，把title提出来
+            that.chartList[i].option.title = '';
+          }else{
+            that.chartList[i].title='';
+          }
           
           // 手动清空series.data里数据
           if (that.chartList[i].option && that.chartList[i].option.series) {
@@ -389,7 +391,7 @@ export default {
         that.loadGrid();
         that.toggleFullScreen();        
         that.lazyload();
-        return
+        return;
         // 以下为不用懒加载的方式
         for (let i = 0; i < that.chartList.length; i++) {
           chartDataPms.push(
@@ -422,7 +424,7 @@ export default {
           }
 
           that.toggleFullScreen();
-          if ("function" == typeof callback) {
+          if ('function' == typeof callback) {
             callback();
           }
         });
@@ -431,15 +433,15 @@ export default {
     // 获取单一图表数据,i是在索引中的顺序
     getChartData(chartId, i, resolve, reject) {
       let that = this;
-      if ("function" != typeof resolve) {
+      if ('function' != typeof resolve) {
         resolve = that.noop;
       }
-      if ("function" != typeof reject) {
+      if ('function' != typeof reject) {
         reject = that.noop;
       }
       // 查询图表源 数据
       getJson(
-        "/chart/info.do",
+        '/chart/info.do',
         {
           chart: chartId
         },
@@ -455,7 +457,7 @@ export default {
     getChartSeriesData(sql, queryInfo, index, type, resolve, reject) {
       let that = this;
       getJson(
-        "/query.do",
+        '/query.do',
         {
           view: sql,
           query: queryInfo
@@ -480,7 +482,7 @@ export default {
       let that = this,
         loadingInstance;
       loadingInstance = that.$loading({
-        target: $($event.target).closest("._wrap")[0]
+        target: $($event.target).closest('._wrap')[0]
       });
       // TODO: loading使用elementUI的，但是关闭事件用了延时
       // that.chartList[i].loading = true;
@@ -489,7 +491,7 @@ export default {
 
       // 查询图表源 数据
       getJson(
-        "/chart/info.do",
+        '/chart/info.do',
         {
           chart: chartId
         },
@@ -504,9 +506,9 @@ export default {
             that.chartList[i].query = data.data.query;
             that.chartList[i].title = that.chartList[i].option.title
               ? that.chartList[i].option.title.text
-              : "";
+              : '';
             // 清空title，把title提出来
-            that.chartList[i].option.title = "";
+            that.chartList[i].option.title = '';
             // 手动清空series.data里数据
             if (that.chartList[i].option && that.chartList[i].option.series) {
               for (let j = 0; j < that.chartList[i].option.series.length; j++) {
@@ -514,7 +516,7 @@ export default {
               }
             }
             getJson(
-              "/query.do",
+              '/query.do',
               {
                 view: data.data.tableName.sql,
                 query: JSON.stringify(data.data.query)
@@ -543,14 +545,15 @@ export default {
       this.newCharts.tableName.name = data.name;
     },
     // 新建图表
+    // TODO: 3D图表需增加标识字段和type
     newchartClick(e) {
       let that = this;
       that.addNewChartVisible = false;
       if (e) {
         getJson(
-          "/chart/save.do",
+          '/chart/save.do',
           {
-            folder: "/",
+            folder: '/',
             config: JSON.stringify(that.newCharts)
           },
           function(data) {
@@ -562,13 +565,13 @@ export default {
                   layout: []
                 };
               // 获取各图表x,y,w,h
-              $(".grid-stack-item").each(function(i, e) {
+              $('.grid-stack-item').each(function(i, e) {
                 list.layout.push({
-                  id: $(e).data("id"),
-                  x: $(e).data("gs-x"),
-                  y: $(e).data("gs-y"),
-                  width: $(e).data("gs-width"),
-                  height: $(e).data("gs-height"),
+                  id: $(e).data('id'),
+                  x: $(e).data('gs-x'),
+                  y: $(e).data('gs-y'),
+                  width: $(e).data('gs-width'),
+                  height: $(e).data('gs-height'),
                   isAutoPosition: false
                 });
               });
@@ -581,13 +584,13 @@ export default {
                 isAutoPosition: false
               });
               getJson(
-                "/dashboard/save.do",
+                '/dashboard/save.do',
                 {
                   config: JSON.stringify(list)
                 },
                 function(res) {
                   if (res.success) {
-                    that.$router.push("/chart_editor/" + data.data.id);
+                    that.$router.push('/chart_editor/' + data.data.id);
                   }
                 }
               );
@@ -607,18 +610,18 @@ export default {
           layout: []
         };
       // 获取各图表x,y,w,h
-      $(".grid-stack-item").each(function(i, e) {
+      $('.grid-stack-item').each(function(i, e) {
         list.layout.push({
-          id: $(e).data("id"),
-          x: $(e).data("gs-x"),
-          y: $(e).data("gs-y"),
-          width: $(e).data("gs-width"),
-          height: $(e).data("gs-height"),
+          id: $(e).data('id'),
+          x: $(e).data('gs-x'),
+          y: $(e).data('gs-y'),
+          width: $(e).data('gs-width'),
+          height: $(e).data('gs-height'),
           isAutoPosition: false
         });
       });
       getJson(
-        "/dashboard/save.do",
+        '/dashboard/save.do',
         {
           config: JSON.stringify(list)
         },
@@ -627,7 +630,7 @@ export default {
             if (callback) {
               callback();
             } else {
-              that.$message({ message: "保存成功", type: "success" });
+              that.$message({ message: '保存成功', type: 'success' });
             }
             that.editStatus = false;
           }
@@ -638,27 +641,27 @@ export default {
     addDashboard() {
       let that = this;
       if (!that.newDashboardName) {
-        that.$message({ message: "请输入仪表名", type: "error" });
+        that.$message({ message: '请输入仪表名', type: 'error' });
         return;
       }
       let list = {
-        id: "",
+        id: '',
         text: that.newDashboardName,
         layout: []
       };
       getJson(
-        "/dashboard/save.do",
+        '/dashboard/save.do',
         {
           config: JSON.stringify(list)
         },
         function(res) {
           if (res.success) {
-            that.$message({ message: "新建成功", type: "success" });
+            that.$message({ message: '新建成功', type: 'success' });
             that.dashboardDialogVisible = false;
             // that.$router.replace({ path: '/dashboard/'+resData.data.id });
             that.$router.replace({
-              path: "/empty",
-              query: { link: "/dashboard/" + res.data.id }
+              path: '/empty',
+              query: { link: '/dashboard/' + res.data.id }
             });
           }
         }
@@ -669,11 +672,11 @@ export default {
       this.addChartVisible = !this.addChartVisible;
     },
     onClickAddNewChart(){
-      this.addNewChartVisible = true
+      this.addNewChartVisible = true;
     },
     // 关闭仪表盘编辑弹窗
     closeEditDialog(){
-       this.editDialogVisible = false
+      this.editDialogVisible = false;
     },
     // 打开/关闭设计模式
     toggleEdit() {
@@ -689,7 +692,7 @@ export default {
     preview() {
       // 预览前先保存
       let that = this;
-      var href = vars.src + "/viewer/dashboard.html?id=" + that.dashboardId;
+      var href = vars.src + '/viewer/dashboard.html?id=' + that.dashboardId;
       that.saveDashboard(openPrevView);
       function openPrevView() {
         window.open(href);
@@ -722,12 +725,12 @@ export default {
       }
       for (let i = 0; i < that.chartList.length; i++) {
         if (chartId == that.chartList[i].id) {
-          that.$message({ message: "不能添加相同的图表", type: "warning" });
+          that.$message({ message: '不能添加相同的图表', type: 'warning' });
           return false;
         }
       }
       if (!chartId) {
-        that.$message({ message: "没有选中的图表", type: "warning" });
+        that.$message({ message: '没有选中的图表', type: 'warning' });
       } else {
         that.addChartVisible = false;
         that.toggleFullScreen(true);
@@ -740,7 +743,7 @@ export default {
           isAutoPosition: true
         });
         that.dash.destroy(false);
-        $("#dash").data("gridstack", "");
+        $('#dash').data('gridstack', '');
         that.getDashboardData(that.saveDashboard);
       }
     },
@@ -760,8 +763,8 @@ export default {
     itemClick(data) {
       if(data!= this.dashboardId){
         this.$router.push({
-          path: "/empty",
-          query: { link: "/dashboard/" + data }
+          path: '/empty',
+          query: { link: '/dashboard/' + data }
         });
       }
       
@@ -774,7 +777,7 @@ export default {
         that.saveDashboard(callback);
       }, 300);
       function callback() {
-        that.$message({ message: "删除成功", type: "success" });
+        that.$message({ message: '删除成功', type: 'success' });
       }
     },
     // 编辑标题弹窗显示
@@ -794,14 +797,14 @@ export default {
         layout: this.dashboardList[that.editIndex].layout
       };
       getJson(
-        "/dashboard/save.do",
+        '/dashboard/save.do',
         {
           config: JSON.stringify(list)
         },
         function(res) {
           var resData = res.data;
           if (res.success) {
-            that.$message({ message: "保存成功", type: "success" });
+            that.$message({ message: '保存成功', type: 'success' });
             if (that.editId == that.$route.params.viewId) {
               list.active = true;
               that.dashboardName = that.editTitle;
@@ -841,186 +844,186 @@ export default {
       }
       // 根据type选择处理方式
       switch (type) {
-        case "bar":
-          that.chartList[index].option.series = Object.assign(
-            [],
-            seriesBar(
-              columns,
-              rows,
-              queryNameKeyX,
-              queryNameKeyY,
-              seriesBarDefault,
-              that.chartList[index].option.series
-            )
-          );
-          break;
-        case "line":
-          that.chartList[index].option.series = Object.assign(
-            [],
-            seriesLine(
-              columns,
-              rows,
-              queryNameKeyX,
-              queryNameKeyY,
-              {},
-              that.chartList[index].option.series
-            )
-          );
-          break;
-        case "pie":
-          that.chartList[index].option.series = Object.assign(
-            [],
-            seriesPie(
-              columns,
-              rows,
-              queryNameKeyX,
-              queryNameKeyY,
-              seriesPieDefault,
-              that.chartList[index].option.series
-            )
-          );
-          break;
-        case "area":
-          that.chartList[index].option.series = Object.assign(
-            [],
-            seriesArea(
-              columns,
-              rows,
-              queryNameKeyX,
-              queryNameKeyY,
-              seriesAreaDefault,
-              that.chartList[index].option.series
-            )
-          );
-          break;
-        case "stackbar":
-          that.chartList[index].option.series = Object.assign(
-            [],
-            seriesStackbar(
-              columns,
-              rows,
-              queryNameKeyY,
-              seriesBarDefault,
-              that.chartList[index].option.series
-            )
-          );
-          break;
-        case "funnel":
-          that.chartList[index].option.series = Object.assign(
-            [],
-            seriesFunnel(
-              columns,
-              rows,
-              queryNameKeyX,
-              queryNameKeyY,
-              seriesFunnelDefault,
-              that.chartList[index].option.series
-            )
-          );
-          break;
-        case "rosePie":
-          that.chartList[index].option.series = Object.assign(
-            [],
-            seriesRosePie(
-              columns,
-              rows,
-              queryNameKeyX,
-              queryNameKeyY,
-              seriesRosePieDefault,
-              that.chartList[index].option.series
-            )
-          );
-          break;
-        case "radar":
-          that.chartList[index].option.series = Object.assign(
-            [],
-            seriesRadar(
-              columns,
-              rows,
-              queryNameKeyX,
-              queryNameKeyY,
-              seriesRadarDefault,
-              that.chartList[index].option.series
-            )
-          );
-          break;
-        case "treemap":
-          that.chartList[index].option.series = Object.assign(
-            [],
-            seriesTreemap(
-              columns,
-              rows,
-              queryNameKeyX,
-              queryNameKeyY,
-              seriesTreemapDefault,
-              that.chartList[index].option.series
-            )
-          );
-          break;
-        case "waterfall":
-          that.chartList[index].option.series = Object.assign(
-            [],
-            seriesWaterfall(
-              columns,
-              rows,
-              queryNameKeyX,
-              queryNameKeyY,
-              seriesWaterfallDefault,
-              that.chartList[index].option.series
-            )
-          );
-          break;
-        case "gauge":
-          that.chartList[index].option.series = Object.assign(
-            [],
-            seriesGauge(
-              columns,
-              rows,
-              queryNameKeyX,
-              queryNameKeyY,
-              seriesWaterfallDefault,
-              that.chartList[index].option.series
-            )
-          );
-          break;
-        case "wordCloud":
-          that.chartList[index].option.series = Object.assign(
-            [],
-            seriesWordCloud(
-              columns,
-              rows,
-              queryNameKeyX,
-              queryNameKeyY,
-              seriesWaterfallDefault,
-              that.chartList[index].option.series
-            )
-          );
-          break;
-        case "percentStackbar":
-          that.chartList[index].option.series = Object.assign(
-            [],
-            seriesPercentStackbar(
-              columns,
-              rows,
-              queryNameKeyY,
-              seriesWaterfallDefault,
-              that.chartList[index].option.series
-            )
-          );
-          break;
-        case "table":
-          this.chartList[index].chartData = data.data;
-          break;
-        default:
-          console.warn("类型错误！");
+      case 'bar':
+        that.chartList[index].option.series = Object.assign(
+          [],
+          seriesBar(
+            columns,
+            rows,
+            queryNameKeyX,
+            queryNameKeyY,
+            seriesBarDefault,
+            that.chartList[index].option.series
+          )
+        );
+        break;
+      case 'line':
+        that.chartList[index].option.series = Object.assign(
+          [],
+          seriesLine(
+            columns,
+            rows,
+            queryNameKeyX,
+            queryNameKeyY,
+            {},
+            that.chartList[index].option.series
+          )
+        );
+        break;
+      case 'pie':
+        that.chartList[index].option.series = Object.assign(
+          [],
+          seriesPie(
+            columns,
+            rows,
+            queryNameKeyX,
+            queryNameKeyY,
+            seriesPieDefault,
+            that.chartList[index].option.series
+          )
+        );
+        break;
+      case 'area':
+        that.chartList[index].option.series = Object.assign(
+          [],
+          seriesArea(
+            columns,
+            rows,
+            queryNameKeyX,
+            queryNameKeyY,
+            seriesAreaDefault,
+            that.chartList[index].option.series
+          )
+        );
+        break;
+      case 'stackbar':
+        that.chartList[index].option.series = Object.assign(
+          [],
+          seriesStackbar(
+            columns,
+            rows,
+            queryNameKeyY,
+            seriesBarDefault,
+            that.chartList[index].option.series
+          )
+        );
+        break;
+      case 'funnel':
+        that.chartList[index].option.series = Object.assign(
+          [],
+          seriesFunnel(
+            columns,
+            rows,
+            queryNameKeyX,
+            queryNameKeyY,
+            seriesFunnelDefault,
+            that.chartList[index].option.series
+          )
+        );
+        break;
+      case 'rosePie':
+        that.chartList[index].option.series = Object.assign(
+          [],
+          seriesRosePie(
+            columns,
+            rows,
+            queryNameKeyX,
+            queryNameKeyY,
+            seriesRosePieDefault,
+            that.chartList[index].option.series
+          )
+        );
+        break;
+      case 'radar':
+        that.chartList[index].option.series = Object.assign(
+          [],
+          seriesRadar(
+            columns,
+            rows,
+            queryNameKeyX,
+            queryNameKeyY,
+            seriesRadarDefault,
+            that.chartList[index].option.series
+          )
+        );
+        break;
+      case 'treemap':
+        that.chartList[index].option.series = Object.assign(
+          [],
+          seriesTreemap(
+            columns,
+            rows,
+            queryNameKeyX,
+            queryNameKeyY,
+            seriesTreemapDefault,
+            that.chartList[index].option.series
+          )
+        );
+        break;
+      case 'waterfall':
+        that.chartList[index].option.series = Object.assign(
+          [],
+          seriesWaterfall(
+            columns,
+            rows,
+            queryNameKeyX,
+            queryNameKeyY,
+            seriesWaterfallDefault,
+            that.chartList[index].option.series
+          )
+        );
+        break;
+      case 'gauge':
+        that.chartList[index].option.series = Object.assign(
+          [],
+          seriesGauge(
+            columns,
+            rows,
+            queryNameKeyX,
+            queryNameKeyY,
+            seriesWaterfallDefault,
+            that.chartList[index].option.series
+          )
+        );
+        break;
+      case 'wordCloud':
+        that.chartList[index].option.series = Object.assign(
+          [],
+          seriesWordCloud(
+            columns,
+            rows,
+            queryNameKeyX,
+            queryNameKeyY,
+            seriesWaterfallDefault,
+            that.chartList[index].option.series
+          )
+        );
+        break;
+      case 'percentStackbar':
+        that.chartList[index].option.series = Object.assign(
+          [],
+          seriesPercentStackbar(
+            columns,
+            rows,
+            queryNameKeyY,
+            seriesWaterfallDefault,
+            that.chartList[index].option.series
+          )
+        );
+        break;
+      case 'table':
+        this.chartList[index].chartData = data.data;
+        break;
+      default:
+        console.warn('类型错误！');
       }
-      that.chartList[index].option = Object.assign({},that.chartList[index].option)
-      that.$set(that.chartList,index,that.chartList[index])
+      that.chartList[index].option = Object.assign({},that.chartList[index].option);
+      that.$set(that.chartList,index,that.chartList[index]);
     },
     // 选择视图搜索
     filterView(value,data){
       if (!value) return true;
-        return data.label.indexOf(value) !== -1;
+      return data.label.indexOf(value) !== -1;
     },
     // 懒加载
     lazyload(){
@@ -1038,10 +1041,10 @@ export default {
             that.chartList[index].isload=true;
             let type = that.chartList[index].type ;
             let queryInfo = JSON.stringify(that.chartList[index].query );
-            let sql =that.chartList[index].sql
+            let sql =that.chartList[index].sql;
             that.getChartSeriesData(sql, queryInfo, index, type);
           }
-        })
+        });
       }).trigger('scroll');
     }
   }

@@ -105,7 +105,6 @@ export default {
         }
       }
     },
-
     init() {
       let that = this;
       if(this.myMessage){ 

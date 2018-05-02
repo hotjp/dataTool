@@ -10,10 +10,10 @@
       <div class="fix dirTreeTitle">
         数据视图
         <i class="el-icon-more r"></i>
-        <i class="el-icon-plus r" @click="addSouch()" ></i>
+        <i class="el-icon-plus r" @click="addSouch()"></i>
         <div class="search_box r">
           <i class="el-icon-search"></i>
-          <input type="text"  v-model="search" class="search_input">
+          <input type="text" v-model="search" class="search_input">
         </div>
       </div>
 
@@ -25,8 +25,8 @@
                 <i class="el-icon-document"></i>
                 {{child.name}}
               </div>
-              <i class="el-icon-more" @mouseenter="mouseenter(childIndex)" @mouseleave="mouseleave()" ></i>
-              <div class="cover" @mouseenter="mouseenter(childIndex)" @mouseleave="mouseleave()" >
+              <i class="el-icon-more" @mouseenter="mouseenter(childIndex)" @mouseleave="mouseleave()"></i>
+              <div class="cover" @mouseenter="mouseenter(childIndex)" @mouseleave="mouseleave()">
                 <p class="cover_item" @click="del(child)">删除</p>
               </div>
             </div>
@@ -45,23 +45,25 @@
       </span>
     </el-dialog>
 
-    <el-dialog class="common_dialog chart_add_dialog" title="添加数据视图" :visible.sync="addVisible" >
+    <el-dialog class="common_dialog chart_add_dialog" title="添加数据视图" :visible.sync="addVisible">
       <form action onsubmit="return false">
-        <el-input v-model="newName.text" class="new_name" type="text" placeholder="请输入视图名称"></el-input><i class="required">*</i>
+        <el-input v-model="newName.text" class="new_name" type="text" placeholder="请输入视图名称"></el-input>
+        <i class="required">*</i>
         <div class="tit">
-          选择数据源<i class="required">*</i>  
+          选择数据源
+          <i class="required">*</i>
           <div class="search_box r">
             <i class="el-icon-search"></i>
             <input type="text" class="search_input" v-model="searchView">
-          </div> 
+          </div>
         </div>
-        <el-tree class="dialog_content" :data="listFolders.list" :props="listFolders.defaultProps"  @node-click="handleNodeClick" :filter-node-method="filterView" ref="viewTree"></el-tree>
+        <el-tree class="dialog_content" :data="listFolders.list" :props="listFolders.defaultProps" @node-click="handleNodeClick" :filter-node-method="filterView" ref="viewTree"></el-tree>
       </form>
-        
-        <span slot="footer" class="dialog-footer">
-          <el-button class="btn-confirm" type="primary" @click="addView()">确 定</el-button>
-          <el-button class="btn-cancel" @click="addVisible = false">取 消</el-button>
-        </span>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button class="btn-confirm" type="primary" @click="addView()">确 定</el-button>
+        <el-button class="btn-cancel" @click="addVisible = false">取 消</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
@@ -71,33 +73,32 @@ import { getJson } from '../../router/utils';
 export default {
   mounted() {
     // 挂载后
-    let that=this;
-    getJson('/dataview/list.do',{
-      folder:''
-    },function(res){
+    let that = this;
+    getJson('/dataview/list.do', {
+      folder: ''
+    }, function (res) {
       if (res.success) {
-        for(let i=0;i<res.data.length;i++){
+        for (let i = 0; i < res.data.length; i++) {
           res.data[i].show = true;
         }
-        that.list=res.data;
+        that.list = res.data;
         let params = that.$route.params;
-        if(!params.viewId){
+        if (!params.viewId) {
           // 获取不到当前id时默认取第一个
-            that.$router.replace({
-              path: "/empty",
-              query: { link: "/dataview/" + res.data[0].id }
-            });
-          return
+          that.$router.replace({
+            path: '/empty',
+            query: { link: '/dataview/' + res.data[0].id }
+          });
+          return;
         }
-        for(let i=0;i<res.data.length;i++){
-          if(res.data[i].id==params.viewId){
-            getJson('/dataview/design/info.do',{
-              view:params.viewId
-            },function(res){
+        for (let i = 0; i < res.data.length; i++) {
+          if (res.data[i].id == params.viewId) {
+            getJson('/dataview/design/info.do', {
+              view: params.viewId
+            }, function (res) {
               if (res.success) {
-                that.activeIndex=i;
-                // that.src= vars.src + '/data_editor/index.html?sourceId='+res.data.datasourceId+'&view='+params.viewId;
-                that.src='http://localhost:8080/src/data_editor/index.html?sourceId='+res.data.datasourceId+'&view='+params.viewId;
+                that.activeIndex = i;
+                that.src = vars.src + '/data_editor/index.html?sourceId=' + res.data.datasourceId + '&view=' + params.viewId;
               }
             });
             break;
@@ -105,21 +106,21 @@ export default {
         }
       }
     });
-    
+
   },
-  
+
   data: () => ({
     // 页面控制
     // 删除视图弹窗
-    dialogVisible:false,
+    dialogVisible: false,
     // 添加数据视图弹窗
-    addVisible:false,
+    addVisible: false,
     // 数据流
-    list:[],
+    list: [],
     src: vars.src + '/data_editor/index.html',
-    tip:'',
-    delId:'',
-    hoverIndex:null,
+    tip: '',
+    delId: '',
+    hoverIndex: null,
     listFolders: {
       list: [{
         name: '',
@@ -132,67 +133,67 @@ export default {
       // 选择的id
       checkId: ''
     },
-    sqlId:'',
-    activeIndex:null,
-    newName:{
-      text:''
+    sqlId: '',
+    activeIndex: null,
+    newName: {
+      text: ''
     },
     // 搜索用
-    search:'',
-    searchView:''
+    search: '',
+    searchView: ''
   }),
   watch: {
-    search:function(val){
-      for(let i=0;i<this.list.length;i++){
-        if(this.list[i].name.indexOf(val)<0){
-          this.list[i].show=false;
-        }else{
-          this.list[i].show=true;          
+    search: function (val) {
+      for (let i = 0; i < this.list.length; i++) {
+        if (this.list[i].name.indexOf(val) < 0) {
+          this.list[i].show = false;
+        } else {
+          this.list[i].show = true;
         }
-      }    
+      }
     },
-    searchView:function(val){
+    searchView: function (val) {
       this.$refs.viewTree.filter(val);
     }
   },
   methods: {
     // 更换数据视图
-    changeView(item,index){
+    changeView(item, index) {
       this.openFullScreen(1);
-      let that=this;
-      getJson('/dataview/design/info.do',{
-        view:item.id
-      },function(res){
+      let that = this;
+      getJson('/dataview/design/info.do', {
+        view: item.id
+      }, function (res) {
         if (res.success) {
-          let src= vars.src + '/data_editor/index.html?sourceId='+res.data.datasourceId+'&view='+item.id;
-          that.src=src;
-          that.activeIndex=index;
-          that.$router.replace({path: '/dataview/'+item.id});
-          that.$refs.iframe.onload=function(){
+          let src = vars.src + '/data_editor/index.html?sourceId=' + res.data.datasourceId + '&view=' + item.id;
+          that.src = src;
+          that.activeIndex = index;
+          that.$router.replace({ path: '/dataview/' + item.id });
+          that.$refs.iframe.onload = function () {
             that.openFullScreen(0);
           };
         }
       });
     },
     // 删除数据视图
-    del(item){
-      this.delId=item.id;
-      this.tip=item.name;
-      this.dialogVisible=true;
+    del(item) {
+      this.delId = item.id;
+      this.tip = item.name;
+      this.dialogVisible = true;
     },
     // 确定删除
-    confirm(){
-      this.dialogVisible=false;
-      let that=this;
-      getJson('/dataview/design/delete.do',{
-        view:that.delId
-      },function(res){
+    confirm() {
+      this.dialogVisible = false;
+      let that = this;
+      getJson('/dataview/design/delete.do', {
+        view: that.delId
+      }, function (res) {
         if (res.success) {
-          getJson('/dataview/list.do',{
-            folder:''
-          },function(res){
+          getJson('/dataview/list.do', {
+            folder: ''
+          }, function (res) {
             if (res.success) {
-              that.list=res.data;
+              that.list = res.data;
               that.$message({
                 message: '删除成功',
                 type: 'success'
@@ -202,84 +203,82 @@ export default {
         }
       });
     },
-    mouseenter(index){
+    mouseenter(index) {
       this.hoverIndex = index;
     },
-    mouseleave(){
+    mouseleave() {
       this.hoverIndex = null;
     },
     // 新建数据视图
-    addSouch(){
+    addSouch() {
       let that = this;
-      getJson('/datasource/list.do',{},function(res){
+      getJson('/datasource/list.do', {}, function (res) {
         if (res.success) {
           that.listFolders.list = res.data;
-          that.addVisible=true;
+          that.addVisible = true;
         }
       });
     },
     // 添加数据视图
-    addView(){
-      let that=this;
+    addView() {
+      let that = this;
       // let src='http://localhost:8080/src/data_editor/index.html?sourceId='+this.sqlId;
       // this.src=src;
-      if(!this.newName.text){
+      if (!this.newName.text) {
         that.$message({ message: '请输入视图名称', type: 'success' });
         return;
       }
-      this.addVisible=false;
-      
-      let data={
-        id:'',
-        name:this.newName.text,
-        datasourceId:this.sqlId,
-        structure:{
-          filters:[],
-          joins:[],
-          orders:[],
-          tables:[]
+      this.addVisible = false;
+
+      let data = {
+        id: '',
+        name: this.newName.text,
+        datasourceId: this.sqlId,
+        structure: {
+          filters: [],
+          joins: [],
+          orders: [],
+          tables: []
         },
-        layout:''
+        layout: ''
       };
-      getJson('/dataview/design/save.do',{
-        folder:'',
-        config:JSON.stringify(data)
-      },function(ress){
-        if(ress.success){
-          getJson('/dataview/list.do',{
-            folder:''
-          },function(res){
+      getJson('/dataview/design/save.do', {
+        folder: '',
+        config: JSON.stringify(data)
+      }, function (ress) {
+        if (ress.success) {
+          getJson('/dataview/list.do', {
+            folder: ''
+          }, function (res) {
             if (res.success) {
-              that.list=res.data;
-              that.$router.replace({path: '/dataview/'+ress.data.id});
-              // let src= vars.src + '/data_editor/index.html?sourceId='+that.sqlId+'&view='+ress.data.id;
-              let src='http://localhost:8080/src/data_editor/index.html?sourceId='+that.sqlId+'&view='+ress.data.id;
-              
-              that.src=src;
+              that.list = res.data;
+              that.$router.replace({ path: '/dataview/' + ress.data.id });
+              let src = vars.src + '/data_editor/index.html?sourceId=' + that.sqlId + '&view=' + ress.data.id;
+              that.src = src;
             }
           });
         }
       });
     },
     // 选择了哪个数据源
-    handleNodeClick(data){
-      this.sqlId=data.id;
+    handleNodeClick(data) {
+      this.sqlId = data.id;
     },
     // loadding的全屏遮罩
     openFullScreen(e) {
-      if(e){
+      if (e) {
         this.$loading({
-          customClass:'dataview_loading'
+          customClass: 'dataview_loading'
         });
-      }else{
+      } else {
         const loading = this.$loading({
-          customClass:'dataview_loading'
+          customClass: 'dataview_loading'
         });
         return loading.close();
       }
     },
     // 选择视图搜索
-    filterView(value,data){
+    filterView(value, data) {
       if (!value) return true;
       return data.name.indexOf(value) !== -1;
     }

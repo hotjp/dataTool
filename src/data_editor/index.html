@@ -303,6 +303,8 @@
     <script src="./js/urlparas.js"></script>
     <script src="./js/template-native.js"></script>
     <script src="../assets/js/vars.js"></script> 
+    <script src="../assets/js/common.js"></script>
+    
     <script type="text/javascript">
     mxBasePath = './mxClient';
     </script>
@@ -338,37 +340,29 @@
      */
     function loadDatatables() {
         datasourceId = page.url.get('datasource');
-        $.ajax({
-            url: vars.api + '/datasource/metadata/listTables.do',
-            // url: 'http://192.168.50.200:8880/dataviz/api/dataview/list.do',
-            method: 'GET',
-            dataType: 'JSON',
-            data: {
-                datasource: page.url.get('sourceId') ? page.url.get('sourceId') : 0
-            },
-            success: function(res) {
-                var data = {
-                    tableList: res.data
-                };
-                $('#tableList').empty();
-                renderTmp('#tableList', 'tableListTpl', data);
-                // $.each(r.data, function () {
-                //   var li = $('<li></li>')
-                //     .data('table', this)
-                //     .text(this.name)
-                //     .append($(' <a href="javascript:;" title="add to graph">&gt;</a>')
-                //       .click(function () {
-                //         // 将所选table加入到关系图
-                //         addTableToGraph(datasourceId, $(this).parent().data('table'));
-                //       }));
-                //   $('#tables').append(li);
-                // });
+        getJson('/datasource/metadata/listTables.do',{
+            datasource: page.url.get('sourceId') ? page.url.get('sourceId') : 0
+        },function(res) {
+            var data = {
+                tableList: res.data
+            };
+            $('#tableList').empty();
+            renderTmp('#tableList', 'tableListTpl', data);
+            // $.each(r.data, function () {
+            //   var li = $('<li></li>')
+            //     .data('table', this)
+            //     .text(this.name)
+            //     .append($(' <a href="javascript:;" title="add to graph">&gt;</a>')
+            //       .click(function () {
+            //         // 将所选table加入到关系图
+            //         addTableToGraph(datasourceId, $(this).parent().data('table'));
+            //       }));
+            //   $('#tables').append(li);
+            // });
 
-                $('select').select2({
-                    minimumResultsForSearch: -1
-                });
-
-            }
+            $('select').select2({
+                minimumResultsForSearch: -1
+            });
         });
     }
 
@@ -378,19 +372,16 @@
         for (var i = 0; i < vb._view.tables.length; i++) {
             refTables.push(vb._view.tables[i].name);
         }
-        $.ajax({
-            url: vars.api + '/api/datasource/metadata/table.do',
-            data: {
-                datasource: sourceId,
-                table: table['name'],
-                type: table['type'],
-                refTables: refTables.join(',')
-            },
-            success: function(res) {
-                // 刷新预览
-                // previewData();
-                vb.diagram.addView(res.data);
-            }
+        getJson('/datasource/metadata/table.do',{
+            datasource: sourceId,
+            table: table['name'],
+            type: table['type'],
+            refTables: refTables.join(',')
+        },
+        function(res) {
+            // 刷新预览
+            // previewData();
+            vb.diagram.addView(res.data);
         });
     }
     // FIXME: 以下方法，变量没有用到
@@ -640,25 +631,20 @@
                 structure: vb._view,
                 layout: vb._layout
             };
-            $.ajax({
-                url: vars.api + '/api/dataview/design/save.do',
-                method: 'get',
-                dataType: 'json',
-                data: {
-                    folder: '',
-                    config: JSON.stringify(data)
-                },
-                success: function(res) {
-                    // 替换url
-                    if (!getUrl(location.href, 'view')) {
-                        var url = page.url.url + '&view=' + res.data.id;
-                        var title = document.title;
-                        history.replaceState(null, title, url);
-                    }
-                },
-                error: function(err) {
-
+            getJson('/dataview/design/save.do',{
+                folder: '',
+                config: JSON.stringify(data)
+            },
+            function(res) {
+                // 替换url
+                if (!getUrl(location.href, 'view')) {
+                    var url = page.url.url + '&view=' + res.data.id;
+                    var title = document.title;
+                    history.replaceState(null, title, url);
                 }
+            },
+            function(err) {
+
             });
         });
         // 弹窗里的事件
@@ -668,16 +654,27 @@
             data['text'] = $.trim($(this).val());
             $('#t-viewRef').find('li').eq(idx).attr('data-list', JSON.stringify(data));
         });
-        $('#viewRefEditor').find('.checkUse').on('click', function() {
-            var idx = $('#viewRefEditor').find('.right').attr('data-idx');
-            $('#t-viewRef').find('li').eq(idx).find('.check').prop('checked', $(this)[0].checked).trigger('change');
+        // $('#viewRefEditor').find('.checkUse').on('click', function() {
+        //     var idx = $('#viewRefEditor').find('.right').attr('data-idx');
+        //     $('#t-viewRef').find('li').eq(idx).find('.check').prop('checked', $(this)[0].checked).trigger('change');
+        // });
+
+        $('#viewRefEditor .use .checkbox').on('click', function() {
+            var $this = $(this);
+            setTimeout(function(){
+                var idx = $('#viewRefEditor').find('.right').attr('data-idx');
+                var checked = $this.find('.checkUse')[0].checked;
+                $('#t-viewRef').find('li').eq(idx).find('.check').prop('checked', checked).trigger('change');
+            },10)
+            
         })
-        $('body').on('click', '#viewRefEditor .check', function() {
-            var idx = $(this).closest('li').index();
-            if (idx == $('#viewRefEditor').find('.right').attr('data-idx')) {
-                $('#viewRefEditor').find('.checkUse').prop('checked', $(this)[0].checked).trigger('change').trigger('change');
-            }
-        })
+
+        // $('body').on('click', '#viewRefEditor .check', function() {
+        //     var idx = $(this).closest('li').index();
+        //     if (idx == $('#viewRefEditor').find('.right').attr('data-idx')) {
+        //         $('#viewRefEditor').find('.checkUse').prop('checked', $(this)[0].checked).trigger('change');
+        //     }
+        // })
         $('body').on('click', '#t-viewRef li', function() {
             $('#viewRefEditor').find('.right').show();
             $('#viewRefEditor').find('.right').attr('data-idx', $(this).index());
@@ -840,24 +837,19 @@
         $('#advView').on('click', function() {
             $('#tableView').html('')
             $('#advViewShow').show();
-            $.ajax({
-                type: 'POST',
-                url: vars.api + '/preview.do',
-                data: {
-                    datasource: page.url.get('sourceId'),
-                    view: JSON.stringify(vb._view)
-                },
-                dataType: 'json',
-                success: function(res) {
-                    var data = {
-                        xData: res.data.data
-                    }
-                    renderTmp('#tableView', 'tableViewTpl', data);
-
-                },
-                error: function(data) {
-                    console.log(data);
+            getJson('/preview.do',{
+                datasource: page.url.get('sourceId'),
+                view: JSON.stringify(vb._view)
+            },
+            function(res) {
+                var data = {
+                    xData: res.data.data
                 }
+                renderTmp('#tableView', 'tableViewTpl', data);
+
+            },
+            function(data) {
+                console.log(data);
             });
         });
         $('[type="radio"]').on('change', function() {
@@ -876,8 +868,10 @@
             var check = $(this).find('input[type="checkbox"]')
             if(check.is(':checked')){
                 check.removeProp('checked').trigger('change');
+                // $(this).closest('.checkbox').addClass('on');
             }else{
                 check.prop('checked',true).trigger('change');
+                // $(this).closest('.checkbox').removeClass('on');
             }
         });
 

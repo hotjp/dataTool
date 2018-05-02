@@ -12,9 +12,14 @@
           </el-menu>
           <div v-show="loginActive">
             <form action onsubmit="return false">
-              <div class="login_ipt"><input type="text" placeholder="手机号/邮箱"></div>
-              <div class="login_ipt"><input type="text" placeholder="密码"></div>
-              <div class="login_btn"><button>登录</button></div>
+              <div class="login_ipt">
+                <input type="text" v-model="login_name" placeholder="手机号/用户名">
+              </div>
+              <div class="login_ipt">
+                <input type="text" v-model="login_pwd" placeholder="密码">
+              </div>
+              <div class="login_error">{{loginMessage}}</div>
+              <div class="login_btn"><button @click="gpLogin()" class="btn_go">登录</button></div>
             </form>
             <div class="login_tip fix">
               <div class="l">还没有帐号?<span @click="regTag()" class="reg">免费注册</span></div>
@@ -72,8 +77,8 @@
         </div>
         <div class="reg" v-show="reg">
           <el-menu active-text-color="#3582e3" :default-active="refindIndex" class="el-menu-demo" mode="horizontal" @select="refindSelect">
-            <el-menu-item index="1">邮箱注册</el-menu-item>
-            <el-menu-item index="2">手机注册</el-menu-item>
+            <!-- <el-menu-item index="1">邮箱注册</el-menu-item> -->
+            <el-menu-item index="1">手机注册</el-menu-item>
           </el-menu>
           <div v-show="refindActive">
             <form action onsubmit="return false">
@@ -82,8 +87,8 @@
                 <input type="text" placeholder="验证码">
                 <div class="sent">获取验证码</div>
                 </div>
-              <div class="login_ipt"><input type="text" placeholder="设置密码"></div>
-              <div class="login_ipt"><input type="text" placeholder="再次输入密码"></div>
+              <div class="login_ipt"><input type="password" placeholder="设置密码"></div>
+              <div class="login_ipt"><input type="password" placeholder="再次输入密码"></div>
               <div class="login_btn"><button>确定</button></div>
             </form>
             <div class="login_tip fix">
@@ -93,14 +98,34 @@
           </div>
           <div v-show="!refindActive">
             <form action onsubmit="return false">
-              <div class="login_ipt"><input type="text" placeholder="手机号"></div>
               <div class="login_ipt">
-                <input type="text" placeholder="短信验证码">
-                <div class="sent">获取验证码</div>
+                <el-tooltip class="item" effect="light" :content="userNameTitle" placement="left">
+                  <input type="text" v-model="userName"  placeholder="用户名">
+                </el-tooltip>
+                <i class="el-icon-success" :class="nameReg.test(userName)?'on':''"></i>
               </div>
-              <div class="login_ipt"><input type="text" placeholder="设置密码"></div>
-              <div class="login_ipt"><input type="text" placeholder="再次输入密码"></div>
-              <div class="login_btn"><button>确定</button></div>
+              <div class="login_ipt">
+                <el-tooltip class="item" effect="light" :content="telRegTitle" placement="left">
+                  <input type="text" v-model="userTel" placeholder="手机号">
+                </el-tooltip>
+                <i class="el-icon-success" :class="telReg.test(userTel)?'on':''"></i>
+              </div>
+              <div class="login_ipt">
+                <input type="text" v-model="code" placeholder="图形验证码">
+                <div class="sent"><img :src='regcodeSrc' alt=""></div>
+              </div>
+              <div class="login_ipt">
+                <el-tooltip class="item" effect="light" :content="pwdRegTitle" placement="left">
+                  <input type="password" v-model="userPwd" placeholder="设置密码">
+                </el-tooltip>
+                <i class="el-icon-success" :class="pwdReg.test(userPwd)?'on':''"></i>
+              </div>
+              <div class="login_ipt">
+                <input type="password" v-model="userPwd2" :title="pwdRegTitle" placeholder="再次输入密码">
+                <i class="el-icon-success" :class="userPwd2==userPwd && pwdReg.test(userPwd)?'on':''"></i>
+              </div>
+              <div class="login_error">{{errorMessage}}</div>
+              <div class="login_btn" @click="goReg()"><button>确定</button></div>
             </form>
             <div class="login_tip fix">
               <!-- <div class="l">还没有帐号?<span class="reg">免费注册</span></div> -->
@@ -122,11 +147,44 @@ export default {
     loginActive:1,
     refindIndex: '1',
     refindIndex2: '1',
-    refindActive:1,
+    refindActive:0,
     forgetPass:0,
     login:1,
-    reg:0
+    reg:0,
+    regcodeSrc:'',
+    userNameTitle:'',
+    telRegTitle:'',
+    pwdRegTitle:'',
+    nameReg:/\S/,
+    telReg:/\S/,
+    pwdReg:/\S/,
+    userName:'',
+    userTel:'',
+    userPwd:'',
+    userPwd2:'',
+    errorMessage:'',
+    code:'',
+    login_name:'',
+    login_pwd:'',
+    loginMessage:''
   }),
+  mounted(){
+    let that=this;
+    that.regcodeSrc=vars.src+'/images/kaptcha.jpg';
+    // 获取正则表达式
+    getJson('/common/getRegularExpression.do',{
+      no:'userName,userTel,userPwd'
+    },function(res){
+      if(res.success){
+        that.nameReg=new RegExp(res.data.regularExpression[0].regexp);
+        that.telReg=new RegExp(res.data.regularExpression[1].regexp);
+        that.pwdReg=new RegExp(res.data.regularExpression[2].regexp);
+        that.userNameTitle=res.data.regularExpression[0].regDesc;
+        that.telRegTitle=res.data.regularExpression[1].regDesc;
+        that.pwdRegTitle=res.data.regularExpression[2].regDesc;
+      }
+    });
+  },
   methods: {
     // 切换登录块
     handleSelect(key, keyPath){
@@ -134,7 +192,7 @@ export default {
     },
     // 切换找回
     refindSelect(){
-      this.refindActive=!this.refindActive;
+      // this.refindActive=!this.refindActive;
     },
     // 去登录
     goLogin(){
@@ -153,6 +211,39 @@ export default {
       this.login=0;
       this.forgetPass=0;
       this.reg=1; 
+    },
+    goReg(){
+      let that=this;
+      getJson('/member/memberRegister.do',{
+        userName:that.userName,
+        userTel:that.userTel,
+        pwd1:that.userPwd,
+        pwd2:that.userPwd2,
+        code:that.code
+      },function(res){
+        if(res.success){
+          that.$message({
+            showClose: true,
+            message: '恭喜你，注册成功',
+            type: 'success'
+          });
+        }else{
+          that.errorMessage=res.errorMessage;
+        }
+      });
+    },
+    gpLogin(){
+      let that=this;
+      getJson('/member/memberLogin.do',{
+        account:that.login_name,
+        pwd:that.login_pwd
+      },function(res){
+        if(res.success){
+          that.$router.push({path:'/'});
+        }else{
+          that.loginMessage=res.errorMessage;
+        }
+      });
     }
   }
 };

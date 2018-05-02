@@ -33,14 +33,10 @@ var vb = {
     // extractViewDef返回当前视图数据
     var view=page.url.get('view') ? page.url.get('view') : 0;
     if(view){
-      $.ajax({
-        url: vars.api + '/dataview/design/info.do',
-        method: 'GET',
-        dataType: 'JSON',
-        data: {
+      getJson('/dataview/design/info.do',{
           view: view
         },
-        success: function(res) {
+        function(res) {
           if(res.success){
             vb.showView(res.data.structure);
             getNewViewProvider(VIEW_TYPE_USER_COMPOSITE);
@@ -48,7 +44,6 @@ var vb = {
             vb._layout=res.data.layout;
             // vb._folder=res.data.folder;
           }
-        }
       });
     }else{
       vb.showView(vb._view);

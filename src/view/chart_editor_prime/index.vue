@@ -162,14 +162,14 @@
         </div>
       </div>
       <div class="full chart_right">
-        <div class="grid-content ">
-
+        <div class="grid-content">
+          <!-- TODO: 3D图表配置 -->
           <!-- 图表类型 -->
-          <chartsTypes ref="chartsTypes" :charts="charts" :echartsShow="echartsShow" :tableShow="tableShow" @gettableShow="gettableShow" @getechartsShow="getechartsShow" @getCharts="getCharts" :setqueryInfo="queryInfo"></chartsTypes>
+          <!-- <chartsTypes ref="chartsTypes" :charts="charts" :echartsShow="echartsShow" :tableShow="tableShow" @gettableShow="gettableShow" @getechartsShow="getechartsShow" @getCharts="getCharts" :setqueryInfo="queryInfo"></chartsTypes> -->
           <!-- 序列风格 -->
-          <seriesStyles v-if="charts.type!='table'" :charts="charts" @seriesStyles="seriesStyles"></seriesStyles>
+          <!-- <seriesStyles v-if="charts.type!='table'" :charts="charts" @seriesStyles="seriesStyles"></seriesStyles> -->
           <!-- 面板属性 -->
-          <chartConfig @getProp="getProp" :setProp="graphData" :charts="charts"></chartConfig>
+          <!-- <chartConfig @getProp="getProp" :setProp="graphData" :charts="charts"></chartConfig> -->
 
         </div>
       </div>
@@ -377,7 +377,7 @@ import numShow from '../../components/chartEditor/yAxis/numShow.vue';
 import chartTitle from '../../components/chartEditor/title.vue';
 
 // 历史记录工具
-import TimeLine from '../../vendor/jsVendor/objectTimeLine';
+import TimeLine from '../../assets/js/objectTimeLine';
 
 export default {
   components: {
@@ -1114,7 +1114,10 @@ export default {
     },
     //维度下拉框
     toggleSelectedItem(index) {
-      let selectedItemSwitch = this.queryInfo.categoryColumns[index].selectedItemSwitch ? this.queryInfo.categoryColumns[index].selectedItemSwitch : false;
+      let selectedItemSwitch = this.queryInfo.categoryColumns[index]
+        .selectedItemSwitch
+        ? this.queryInfo.categoryColumns[index].selectedItemSwitch
+        : false;
       let val = !selectedItemSwitch;
       this.$set(
         this.queryInfo.categoryColumns[index],
@@ -1454,12 +1457,12 @@ export default {
     preview() {
       // 预览前先保存
       let that = this;
-      var href = vars.src + '/viewer/chart.html?id=' + that.charts.id;
+      var href = vars.src + "/viewer/chart.html?id=" + that.charts.id;
       that.saveChartData(openPrevView);
       function openPrevView() {
         window.open(href);
       }
-    }
+    },
   }
 };
 </script>

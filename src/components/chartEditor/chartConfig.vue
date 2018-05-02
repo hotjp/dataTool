@@ -55,7 +55,6 @@ export default {
     },
     // 提交配置
     submitOption: function (data) {
-      // this.option= _.merge({},this.option, data);
       this.option.radar =null;
       if (data.xAxis && data.xAxis.data) {
         this.option.xAxis.data = data.xAxis.data;
@@ -63,7 +62,6 @@ export default {
       if (data.series) {
         this.option.series = [];
         this.option.series = data.series;
-        // Object.assign([],this.option.series,data.series);
       }
       if(this.charts.type == 'radar'){
         this.option.radar = data.radar;

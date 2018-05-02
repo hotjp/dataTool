@@ -133,25 +133,37 @@ routes.push({
   }
 });
 
+import { getJson } from './utils';
+// import { ElStep } from 'element-ui/types/step';
 // 实例化路由
 const router = new VueRouter({
   routes
 });
 
 router.beforeEach((to, from, next) => {
-  let needLogin= false;
-  for(let i=0;i<loginConfig.list.length;i++){
-    if(to.path.indexOf(loginConfig.list[i])>=0){
-      needLogin=true
-    }
-  }
-
-  if(needLogin){
-    next("/login");
-  }else{
+  if (to.name === '登录页') {
     next();
+  }else{
+    getJson('/member/getSessionMember.do',{},function(res){
+      if(res){
+        if(res.success){
+          if(res.data.user==null){
+            router.push({name:'登录页'});
+          }else{
+            next();
+          }
+        }else{
+          // router.push({name:'登录页'});
+          next();
+        }
+      }
+    },function(error){
+      if(error.status==200){
+        router.push({name:'登录页'});
+      }
+    });
   }
-})
+});
 
 
 

@@ -2,18 +2,19 @@
  * @Author: hotjp 
  * @Date: 2017-11-06 13:40:14 
  * @Last Modified by: hotjp
- * @Last Modified time: 2018-04-24 09:38:01
+ * @Last Modified time: 2018-05-02 09:33:26
  */
 
 import Stats from 'stats.js';
 let stats = window.stats = new Stats();
 document.body.appendChild(stats.dom);
 stats.showPanel(3);
-function animate(){
+
+function animate() {
   stats.update();
-  requestAnimationFrame( animate );
+  requestAnimationFrame(animate);
 }
-requestAnimationFrame( animate );
+requestAnimationFrame(animate);
 
 import Vue from 'vue';
 
@@ -43,5 +44,6 @@ const app = new Vue({
 // 数据编辑
 
 // 设置版本
-import {version} from '../package.json';
-document.body.setAttribute('data-version',version);
+import { version } from '../package.json';
+document.body.setAttribute('data-version', version);
+// 

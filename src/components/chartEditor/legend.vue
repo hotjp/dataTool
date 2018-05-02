@@ -151,12 +151,6 @@ export default {
     },
     // 设置图例字号
     legendfontSize(command) {
-      // let that = this;
-      // for(let i = 0;i < that.legend.data.length;i++){
-      //   // that.legend.data[i].fontFamily = command;
-      //   this.$set(that.legend.data[i], 'fontSize', command);
-      // }
-      // this.legend.fontSize = command;
       this.legend.textStyle.fontSize = command;
     },
     // 设置图例布局  水平/垂直
@@ -171,15 +165,11 @@ export default {
     legendWatcher() {
       let legendKeyArr = [];
       let legendValArr = [];
-      // 一个数值时，只有pie funnel rosePie有图例
+      // pie funnel rosePie有图例 取维度的具体内容，其他取数值名称
       if (
-        this.propData.query &&
-        this.propData.data &&
-        this.propData.query.categoryColumns &&
+        this.propData.query && this.propData.data && this.propData.query.categoryColumns &&
         this.propData.query.categoryColumns.length > 0 &&
-        (this.chartsType == "pie" ||
-          this.chartsType == "funnel" ||
-          this.chartsType == "rosePie")
+        ( this.chartsType == "pie" || this.chartsType == "funnel" || this.chartsType == "rosePie" )
       ) {
         let categoryColumnsNames = [];
         for (let i = 0; i < this.propData.query.categoryColumns.length; i++) {
@@ -208,13 +198,16 @@ export default {
           valueColumnsNames.push(this.propData.query.valueColumns[i].name);
         }
         for (let k = 0; k < valueColumnsNames.length; k++) {
-          for (let j = 0; j < this.propData.data.columns.length; j++) {
-            if (
-              this.propData.data.columns[j].source.name == valueColumnsNames[k]
-            ) {
-              legendKeyArr.push(this.propData.data.columns[j].source.text);
+          if(this.propData.data.columns){
+            for (let j = 0; j < this.propData.data.columns.length; j++) {
+              if (
+                this.propData.data.columns[j].source.name == valueColumnsNames[k]
+              ) {
+                legendKeyArr.push(this.propData.data.columns[j].source.text);
+              }
             }
           }
+          
         }
         // 计量图不需要图例
         if (this.chartsType == "gauge") {

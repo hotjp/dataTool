@@ -327,7 +327,7 @@ $('body').on('dblclick', '.grid-stack-item', function() {
             var chartData = res.data.chartData;
             $('#singleTable').html('');
             renderTmp('#singleTable', 'tableViewTpl', chartData);
-            res.data.background?res.data.background:{
+            res.data.background?res.data.background:res.data.background={
               backgroundColor:'#fff',
               backgroundRepeat:'no-repeat',
               backgroundImage:''
@@ -344,7 +344,7 @@ $('body').on('dblclick', '.grid-stack-item', function() {
             singleChart.clear()
             singleChart.setOption(res.data.option);
             singleChart.resize();
-            res.data.background?res.data.background:{
+            res.data.background?res.data.background:res.data.background={
               backgroundColor:'#fff',
               backgroundRepeat:'no-repeat',
               backgroundImage:''

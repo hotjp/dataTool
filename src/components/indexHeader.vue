@@ -30,14 +30,14 @@
     <h1 href="javascript:;" class="logo1"></h1>
     <h1 href="javascript:;" class="logo2"></h1>
     <h1 href="javascript:;" class="logo3"></h1>
-
-    
-    
+    <message></message>
   </div>
 </template>
 <script>
+import message from './message.vue';
 
 export default {
+  components: {message},
   mounted() {
     this.isFullscreen =
       document.documentElement.fullScreen ||

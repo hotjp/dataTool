@@ -55,15 +55,10 @@ function getChartData(chartId) {
       if (res.data.type == 'table') {
         var queryInfo = JSON.stringify(res.data.query),
           viewId = res.data.tableName.sql
-        $.ajax({
-          type: "post",
-          url: vars.api + "/query.do",
-          data: {
+          getJson("/query.do",{
             view: viewId,
             query: queryInfo
-          },
-          dataType: "json",
-          success: function(data) {
+          }, function(data) {
             // 处理数据
             var chartData = replaceNull(data.data.data)
             // renderTmp('#chart' + chartId, 'tableViewTpl', chartData);
@@ -148,8 +143,7 @@ function getChartData(chartId) {
             //   html+='</tr>'
             // }
             $('#chartWrap').append(html).addClass('ova')
-          }
-        })
+          })
       } else {
         var myChart = echarts.init(document.getElementById('chartWrap'));
         myChart.setOption(res.data.option);
