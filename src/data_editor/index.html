@@ -1,7 +1,5 @@
 <!DOCTYPE html>
 <html lang="zh-cn">
-`
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,7 +36,7 @@
     <div class="editor_left">
         <aside>
             <div class="fix editor_left_title">
-                视图模型
+                视图编辑器
                 <!-- <a href="javascript:;" class="r icon_btn modify_icon block"></a> -->
                 <!-- <a href="javascript:;" class="r icon_btn scale_icon block"></a> -->
                 <a href="javascript:;" class="r icon_btn refresh_icon block"></a>
@@ -207,7 +205,7 @@
                                     <option value="like">相似</option>
                                 </select>
                                 <div class="values full">
-                                    <input type="text" class="min" placeholder="请输入数值">
+                                    <input type="text" class="min" placeholder="请输入数值" title="请输入数值">
                                     <span class="between hide">－<input type="text" class="max" placeholder="最大值"></span>
                                 </div>
                                 <div class="in hide">
@@ -221,7 +219,7 @@
                                     </div> -->
                                     <div class="in_inner fix">
                                         <div class="in_ipt l">
-                                            <input type="text" class="add" placeholder="请输入数值">
+                                            <input type="text" class="add" placeholder="请输入数值" title="请输入数值">
                                         </div>
                                         <div class="in_add r">添加</div>
                                     </div>
@@ -257,7 +255,7 @@
             <a href="javascript:;" class="block r dialog_close cancal"></a>
             <div class="title">编辑数据表别名</div>
             <form onsubmit="return false">
-                <input type="text" id="viewNameIpt" placeholder="请输入备注名">
+                <input type="text" id="viewNameIpt" placeholder="请输入备注名" title="请输入备注名">
             </form>
             <div class="dialog-button">
                 <a class="confirm" href="javascript:;">确定</a>
@@ -274,22 +272,28 @@
                 <table border="1">
                     <thead>
                         <tr>
+                            <%if(xData.columns!=null){%>
                             <%for(i=0;i<xData.columns.length;i++){%>
                                 <td>
                                     <%=xData.columns[i].source.text%>
                                 </td>
                                 <%}%>
+                                <%}%>
                         </tr>
                     </thead>
                     <tbody>
+                        <%if(xData.rows!=null){%>
                         <%for(var j=0;j<xData.rows.length;j++){%>
                             <tr>
+     
                                 <%for(var k in xData.rows[j]){%>
                                     <td>
                                         <%=xData.rows[j][k]%>
                                     </td>
                                     <%}%>
+                       
                             </tr>
+                            <%}%>
                             <%}%>
                     </tbody>
                 </table>
@@ -297,6 +301,9 @@
             <div id="tableView">
             </div>
         </div>
+    </div>
+    <div class="el-alert">
+        <i></i>保存成功
     </div>
     <script src="./js/jquery.js"></script>      
     <script src="./js/select2.full.min.js"></script>
@@ -629,6 +636,7 @@
                 name: $.trim($('#viewName').val()),
                 datasourceId: page.url.get('sourceId'),
                 structure: vb._view,
+                // TODO:数据位置
                 layout: vb._layout
             };
             getJson('/dataview/design/save.do',{
@@ -641,6 +649,12 @@
                     var url = page.url.url + '&view=' + res.data.id;
                     var title = document.title;
                     history.replaceState(null, title, url);
+                }
+                if(res.success){
+                    $('.el-alert').show();
+                    setTimeout(function(){
+                        $('.el-alert').hide();
+                    },3000)
                 }
             },
             function(err) {
@@ -721,10 +735,10 @@
                     $('#viewRefEditor').find('.checkOrders').prop('checked', true).trigger('change');
                     $('#viewRefEditor').find('.orders_inner').addClass('on');
                     if (vb._orders[k]['order'].toLowerCase() == 'asc') {
-                        $('#asc').prop('checked', true).trigger('change').closest('.radio').addClass('on').siblings().removeClass('on')
+                        $('#asc').prop('checked', true).trigger('change').closest('.radio').addClass('on').end().siblings().find('.radio').removeClass('on')
                     }
                     if (vb._orders[k]['order'].toLowerCase() == 'desc') {
-                        $('#dese').prop('checked', true).trigger('change').closest('.radio').addClass('on').siblings().removeClass('on')
+                        $('#dese').prop('checked', true).trigger('change').closest('.radio').addClass('on').end().siblings().find('.radio').removeClass('on')
                     }
                     $('#viewRefEditor').find('.orders').attr('data-orders', k);
                     break;
@@ -854,7 +868,7 @@
         });
         $('[type="radio"]').on('change', function() {
             if ($(this).is(':checked')) {
-                $(this).closest('.radio').addClass('on').siblings().removeClass('on');
+                $(this).closest('.radio').addClass('on').closest('label').siblings().find('.radio').removeClass('on');
             }
         });
         $('body').on('change','[type="checkbox"]', function() {
@@ -884,7 +898,12 @@
                 }else{
                     $(e).hide()
                 }
-            })
+            });
+            if(val.length){
+                $('.search_box').addClass('hover')
+            }else{
+                $('.search_box').removeClass('hover')                
+            }
         })
 
     }

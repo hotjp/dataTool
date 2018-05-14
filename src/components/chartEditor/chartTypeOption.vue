@@ -13,7 +13,8 @@
     <chartGauge v-else-if="type=='gauge'" :option="option" :data="data" @getSeries="getOption"></chartGauge>
     <chartWordCloud v-else-if="type=='wordCloud'" :option="option" :data="data" @getSeries="getOption"></chartWordCloud>
     <chartPercentStackbar v-else-if="type=='percentStackbar'" :option="option" :data="data" @getSeries="getOption"></chartPercentStackbar>
-  
+    <chartBar3D v-if="type=='bar3D'" :option="option" :data="data" @getSeries="getOption"></chartBar3D>
+    
   </div>
 </template>
 
@@ -33,44 +34,48 @@ import chartGauge from '../chartsComponents/chart-gauge.vue';
 import chartWordCloud from '../chartsComponents/chart-wordCloud.vue';
 import chartPercentStackbar from '../chartsComponents/chart-percentStackbar.vue';
 
+// 特殊图表
+import chartBar3D from '../chartsComponents/chart-bar3D.vue';
+
+
 
 export default {
   components: {
     chartBar, chartLine, chartPie, chartArea, chartStackbar, chartFunnel, 
     chartRosePie, chartRadar,chartTreemap,chartWaterfall,chartGauge,chartWordCloud,
-    chartPercentStackbar
+    chartPercentStackbar,chartBar3D
   },
   mounted() {
   },
   data:()=>({
-      // series设置
-      seriesOption: {
-      },
-      // 图表样式
-      chartsStyle: {
-        xAxis: {
-          splitLine: {
-            show: false,
-            lineStyle: {
-              color: ['#ccc'],
-              width: 1,
-              type: 'solid'
-            }
-          }
-        },
-        yAxis: {
-          splitLine: {
-            show: false,
-            lineStyle: {
-              color: ['#ccc'],
-              width: 1,
-              type: 'solid'
-            }
+    // series设置
+    seriesOption: {
+    },
+    // 图表样式
+    chartsStyle: {
+      xAxis: {
+        splitLine: {
+          show: false,
+          lineStyle: {
+            color: ['#ccc'],
+            width: 1,
+            type: 'solid'
           }
         }
-
+      },
+      yAxis: {
+        splitLine: {
+          show: false,
+          lineStyle: {
+            color: ['#ccc'],
+            width: 1,
+            type: 'solid'
+          }
+        }
       }
-    }),
+
+    }
+  }),
   watch: {
     chartsStyle: {
       handler: function (oldval, val) {

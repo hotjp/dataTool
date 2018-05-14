@@ -1,8 +1,8 @@
 <template>
   <div class="chartConfig">
-    <chartXaxis v-if="charts.type!='table'" class="series" @xaxisOptions="getOptions" :setXaxis="option.xAxis"></chartXaxis>
-    <chartYaxis v-if="charts.type!='table'" class="series" @yaxisOptions="getOptions" :setYaxis="option.yAxis"></chartYaxis>
-    <chartLegend v-if="charts.type!='table'" class="series" @legendOptions="getOptions" :propData="setProp" :setLegend="option.legend" :chartsType="charts.type"></chartLegend>
+    <chartXaxis v-if="charts.type!='table' && !charts.isSpec" class="series" @xaxisOptions="getOptions" :setXaxis="option.xAxis"></chartXaxis>
+    <chartYaxis v-if="charts.type!='table' && !charts.isSpec" class="series" @yaxisOptions="getOptions" :setYaxis="option.yAxis"></chartYaxis>
+    <chartLegend v-if="charts.type!='table' && !charts.isSpec" class="series" @legendOptions="getOptions" :propData="setProp" :setLegend="option.legend" :chartsType="charts.type"></chartLegend>
     <background class="series" :backgroundStyle="charts.background" @backgroundOption="backgroundOption"></background>
     <chartTypeOption class="series" :option="option" :data="setProp" :type="charts.type" @submitOption="submitOption"></chartTypeOption>
   </div>
@@ -59,6 +59,33 @@ export default {
       if (data.xAxis && data.xAxis.data) {
         this.option.xAxis.data = data.xAxis.data;
       }
+      if (data.xAxis3D && data.xAxis3D.data) {
+        this.option.xAxis3D
+          ? (this.option.xAxis3D.data = data.xAxis3D.data)
+          : (this.option.xAxis3D = {
+            data: data.xAxis3D.data
+          });
+            
+        this.option.xAxis3D.type='category';
+      }
+      if (data.yAxis3D && data.yAxis3D.data) {
+        this.option.yAxis3D
+          ? (this.option.yAxis3D.data = data.yAxis3D.data)
+          : (this.option.yAxis3D = {
+            data: data.yAxis3D.data
+          });
+        this.option.yAxis3D.type='category';
+            
+      }
+      if (data.zAxis3D) {
+        this.option.zAxis3D=data.zAxis3D;
+        this.option.zAxis3D.type= 'value';
+      }
+      if (data.grid3D) {
+        this.option.grid3D = data.grid3D;
+      }
+      
+      
       if (data.series) {
         this.option.series = [];
         this.option.series = data.series;
@@ -66,6 +93,11 @@ export default {
       if(this.charts.type == 'radar'){
         this.option.radar = data.radar;
         this.option.tooltip ={};
+      }
+      if(data.tooltip){
+        this.option.tooltip = data.tooltip;
+      }else{
+        this.option.tooltip = {};
       }
       if (data.grid) {
         this.option.grid = null;

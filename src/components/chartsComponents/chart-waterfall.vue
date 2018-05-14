@@ -12,10 +12,10 @@
 </template>
 
 <script>
-import seriesDefault from "../../vendor/seriesWaterfall.json";
-import "../../vendor/jsVendor/seriesWaterfall.js";
+import seriesDefault from '../../vendor/seriesWaterfall.json';
+import '../../vendor/jsVendor/seriesWaterfall.js';
 
-import colorPicker from "../chartEditor/propSelect/colorPicker.vue";
+import colorPicker from '../chartEditor/propSelect/colorPicker.vue';
 
 export default {
   components: {
@@ -39,15 +39,15 @@ export default {
     // 数据
     chartData: {},
     // 默认配置项展开
-    activeNames: ["1"],
+    activeNames: ['1'],
     // 图表类型
-    type: "bar",
-    pageName: "瀑布图"
+    type: 'bar',
+    pageName: '瀑布图'
   }),
   watch: {
     seriesOption: {
       handler: function(newVal, oldVal) {
-        this.$emit("getSeries", this.seriesOption.option);
+        this.$emit('getSeries', this.seriesOption.option);
       },
       deep: true
     },
@@ -58,11 +58,11 @@ export default {
       },
       deep: true
     },
-    "seriesOption.option.series": {
+    'seriesOption.option.series': {
       // 父级传来的图表数据
       handler: function(newVal, oldVal) {
         for (let i = 0; i < newVal.length; i++) {
-          if (newVal[i].itemStyle.normal.color == "transparent") {
+          if (newVal[i].itemStyle.normal.color == 'transparent') {
             this.seriesOption.option.series[i].itemStyle.normal.color = null;
           }
         }
@@ -109,7 +109,7 @@ export default {
       newData.xAxis = that.seriesOption.option.xAxis;
       if (queryNameKeyX.length) {
         for (let i = 0; i < queryNameKeyX.length; i++) {
-          let arr = ["总计"];
+          let arr = ['总计'];
           for (let j = 0; j < rows.length; j++) {
             arr.push(rows[j][queryNameKeyX[i]]);
           }
@@ -123,7 +123,7 @@ export default {
             }
           }
         });
-        arr.unshift("总计");
+        arr.unshift('总计');
         newData.xAxis.data = arr;
       }
 
@@ -138,13 +138,13 @@ export default {
         true
       );
 
-      that.$set(this.seriesOption.option, "grid", seriesDefault.grid);
-      that.$set(this.seriesOption.option, "xAxis", newData.xAxis);
-      that.$set(this.seriesOption.option, "series", newData.series);
-      that.$emit("getSeries", that.seriesOption.option);
+      that.$set(this.seriesOption.option, 'grid', seriesDefault.grid);
+      that.$set(this.seriesOption.option, 'xAxis', newData.xAxis);
+      that.$set(this.seriesOption.option, 'series', newData.series);
+      that.$emit('getSeries', that.seriesOption.option);
     }
   },
-  props: ["option", "data"]
+  props: ['option', 'data']
 };
 </script>
 <style>

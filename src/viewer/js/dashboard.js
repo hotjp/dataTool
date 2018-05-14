@@ -281,6 +281,12 @@ function dataHandler(data, series, type) {
       seriesPercentStackbar(columns, rows, queryNameKeyY, {}, series)
     );
     return series;
+  }else if (type == 'bar3D') {
+    series = Object.assign(
+      [],
+      seriesBar3D(columns, rows, queryNameKeyX, queryNameKeyY, {}, series)
+    );
+    return series;
   }
   
 }

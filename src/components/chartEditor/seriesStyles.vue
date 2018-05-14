@@ -133,7 +133,7 @@ export default{
     
       if(this.isAllStyleShow){
         for(let i = 0;i<this.seriesColors.length;i++){
-            this.seriesColors[i]['show']=0;
+          this.seriesColors[i]['show']=0;
         }
       }else{
         for(let i = 0;i<this.seriesColors.length;i++){

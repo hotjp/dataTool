@@ -7,16 +7,18 @@
       <div class="l right">
         <div v-show="login">
           <el-menu active-text-color="#3582e3" :default-active="loginIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
-            <el-menu-item index="1">登录</el-menu-item>
-            <el-menu-item index="2">短信登陆</el-menu-item>
+            <el-menu-item index="1">帐号登录</el-menu-item>
+            <!-- <el-menu-item index="2">短信登陆</el-menu-item> -->
           </el-menu>
           <div v-show="loginActive">
             <form action onsubmit="return false">
               <div class="login_ipt">
-                <input type="text" v-model="login_name" placeholder="手机号/用户名">
+                <input type="text" v-model="login_name" placeholder="手机号/用户名" autocomplete="off">
               </div>
               <div class="login_ipt">
-                <input type="text" v-model="login_pwd" placeholder="密码">
+                <input v-if="passwordHide" type="password" v-model="login_pwd" placeholder="密码" autocomplete="off">
+                <input v-else type="text" v-model="login_pwd" placeholder="密码" autocomplete="off">
+                <i class="fa" :class="{on:!passwordHide,'fa-eye':!passwordHide,'fa-eye-slash':passwordHide}" @mousedown="passwordHide=false" @mouseup="passwordHide=true"></i>
               </div>
               <div class="login_error">{{loginMessage}}</div>
               <div class="login_btn"><button @click="gpLogin()" class="btn_go">登录</button></div>
@@ -28,9 +30,9 @@
           </div>
           <div v-show="!loginActive">
             <form action onsubmit="return false">
-              <div class="login_ipt"><input type="text" placeholder="手机号"></div>
+              <div class="login_ipt"><input type="text" placeholder="手机号" autocomplete="off"></div>
               <div class="login_ipt">
-                <input type="text" placeholder="短信验证码">
+                <input type="text" placeholder="短信验证码" autocomplete="off">
                 <div class="sent">获取验证码</div>
               </div>
               <div class="login_btn"><button>登录</button></div>
@@ -48,9 +50,9 @@
           </el-menu>
           <div v-show="refindActive">
             <form action onsubmit="return false">
-              <div class="login_ipt"><input type="text" placeholder="邮箱"></div>
+              <div class="login_ipt"><input type="text" placeholder="邮箱" autocomplete="off"></div>
               <div class="login_ipt">
-                <input type="text" placeholder="验证码">
+                <input type="text" placeholder="验证码" autocomplete="off">
                 <div class="sent">获取验证码</div>
                 </div>
               <div class="login_btn"><button>确定</button></div>
@@ -62,9 +64,9 @@
           </div>
           <div v-show="!refindActive">
             <form action onsubmit="return false">
-              <div class="login_ipt"><input type="text" placeholder="手机号"></div>
+              <div class="login_ipt"><input type="text" placeholder="手机号" autocomplete="off"></div>
               <div class="login_ipt">
-                <input type="text" placeholder="短信验证码">
+                <input type="text" placeholder="短信验证码" autocomplete="off">
                 <div class="sent">获取验证码</div>
               </div>
               <div class="login_btn"><button>确定</button></div>
@@ -82,13 +84,13 @@
           </el-menu>
           <div v-show="refindActive">
             <form action onsubmit="return false">
-              <div class="login_ipt"><input type="text" placeholder="邮箱"></div>
+              <div class="login_ipt"><input type="text" placeholder="邮箱" autocomplete="off"></div>
               <div class="login_ipt">
-                <input type="text" placeholder="验证码">
+                <input type="text" placeholder="验证码" autocomplete="off">
                 <div class="sent">获取验证码</div>
                 </div>
-              <div class="login_ipt"><input type="password" placeholder="设置密码"></div>
-              <div class="login_ipt"><input type="password" placeholder="再次输入密码"></div>
+              <div class="login_ipt"><input type="password" placeholder="设置密码" autocomplete="off"></div>
+              <div class="login_ipt"><input type="password" placeholder="再次输入密码" autocomplete="off"></div>
               <div class="login_btn"><button>确定</button></div>
             </form>
             <div class="login_tip fix">
@@ -100,28 +102,28 @@
             <form action onsubmit="return false">
               <div class="login_ipt">
                 <el-tooltip class="item" effect="light" :content="userNameTitle" placement="left">
-                  <input type="text" v-model="userName"  placeholder="用户名">
+                  <input type="text" v-model="userName"  placeholder="用户名" autocomplete="off">
                 </el-tooltip>
                 <i class="el-icon-success" :class="nameReg.test(userName)?'on':''"></i>
               </div>
               <div class="login_ipt">
                 <el-tooltip class="item" effect="light" :content="telRegTitle" placement="left">
-                  <input type="text" v-model="userTel" placeholder="手机号">
+                  <input type="text" v-model="userTel" placeholder="手机号" autocomplete="off">
                 </el-tooltip>
                 <i class="el-icon-success" :class="telReg.test(userTel)?'on':''"></i>
               </div>
               <div class="login_ipt">
-                <input type="text" v-model="code" placeholder="图形验证码">
+                <input type="text" v-model="code" placeholder="图形验证码" autocomplete="off">
                 <div class="sent"><img :src='regcodeSrc' alt=""></div>
               </div>
               <div class="login_ipt">
                 <el-tooltip class="item" effect="light" :content="pwdRegTitle" placement="left">
-                  <input type="password" v-model="userPwd" placeholder="设置密码">
+                  <input type="password" v-model="userPwd" placeholder="设置密码" autocomplete="off">
                 </el-tooltip>
                 <i class="el-icon-success" :class="pwdReg.test(userPwd)?'on':''"></i>
               </div>
               <div class="login_ipt">
-                <input type="password" v-model="userPwd2" :title="pwdRegTitle" placeholder="再次输入密码">
+                <input type="password" v-model="userPwd2" :title="pwdRegTitle" placeholder="再次输入密码" autocomplete="off">
                 <i class="el-icon-success" :class="userPwd2==userPwd && pwdReg.test(userPwd)?'on':''"></i>
               </div>
               <div class="login_error">{{errorMessage}}</div>
@@ -166,11 +168,14 @@ export default {
     code:'',
     login_name:'',
     login_pwd:'',
-    loginMessage:''
+    loginMessage:'',
+    // 登录密码明密文控制
+    passwordHide:true,
+    loginFlag:1
   }),
   mounted(){
     let that=this;
-    that.regcodeSrc=vars.src+'/images/kaptcha.jpg';
+    that.regcodeSrc=vars.root+'/images/kaptcha.jpg?origin='+location.origin;
     // 获取正则表达式
     getJson('/common/getRegularExpression.do',{
       no:'userName,userTel,userPwd'
@@ -188,7 +193,7 @@ export default {
   methods: {
     // 切换登录块
     handleSelect(key, keyPath){
-      this.loginActive=!this.loginActive;
+      // this.loginActive=!this.loginActive;
     },
     // 切换找回
     refindSelect(){
@@ -208,9 +213,10 @@ export default {
     },
     // 注册帐号
     regTag(){
-      this.login=0;
-      this.forgetPass=0;
-      this.reg=1; 
+      // this.login=0;
+      // this.forgetPass=0;
+      // this.reg=1; 
+      this.$router.push({path:'/register'});
     },
     goReg(){
       let that=this;
@@ -234,6 +240,12 @@ export default {
     },
     gpLogin(){
       let that=this;
+      if(!that.loginFlag){
+        return;
+      }
+      if(that.login_name=='' || that.login_pwd==''){
+        return;
+      }
       getJson('/member/memberLogin.do',{
         account:that.login_name,
         pwd:that.login_pwd
@@ -242,8 +254,12 @@ export default {
           that.$router.push({path:'/'});
         }else{
           that.loginMessage=res.errorMessage;
+          that.loginFlag=1;
         }
       });
+    },
+    togglePassword(){
+      this.passwordHide=!this.passwordHide;
     }
   }
 };

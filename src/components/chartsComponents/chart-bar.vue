@@ -12,10 +12,10 @@
 </template>
 
 <script>
-import seriesDefault from "../../vendor/seriesBar.json";
-import "../../vendor/jsVendor/seriesBar.js";
+import seriesDefault from '../../vendor/seriesBar.json';
+import '../../vendor/jsVendor/seriesBar.js';
 
-import colorPicker from "../chartEditor/propSelect/colorPicker.vue";
+import colorPicker from '../chartEditor/propSelect/colorPicker.vue';
 
 export default {
   components: {
@@ -41,15 +41,15 @@ export default {
     // 数据
     chartData: {},
     // 默认配置项展开
-    activeNames: ["1"],
+    activeNames: ['1'],
     // 图表类型
-    type: "bar",
-    pageName: "柱状图"
+    type: 'bar',
+    pageName: '柱状图'
   }),
   watch: {
     seriesOption: {
       handler: function(newVal, oldVal) {
-        this.$emit("getSeries", this.seriesOption.option);
+        this.$emit('getSeries', this.seriesOption.option);
       },
       deep: true
     },
@@ -60,11 +60,11 @@ export default {
       },
       deep: true
     },
-    "seriesOption.option.series": {
+    'seriesOption.option.series': {
       // 父级传来的图表数据
       handler: function(newVal, oldVal) {
         for (let i = 0; i < newVal.length; i++) {
-          if (newVal[i].itemStyle.normal.color == "transparent") {
+          if (newVal[i].itemStyle.normal.color == 'transparent') {
             this.seriesOption.option.series[i].itemStyle.normal.color = null;
           }
         }
@@ -134,13 +134,13 @@ export default {
         true
       );
 
-      that.$set(this.seriesOption.option, "grid", seriesDefault.grid);
-      that.$set(this.seriesOption.option, "xAxis", newData.xAxis);
-      that.$set(this.seriesOption.option, "series", newData.series);
-      that.$emit("getSeries", that.seriesOption.option);
+      that.$set(this.seriesOption.option, 'grid', seriesDefault.grid);
+      that.$set(this.seriesOption.option, 'xAxis', newData.xAxis);
+      that.$set(this.seriesOption.option, 'series', newData.series);
+      that.$emit('getSeries', that.seriesOption.option);
     }
   },
-  props: ["option", "data"]
+  props: ['option', 'data']
 };
 </script>
 <style>

@@ -52,7 +52,7 @@
 </template>
 <script type="text/babel">
 // 引入字体组件
-import font from "./propSelect/font.vue";
+import font from './propSelect/font.vue';
 
 export default {
   components: {
@@ -64,31 +64,31 @@ export default {
   },
   data: () => ({
     // 默认配置项展开
-    activeNames: ["1"],
+    activeNames: ['1'],
     // 图例配置
     legend: {
       // type: 'plain',
       show: true,
-      right: "0",
-      top: "0",
-      bottom: "auto",
+      right: '0',
+      top: '0',
+      bottom: 'auto',
       data: [],
       selectedMode: true, //图例选择的模式，控制是否可以通过点击图例改变系列的显示状态。
-      align: "auto", //图例标记和文本的对齐
-      orient: "vertical", //图例列表的布局朝向。
+      align: 'auto', //图例标记和文本的对齐
+      orient: 'vertical', //图例列表的布局朝向。
       textStyle: {
-        color: "#333",
-        fontStyle: "",
-        fontWeight: "",
-        fontFamily: "sans-serif",
-        fontSize: "12"
+        color: '#333',
+        fontStyle: '',
+        fontWeight: '',
+        fontFamily: 'sans-serif',
+        fontSize: '12'
       }
     }
   }),
   watch: {
     legend: {
       handler: function(val, oldval) {
-        this.$emit("legendOptions", {
+        this.$emit('legendOptions', {
           option: {
             legend: val
           }
@@ -125,25 +125,25 @@ export default {
     rightLegend: function() {
       let that = this;
       that.legend.show = true;
-      that.legend.right = "0";
-      that.legend.top = "0";
-      that.legend.bottom = "auto";
+      that.legend.right = '0';
+      that.legend.top = '0';
+      that.legend.bottom = 'auto';
     },
     // 底部图例
     bottomLegend: function() {
       let that = this;
       that.legend.show = true;
-      that.legend.bottom = "0";
-      that.legend.top = "auto";
-      that.legend.right = "auto";
+      that.legend.bottom = '0';
+      that.legend.top = 'auto';
+      that.legend.right = 'auto';
     },
     // 顶部图例
     topLegend: function() {
       let that = this;
       that.legend.show = true;
-      that.legend.top = "0";
-      that.legend.right = "auto";
-      that.legend.bottom = "auto";
+      that.legend.top = '0';
+      that.legend.right = 'auto';
+      that.legend.bottom = 'auto';
     },
     // 设置图例字体
     legendfontFamily(command) {
@@ -169,7 +169,7 @@ export default {
       if (
         this.propData.query && this.propData.data && this.propData.query.categoryColumns &&
         this.propData.query.categoryColumns.length > 0 &&
-        ( this.chartsType == "pie" || this.chartsType == "funnel" || this.chartsType == "rosePie" )
+        ( this.chartsType == 'pie' || this.chartsType == 'funnel' || this.chartsType == 'rosePie' )
       ) {
         let categoryColumnsNames = [];
         for (let i = 0; i < this.propData.query.categoryColumns.length; i++) {
@@ -210,14 +210,14 @@ export default {
           
         }
         // 计量图不需要图例
-        if (this.chartsType == "gauge") {
+        if (this.chartsType == 'gauge') {
           legendKeyArr = [];
         }
         this.legend.data = legendKeyArr;
       }
     }
   },
-  props: ["setLegend", "propData", "chartsType"]
+  props: ['setLegend', 'propData', 'chartsType']
 };
 </script>
 <style scoped>

@@ -24,7 +24,7 @@
             字段
             <!-- TODO: 添加-->
             <i class="el-icon-plus r"  @click=""></i>
-            <div class="search_box r">
+            <div class="search_box r" :class="{hover:search.length}">
               <i class="el-icon-search"></i>
               <input type="text" v-model="search" class="search_input">
             </div>
@@ -151,7 +151,10 @@
             </div>
             <div class="yAxis"></div>
           </div>
-          <el-card class="display_container box-card" :style="[{width:(screenWidth-442)+'px'},charts.background]">
+          <div class="new_user" v-show='emptyShow' @click='emptyClose()'>
+            <!-- <img src="../../assets/images/data_editer_e.png" alt=""> -->
+          </div>
+          <el-card class="display_container box-card" :style="[{width:(screenWidth-442)+'px'},charts.background]" v-show='!emptyShow'>
             <div class="full empty_container" v-show="!echartsShow && !tableShow" :style="{height:chartsHeight+'px',lineHeight:chartsHeight+'px'}">
               暂无数据
               <!-- {{chartsHeight}}{{screenWidth}} -->
@@ -377,7 +380,7 @@ import numShow from '../../components/chartEditor/yAxis/numShow.vue';
 import chartTitle from '../../components/chartEditor/title.vue';
 
 // 历史记录工具
-import TimeLine from '../../vendor/jsVendor/objectTimeLine';
+import TimeLine from '../../assets/js/objectTimeLine';
 
 export default {
   components: {
@@ -462,10 +465,7 @@ export default {
     getJson(
       '/dataview/list.do',
       {
-        params: {
-          folder: '',
-          dataview: true
-        }
+        folder: ''  
       },
       function(res) {
         if (res.success) {
@@ -474,11 +474,7 @@ export default {
       }
     );
     if (that.charts.id != '') {
-      getJson(
-        '/chart/info.do',
-        {
-          chart: that.charts.id
-        },
+      getJson('/chart/info.do',{chart: that.charts.id},
         function(res) {
           if (res.success&&res.data) {
             that.charts = Object.assign({}, that.charts, res.data);
@@ -487,12 +483,13 @@ export default {
               that.getTopHeight();
               that.getChartDataChangeView();
             });
+            if((!res.data.query.categoryColumns||!res.data.query.categoryColumns.length)
+              &&(!res.data.query.valueColumns||!res.data.query.valueColumns.length)){
+              that.emptyShow=true;
+            }
+
           }
-          getJson(
-            '/dataview/info.do',
-            {
-              view: that.charts.tableName.sql
-            },
+          getJson('/dataview/info.do',{view: that.charts.tableName.sql},
             function(res) {
               if (res.success) {
                 that.nums = [];
@@ -518,8 +515,10 @@ export default {
       );
     } else {
       that.workTableDialogVisible = true;
+      // that.emptyShow=true;
     }
   },
+  
   destroyed() {
     // 销毁后
     window.onresize = null;
@@ -527,6 +526,8 @@ export default {
     window.chartsHeight=null;
   },
   data: () => ({
+    // 空值显示
+    emptyShow:false,
     // 页面控制
     //排序弹出层显示隐藏开关
     sortDialogVisible: false,
@@ -792,7 +793,8 @@ export default {
         title: {
           text: '未命名图表',
           textStyle: {
-            fontSize: 14
+            fontSize: 14,
+            color:'#333'            
           }
         }
       },
@@ -918,28 +920,29 @@ export default {
     // 查询图表源 数据    
     getChartData() {
       let that = this;
-      getJson(
-        '/query.do',
-        {
-          view: that.charts.tableName.sql,
-          query: JSON.stringify(that.queryInfo)
-        },
-        function(res) {
-          if (res.success) {
-            that.chartData = Object.assign({}, res.data);
-            that.graphData = Object.assign({}, res.data);
-            that.$refs.chartsTypes.checkChartType();
-            // that.checkChartType();
-            if (Object.keys(that.charts.option).length) {
-              // that.echartsShow = true;
-            }
-            if (!Object.keys(res.data.data).length) {
-              that.echartsShow = false;
-              that.tableShow = false;
-            }
+      getJson('/query.do',{view: that.charts.tableName.sql,query: JSON.stringify(that.queryInfo)},function(res) {
+        if (res.success) {
+          that.chartData = Object.assign({}, res.data);
+          that.graphData = Object.assign({}, res.data);
+          that.$refs.chartsTypes.checkChartType();
+          // that.checkChartType();
+          if (Object.keys(that.charts.option).length) {
+            // that.echartsShow = true;
+          }
+          if (!Object.keys(res.data.data).length) {
+            that.echartsShow = false;
+            that.tableShow = false;
+          }
+          if(res.data.query&&(!res.data.query.categoryColumns||!res.data.query.categoryColumns.length)
+              &&(!res.data.query.valueColumns||!res.data.query.valueColumns.length)){
+            that.emptyShow=true;
+          }else{
+            that.emptyShow=false;        
           }
         }
-      );
+      });
+      
+      
     },
     //通用填值
     fetchVal(item, type) {
@@ -1016,12 +1019,7 @@ export default {
       that.charts.query = that.queryInfo;
       that.charts.text = that.charts.option.title.text;
       that.charts.layout.type = that.charts.type;
-      getJson(
-        '/chart/save.do',
-        {
-          folder: '/',
-          config: JSON.stringify(that.charts)
-        },
+      getJson('/chart/save.do',{folder: '/',config: JSON.stringify(that.charts)},
         function(data) {
           if (data.success) {
             that.charts.id = data.data.id;
@@ -1368,17 +1366,12 @@ export default {
       let that = this;
       if (e) {
         if (that.charts.tableName.sql != '') {
-          getJson(
-            '/dataview/info.do',
-            {
-              view: that.charts.tableName.sql
-            },
-            function(res) {
-              if (res.success) {
-                that.columns = res.data.columns;
-                that.workTableDialogVisible = false;
-              }
+          getJson('/dataview/info.do',{view: that.charts.tableName.sql},function(res) {
+            if (res.success) {
+              that.columns = res.data.columns;
+              that.workTableDialogVisible = false;
             }
+          }
           );
         }
         if (that.charts.id == '') {
@@ -1459,6 +1452,9 @@ export default {
       function openPrevView() {
         window.open(href);
       }
+    },
+    emptyClose(){
+      this.emptyShow=false;
     }
   }
 };
@@ -1467,5 +1463,11 @@ export default {
 #app {
   font-family: Helvetica, sans-serif;
   text-align: center;
+}
+.new_user{
+  width: 100%;
+  height:500px;
+  background: url('../../assets/images/data_editer_e.png') no-repeat;
+  background-position: 5px 5px;
 }
 </style>

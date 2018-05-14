@@ -12,8 +12,8 @@
 </template>
 
 <script>
-import seriesDefault from "../../vendor/seriesTreemap.json";
-import "../../vendor/jsVendor/seriesTreemap.js";
+import seriesDefault from '../../vendor/seriesTreemap.json';
+import '../../vendor/jsVendor/seriesTreemap.js';
 
 export default {
   created() {
@@ -33,15 +33,15 @@ export default {
     // 数据
     chartData: {},
     // 默认配置项展开
-    activeNames: ["1"],
+    activeNames: ['1'],
     // 图表类型
-    type: "treemap",
-    pageName: "面积图"
+    type: 'treemap',
+    pageName: '面积图'
   }),
   watch: {
     seriesOption: {
       handler: function(newVal, oldVal) {
-        this.$emit("getSeries", this.seriesOption.option);
+        this.$emit('getSeries', this.seriesOption.option);
       },
       deep: true
     },
@@ -108,13 +108,13 @@ export default {
         true
       );
 
-      that.$set(this.seriesOption.option, "grid", seriesDefault.grid);
-      that.$set(this.seriesOption.option, "xAxis", newData.xAxis);
-      that.$set(this.seriesOption.option, "series", newData.series);
-      that.$emit("getSeries", that.seriesOption.option);
+      that.$set(this.seriesOption.option, 'grid', seriesDefault.grid);
+      that.$set(this.seriesOption.option, 'xAxis', newData.xAxis);
+      that.$set(this.seriesOption.option, 'series', newData.series);
+      that.$emit('getSeries', that.seriesOption.option);
     }
   },
-  props: ["option", "data"]
+  props: ['option', 'data']
 };
 </script>
 <style>

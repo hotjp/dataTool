@@ -7,12 +7,15 @@
         </div>
       </div>
       <div class="dashboard_main">
+        <div class="new_user" v-show="dashboardEmpty">
+          <!-- <img src="../../assets/images/dashboard_e.png" alt=""> -->
+        </div>
         <div class="grid-content" :class="{editing:editStatus}"  v-loading.lock="fullscreenLoading">
           <div class="common_top top fix">
             <span class="name l ">{{dashboardName}}</span>
             <button type="button" class="r preview top_btn" @click="preview()">预览分享</button>
             <button type="button" class="r edit_switch top_btn" :class="{active:editStatus}" @click="toggleEdit()">设计模式</button>
-            <button type="button" class="r add_chart top_btn" @click="toggleAddChartDialog">添加图表</button>             
+            <button type="button" class="r add_chart top_btn" @click="toggleAddChartDialog(true)">添加图表</button>             
           </div>
           <!-- 编辑模式下显示的可编辑内容 -->
           <div class="edit_box" :class="{active:editStatus}">
@@ -34,13 +37,15 @@
                 <div class="_wrap" :style="item.background">
                   <div class="chart_tit">{{item.title}}</div>
                   <div class="edit_bar fix">
-                    <!-- TODO: 普通图表和3D图表判断，跳转不同页面 -->
-                    <router-link class="edit_bar_btn r el-icon-edit" :to="'/chart_editor/'+item.id" title="编辑"></router-link>
+                    <!-- 普通图表和3D图表判断，跳转不同页面 -->
+                    <router-link v-if="item.isSpec" class="edit_bar_btn r el-icon-edit" :to="'/chart_editor_prime/'+item.id" title="编辑"></router-link>
+                    <router-link v-else class="edit_bar_btn r el-icon-edit" :to="'/chart_editor/'+item.id" title="编辑"></router-link>
+                    
                     <span class=" edit_bar_btn r el-icon-refresh" @click="onClickRefreshChartData(item.id,index,$event)" title="刷新"></span>
                     <span class="el-icon-delete r edit_bar_btn" @click="onClickDeleteChart(item.id,index,$event)" title="删除"></span>
                   </div>
                   <tableView v-if="item.type =='table'" class="full table_container" :myMessage="item.chartData"></tableView>
-                  <IEcharts v-else class="full charts_container"  :notMerge="true" :resizable="true" :option="item.option" :loading="item.loading"></IEcharts>
+                  <IEcharts v-else class="full charts_container" :resizable="true" :option="item.option" :loading="item.loading"></IEcharts>
                 </div>
               </div>
             </div>
@@ -53,7 +58,7 @@
       <a class="add_new" href="javascript:;" @click="onClickAddNewChart"><i class="el-icon-plus"></i>新建图表</a>
       <!-- <router-link class="new_built" to="/chart_editor/" title="新建图表"><i class="el-icon-plus"></i>新建图表</router-link> -->
       <div class="tit fix">选择已有图表
-        <div class="search_box r">
+        <div class="search_box r" :class="{hover:searchCharts.length}">
           <i class="el-icon-search"></i>
           <input type="text" v-model="searchCharts" class="search_input">
         </div> 
@@ -69,10 +74,27 @@
       </span>
     </el-dialog>
 
+    <el-dialog class="common_dialog chart_add_dialog chart_type_dialog" title="选择类型" :visible.sync="chooseTypeVisible">
+      <div class="tit fix">选择图表展示类型</div>
+      <div class="fix chart_types">
+        <span v-for="(item,index) in chartsTypes" :key="index" class="type" :class="{active:chooseTypeIndex==index,vip:item.isUsable}" @click="onClickChooseType(index)">{{item.name}}</span>
+      </div>
+      <div class="tit fix">选择其他展示类型</div>
+      <ul class="other_types">
+        <div class="empty_child" v-if="!activeChildren.length">暂无内容</div>
+        <li v-else v-for="(item,index) in activeChildren" :key="index" :class="{active:chooseIndex==index}" @click="onClickType(index)">{{item.name}}</li>
+      </ul>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button class="btn-confirm" type="primary" @click="showDataView">确 定</el-button>
+        <el-button class="btn-cancel" @click="toggleChooseTypeDialog">取 消</el-button>
+      </span>
+    </el-dialog>
+
     <el-dialog class="common_dialog chart_add_dialog" title="新建图表-选择数据视图" :visible.sync="addNewChartVisible" >
       <div class="add_new" href="javascript:;" ><router-link to="/dataview">新建数据视图</router-link></div>
       <div class="tit fix">选择已有视图
-        <div class="search_box r">
+        <div class="search_box r" :class="{hover:searchView.length}">
           <i class="el-icon-search"></i>
           <input type="text" v-model="searchView" class="search_input">
         </div> 
@@ -149,8 +171,11 @@ import '../../vendor/jsVendor/seriesWordCloud.js';
 import seriesWordCloudDefault from '../../vendor/seriesWordCloud.json';
 import '../../vendor/jsVendor/seriesPercentStackbar.js';
 
+import '../../vendor/jsVendor/seriesBar3D.js';
+import seriesBar3DDefault from '../../vendor/seriesBar3D.json';
+
 export default {
-  components: { IEcharts, dashboardDir, tableView, colorPicker},
+  components: { IEcharts, dashboardDir, tableView, colorPicker },
   mounted() {
     let that = window.vm = this,
       params = that.$route.params;
@@ -161,7 +186,7 @@ export default {
       {
         folder: '/'
       },
-      function(res) {
+      function (res) {
         if (res.success) {
           that.charts = res.data.map(x => {
             // 多增加一个选择状态
@@ -181,7 +206,7 @@ export default {
         folder: '',
         dataview: true
       },
-      function(res) {
+      function (res) {
         if (res.success) {
           that.listFolders.list = res.data;
         }
@@ -198,6 +223,8 @@ export default {
     fullscreenLoading: true,
     // 添加新图表弹窗
     addChartVisible: false,
+    // 选择图表类型弹窗
+    chooseTypeVisible: false,
     // 添加新图表-新建图表弹窗
     addNewChartVisible: false,
     // 添加添加仪表盘弹窗
@@ -221,7 +248,7 @@ export default {
     // 仪表盘id
     dashboardId: '',
     // 仪表盘背景色
-    dashboardBgcolor:'',    
+    dashboardBgcolor: '',
     // dashboard 列表
     dashboardList: [],
     // chart列表
@@ -256,17 +283,49 @@ export default {
       tableName: {
         sql: '',
         name: ''
-      }
+      },
+      isSpec: false,
+      type: ''
     },
     // 已有图表搜索
-    searchCharts:'',
+    searchCharts: '',
     // 已有视图搜索    
-    searchView:'',
+    searchView: '',
     // 仪表盘模式 瀑布流(waterfall)/ppt(ppt)  TODO: ppt模式
-    model:'waterfall'
+    model: 'waterfall',
+    // 选中的图表类型
+    chooseIndex: null,
+    chooseTypeIndex: null,
+    // 选中的特殊图表类型
+    chooseType: '',
+    // 图表类型
+    chartsTypes: [{
+      name: '二维图表',
+      isSpec: false,
+      isUsable: true,
+      children: []
+    }, {
+      name: '三维图表',
+      isSpec: true,
+      isUsable: false,
+      children: [{
+        name: '三维柱图',
+        img: '',
+        type: 'bar3D',
+        choose: false
+      }]
+    }, {
+      name: '地理图表',
+      isSpec: true,
+      isUsable: false,
+      children: []
+    }],
+    activeChildren: [],
+    // 新用户的帮助
+    dashboardEmpty: false
   }),
   watch: {
-    editStatus: function(newVal, oldVal) {
+    editStatus: function (newVal, oldVal) {
       if (newVal) {
         this.toggleGridEdit(true);
       } else {
@@ -274,16 +333,16 @@ export default {
         this.saveDashboard();
       }
     },
-    searchCharts:function(val,oldVal){
-      for(let i=0;i<this.charts.length;i++){
-        if(this.charts[i].text&&this.charts[i].text.indexOf(val)<0){
-          this.charts[i].show=false;
-        }else{
-          this.charts[i].show=true;          
+    searchCharts: function (val, oldVal) {
+      for (let i = 0; i < this.charts.length; i++) {
+        if (this.charts[i].text && this.charts[i].text.indexOf(val) < 0) {
+          this.charts[i].show = false;
+        } else {
+          this.charts[i].show = true;
         }
       }
     },
-    searchView:function(val){
+    searchView: function (val) {
       this.$refs.viewTree.filter(val);
     }
   },
@@ -308,35 +367,32 @@ export default {
     loadDashboard() {
       let that = this,
         params = that.$route.params;
-      getJson('/dashboard/list.do', {}, function(res) {
+      getJson('/dashboard/list.do', {}, function (res) {
         if (res.success) {
           that.dashboardList = Object.assign([], res.data);
-          if (!params.viewId) {
-            // 获取不到当前仪表盘id时默认取第一个
-            that.$router.replace({
-              path: '/empty',
-              query: { link: '/dashboard/' + that.dashboardList[0].id }
-            });
-            return;
-          } else {
-            for (let i = 0; i < that.dashboardList.length; i++) {
-              that.dashboardList[i].active = false;
-              that.dashboardList[i].show = true;
-              if (that.dashboardList[i].id == params.viewId) {
-                that.chartList = that.dashboardList[i].layout || [];
-                that.dashboardName = that.dashboardList[i].text;
-                that.dashboardId = that.dashboardList[i].id;
-                that.dashboardBgcolor = that.dashboardList[i].dashboardBgcolor||'';
-                that.dashboardList[i].active = true;
-              }
+           
+          for (let i = 0; i < that.dashboardList.length; i++) {
+            that.dashboardList[i].active = false;
+            that.dashboardList[i].show = true;
+            if (that.dashboardList[i].id == params.viewId) {
+              that.chartList = that.dashboardList[i].layout || [];
+              that.dashboardName = that.dashboardList[i].text;
+              that.dashboardId = that.dashboardList[i].id;
+              that.dashboardBgcolor = that.dashboardList[i].dashboardBgcolor || '';
+              that.dashboardList[i].active = true;
             }
+          }
+          if (!params.viewId) {
+            that.fullscreenLoading = false;
+            that.dashboardEmpty = true;
+            return;
           }
           that.getDashboardData();
         }
       });
     },
     // 空函数
-    noop() {},
+    noop() { },
     getDashboardData(callback) {
       let that = this,
         params = that.$route.params;
@@ -348,9 +404,9 @@ export default {
       for (let i = 0; i < that.chartList.length; i++) {
         resultArr.push(request(that.chartList[i].id, i));
       }
-      
+
       function request(id, i) {
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
           that.getChartData(id, i, resolve, reject);
         });
       }
@@ -360,9 +416,11 @@ export default {
           that.chartList[i].option =
             result[i] && result[i].option ? result[i].option : {};
           that.chartList[i].loading = false;
-          that.chartList[i].type = result[i].type||'';
-          that.chartList[i].sql = result[i].tableName.sql;
-          that.chartList[i].query = result[i].query||{};
+          that.chartList[i].type = result[i].type || '';
+          that.chartList[i].sql = result[i].tableName?result[i].tableName.sql:'';
+          that.chartList[i].query = result[i].query || {};
+          that.chartList[i].isSpec = result[i].isSpec;
+
           that.chartList[i].background = result[i].background
             ? result[i].background
             : {
@@ -370,16 +428,16 @@ export default {
               backgroundRepeat: 'no-repeat',
               backgroundImage: ''
             };
-          if(that.chartList[i].option){
+          if (that.chartList[i].option) {
             that.chartList[i].title = that.chartList[i].option.title
               ? that.chartList[i].option.title.text
               : '';
             // 清空title，把title提出来
             that.chartList[i].option.title = '';
-          }else{
-            that.chartList[i].title='';
+          } else {
+            that.chartList[i].title = '';
           }
-          
+
           // 手动清空series.data里数据
           if (that.chartList[i].option && that.chartList[i].option.series) {
             for (let j = 0; j < that.chartList[i].option.series.length; j++) {
@@ -389,45 +447,43 @@ export default {
         }
 
         that.loadGrid();
-        that.toggleFullScreen();        
+        that.toggleFullScreen();
         that.lazyload();
+        if ('function' == typeof callback) {
+          callback();
+        }
         return;
         // 以下为不用懒加载的方式
-        for (let i = 0; i < that.chartList.length; i++) {
-          chartDataPms.push(
-            chartDataRequest(
-              that.chartList[i].sql,
-              JSON.stringify(that.chartList[i].query),
-              i,
-              that.chartList[i].type
-            )
-          );
-        }
-        function chartDataRequest(sql, queryInfo, index, type) {
-          return new Promise(function(resolve, reject) {
-            that.getChartSeriesData(
-              sql,
-              queryInfo,
-              index,
-              type,
-              resolve,
-              reject
-            );
-          });
-        }
-        Promise.all(chartDataPms).then(result2 => {
-          for (let i = 0; i < result2.length; i++) {
-            if (result2[i].data.dataError || !result2[i].data.data) {
-              continue;
-            }
-            that.dataHandler(result2[i], i, that.chartList[i].type);
-          }
+        // for (let i = 0; i < that.chartList.length; i++) {
+        //   chartDataPms.push(
+        //     chartDataRequest(that.chartList[i].sql, JSON.stringify(that.chartList[i].query), i, that.chartList[i].type)
+        //   );
+        // }
+        // function chartDataRequest(sql, queryInfo, index, type) {
+        //   return new Promise(function (resolve, reject) {
+        //     that.getChartSeriesData(
+        //       sql,
+        //       queryInfo,
+        //       index,
+        //       type,
+        //       resolve,
+        //       reject
+        //     );
+        //   });
+        // }
+        // Promise.all(chartDataPms).then(result2 => {
+        //   for (let i = 0; i < result2.length; i++) {
+        //     if (result2[i].data.dataError || !result2[i].data.data) {
+        //       continue;
+        //     }
+        //     that.dataHandler(result2[i], i, that.chartList[i].type);
+        //   }
 
-          that.toggleFullScreen();
-          if ('function' == typeof callback) {
-            callback();
-          }
-        });
+        //   that.toggleFullScreen();
+        //   if ('function' == typeof callback) {
+        //     callback();
+        //   }
+        // });
       });
     },
     // 获取单一图表数据,i是在索引中的顺序
@@ -445,10 +501,10 @@ export default {
         {
           chart: chartId
         },
-        function(data) {
+        function (data) {
           resolve(data.data);
         },
-        function() {
+        function () {
           reject();
         }
       );
@@ -462,7 +518,7 @@ export default {
           view: sql,
           query: queryInfo
         },
-        function(data) {
+        function (data) {
           // if (data.success) {
           //   resolve(data);
           // }
@@ -473,7 +529,7 @@ export default {
             that.dataHandler(data, index, type);
           }
         },
-        function() {
+        function () {
           // reject();
         }
       );
@@ -495,9 +551,9 @@ export default {
         {
           chart: chartId
         },
-        function(data) {
+        function (data) {
           if (data.success && data.data) {
-            that.chartList[i].isload=false;
+            that.chartList[i].isload = false;
             that.chartList[i].option =
               data.data && data.data.option ? data.data.option : {};
             that.chartList[i].loading = false;
@@ -521,7 +577,7 @@ export default {
                 view: data.data.tableName.sql,
                 query: JSON.stringify(data.data.query)
               },
-              function(res) {
+              function (res) {
                 if (res.success) {
                   if (res.data.dataError || !res.data.data) {
                     return;
@@ -533,8 +589,8 @@ export default {
           }
         }
       );
-      setTimeout(function() {
-        that.$nextTick(function() {
+      setTimeout(function () {
+        that.$nextTick(function () {
           loadingInstance.close();
         });
       }, 1000);
@@ -556,7 +612,7 @@ export default {
             folder: '/',
             config: JSON.stringify(that.newCharts)
           },
-          function(data) {
+          function (data) {
             if (data.success) {
               let params = that.$route.params,
                 list = {
@@ -565,7 +621,7 @@ export default {
                   layout: []
                 };
               // 获取各图表x,y,w,h
-              $('.grid-stack-item').each(function(i, e) {
+              $('.grid-stack-item').each(function (i, e) {
                 list.layout.push({
                   id: $(e).data('id'),
                   x: $(e).data('gs-x'),
@@ -588,9 +644,13 @@ export default {
                 {
                   config: JSON.stringify(list)
                 },
-                function(res) {
+                function (res) {
                   if (res.success) {
-                    that.$router.push('/chart_editor/' + data.data.id);
+                    if (that.newCharts.isSpec) {
+                      that.$router.push('/chart_editor_prime/' + data.data.id);
+                    } else {
+                      that.$router.push('/chart_editor/' + data.data.id);
+                    }
                   }
                 }
               );
@@ -606,11 +666,11 @@ export default {
         list = {
           id: that.dashboardId,
           text: that.dashboardName,
-          dashboardBgcolor:that.dashboardBgcolor,
+          dashboardBgcolor: that.dashboardBgcolor,
           layout: []
         };
       // 获取各图表x,y,w,h
-      $('.grid-stack-item').each(function(i, e) {
+      $('.grid-stack-item').each(function (i, e) {
         list.layout.push({
           id: $(e).data('id'),
           x: $(e).data('gs-x'),
@@ -625,7 +685,7 @@ export default {
         {
           config: JSON.stringify(list)
         },
-        function(res) {
+        function (res) {
           if (res.success) {
             if (callback) {
               callback();
@@ -654,7 +714,7 @@ export default {
         {
           config: JSON.stringify(list)
         },
-        function(res) {
+        function (res) {
           if (res.success) {
             that.$message({ message: '新建成功', type: 'success' });
             that.dashboardDialogVisible = false;
@@ -668,32 +728,74 @@ export default {
       );
     },
     // 显示/隐藏添加图表弹窗
-    toggleAddChartDialog() {
+    toggleAddChartDialog(addFlag) {
+      // 添加图表前判断有没有选择dashboard
+      if('boolean' == typeof addFlag && !this.dashboardId){
+        this.$message({ message: '请先选择仪表盘', type: 'warning' });
+        return;
+      }
       this.addChartVisible = !this.addChartVisible;
+      
     },
-    onClickAddNewChart(){
+    // 显示/隐藏选择图表类型弹窗
+    toggleChooseTypeDialog() {
+      this.chooseTypeVisible = !this.chooseTypeVisible;
+    },
+    // 打开图表类型弹窗
+    onClickAddNewChart() {
+      this.chooseTypeVisible = true;
+    },
+    // 打开数据视图弹窗
+    showDataView() {
+      if (vm.$data.chooseTypeIndex == null) {
+        alert('请选择图表');
+        return;
+      }
+      if (this.newCharts.isSpec && !this.newCharts.type) {
+        alert('请选择图表');
+        return;
+      }
       this.addNewChartVisible = true;
     },
+    // 第一级选择事件
+    onClickChooseType(index) {
+      if (this.chartsTypes[index].isUsable) {
+        this.chooseTypeIndex = index;
+        this.activeChildren = this.chartsTypes[index].children;
+        this.newCharts.isSpec = this.chartsTypes[index].isSpec;
+      }
+    },
+    // 第二级选择事件
+    onClickType(index) {
+      this.chooseIndex = index;
+      this.newCharts.type = this.activeChildren[index].type;
+    },
     // 关闭仪表盘编辑弹窗
-    closeEditDialog(){
+    closeEditDialog() {
       this.editDialogVisible = false;
     },
     // 打开/关闭设计模式
     toggleEdit() {
-      this.editStatus = !this.editStatus;
-      if (this.editStatus) {
-        this.toggleGridEdit(true);
-      } else {
-        this.toggleGridEdit();
-        this.saveDashboard();
+      if(this.dashboardId){
+        this.editStatus = !this.editStatus;
+        if (this.editStatus) {
+          this.toggleGridEdit(true);
+        } else {
+          this.toggleGridEdit();
+          this.saveDashboard();
+        }
       }
     },
     // 预览跳转
     preview() {
       // 预览前先保存
       let that = this;
-      var href = vars.src + '/viewer/dashboard.html?id=' + that.dashboardId;
-      that.saveDashboard(openPrevView);
+      if(that.dashboardId){
+        var href = vars.src + '/viewer/dashboard.html?id=' + that.dashboardId;
+        that.saveDashboard(openPrevView);
+      }else{
+        this.$message({ message: '请先选择仪表盘', type: 'warning' });
+      }
       function openPrevView() {
         window.open(href);
       }
@@ -761,13 +863,13 @@ export default {
     },
     // 左侧列表点击事件
     itemClick(data) {
-      if(data!= this.dashboardId){
+      if (data != this.dashboardId) {
         this.$router.push({
           path: '/empty',
           query: { link: '/dashboard/' + data }
         });
       }
-      
+
     },
     // 删除图表
     onClickDeleteChart(chartId, i, $event) {
@@ -801,7 +903,7 @@ export default {
         {
           config: JSON.stringify(list)
         },
-        function(res) {
+        function (res) {
           var resData = res.data;
           if (res.success) {
             that.$message({ message: '保存成功', type: 'success' });
@@ -811,6 +913,7 @@ export default {
             } else {
               list.active = false;
             }
+            list.show=true;
             that.dashboardList.splice(that.editIndex, 1, list);
           }
         }
@@ -1014,34 +1117,48 @@ export default {
       case 'table':
         this.chartList[index].chartData = data.data;
         break;
+      case 'bar3D':
+        that.chartList[index].option.series = Object.assign(
+          [],
+          seriesBar3D(
+            columns,
+            rows,
+            queryNameKeyX,
+            queryNameKeyY,
+            seriesBar3DDefault,
+            that.chartList[index].option.series
+          )
+        );
+        break;
+
       default:
         console.warn('类型错误！');
       }
-      that.chartList[index].option = Object.assign({},that.chartList[index].option);
-      that.$set(that.chartList,index,that.chartList[index]);
+      that.chartList[index].option = Object.assign({}, that.chartList[index].option);
+      that.$set(that.chartList, index, that.chartList[index]);
     },
     // 选择视图搜索
-    filterView(value,data){
+    filterView(value, data) {
       if (!value) return true;
       return data.label.indexOf(value) !== -1;
     },
     // 懒加载
-    lazyload(){
+    lazyload() {
       let that = this;
-      $('.grid-content').on('scroll',function(){
+      $('.grid-content').on('scroll', function () {
         // 滚动的距离
         let scrollTop = Math.abs($('#dash').position().top);
         var h = $('.grid-content').height();
-        $('.grid-stack-item').each(function(){
-          let position =  $(this).position().top;
-          let index = $(this).attr('data-index');          
+        $('.grid-stack-item').each(function () {
+          let position = $(this).position().top;
+          let index = $(this).attr('data-index');
           let isload = that.chartList[index].isload;
           let id = $(this).attr('data-id');
-          if(position < scrollTop+h && !isload){
-            that.chartList[index].isload=true;
-            let type = that.chartList[index].type ;
-            let queryInfo = JSON.stringify(that.chartList[index].query );
-            let sql =that.chartList[index].sql;
+          if (position < scrollTop + h && !isload) {
+            that.chartList[index].isload = true;
+            let type = that.chartList[index].type;
+            let queryInfo = JSON.stringify(that.chartList[index].query);
+            let sql = that.chartList[index].sql;
             that.getChartSeriesData(sql, queryInfo, index, type);
           }
         });
@@ -1050,3 +1167,12 @@ export default {
   }
 };
 </script>
+<style scoped>
+.new_user {
+  width: 100%;
+  height: 500px;
+  margin-top: 40px;
+  background: url('../../assets/images/dashboard_e.png') no-repeat;
+  background-position: 5px 5px;
+}
+</style>

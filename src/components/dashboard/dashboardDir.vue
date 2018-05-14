@@ -4,7 +4,7 @@
       仪表盘
       <i class="el-icon-more r"></i>
       <i class="el-icon-plus r"  @click="showAddDialog"></i>
-      <div class="search_box r">
+      <div class="search_box r" :class="{hover:search.length}">
         <i class="el-icon-search"></i>
         <input type="text" v-model="search" class="search_input">
       </div>

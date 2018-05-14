@@ -11,8 +11,8 @@
 </template>
 
 <script>
-import seriesDefault from "../../vendor/seriesPie.json";
-import "../../vendor/jsVendor/seriesPie.js";
+import seriesDefault from '../../vendor/seriesPie.json';
+import '../../vendor/jsVendor/seriesPie.js';
 
 export default {
   created() {
@@ -24,11 +24,11 @@ export default {
     if (that.option.series) {
       if (
         that.option.series[0].radius &&
-        "string" == typeof that.option.series[0].radius
+        'string' == typeof that.option.series[0].radius
       ) {
-        that.radius = parseInt(that.option.series[0].radius.split("%")[0]);
+        that.radius = parseInt(that.option.series[0].radius.split('%')[0]);
       } else {
-        that.radius = parseInt(seriesDefault.radius.split("%")[0]);
+        that.radius = parseInt(seriesDefault.radius.split('%')[0]);
       }
     }
   },
@@ -46,17 +46,17 @@ export default {
     // 数据
     chartData: {},
     // 默认配置项展开
-    activeNames: ["1"],
+    activeNames: ['1'],
     // 图表类型
-    type: "pie",
-    pageName: "饼图",
+    type: 'pie',
+    pageName: '饼图',
     // 半径
     radius: null
   }),
   watch: {
     seriesOption: {
       handler: function(newVal, oldVal) {
-        this.$emit("getSeries", newVal.option);
+        this.$emit('getSeries', newVal.option);
       },
       deep: true
     },
@@ -120,7 +120,7 @@ export default {
       if (this.option.series) {
         for (let i = 0; i < this.option.series.length; i++) {
           this.option.series[i].radius = this.radius
-            ? this.radius + "%"
+            ? this.radius + '%'
             : seriesDefault.radius;
         }
       }
@@ -134,20 +134,20 @@ export default {
         true
       );
 
-      that.$set(this.seriesOption.option, "grid", seriesDefault.grid);
-      that.$set(this.seriesOption.option, "xAxis", newData.xAxis);
-      this.$emit("getSeries", that.seriesOption.option);
+      that.$set(this.seriesOption.option, 'grid', seriesDefault.grid);
+      that.$set(this.seriesOption.option, 'xAxis', newData.xAxis);
+      this.$emit('getSeries', that.seriesOption.option);
     },
     // 半径调整
     radiusChange(data) {
       this.radius = data;
       for (let i = 0; i < this.seriesOption.option.series.length; i++) {
-        this.seriesOption.option.series[i].radius = this.radius + "%";
+        this.seriesOption.option.series[i].radius = this.radius + '%';
       }
       this.seriesOption.option = Object.assign({}, this.seriesOption.option);
-      this.$emit("getSeries", this.seriesOption.option);
+      this.$emit('getSeries', this.seriesOption.option);
     }
   },
-  props: ["option", "data"]
+  props: ['option', 'data']
 };
 </script>

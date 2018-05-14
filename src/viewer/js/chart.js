@@ -27,17 +27,55 @@ var options = {
 };
 
 $.extend(options, UrlParams);
-
 var id = options.id;
+var WIDTH = 'string' == typeof options.width ? initSize(options.width) : '100%';
+var HEIGHT = 'string' == typeof options.height ? initSize(options.height) : '100%';
+
+var optionData;
+var myChart, chartType;
+
+var themeData = {
+  backgroundColor: '#333',
+  legend: {
+    textStyle: {
+      color: '#fff'
+    }
+  },
+  title: {
+    textStyle: {
+      color: '#fff'
+    }
+  },
+  xAxis: {
+    axisLabel: {
+      color: '#fff'
+    },
+    axisLine: {
+      lineStyle: {
+        color: '#fff'
+      }
+    }
+  },
+  yAxis: {
+    axisLabel: {
+      color: '#fff'
+    },
+    axisLine: {
+      lineStyle: {
+        color: '#fff'
+      }
+    }
+  }
+};
+
 if (!id || !id.length) {
   alert('缺少id!');
 }
 
-var WIDTH = 'string' == typeof options.width ? initSize(options.width) : '100%';
-var HEIGHT = 'string' == typeof options.height ? initSize(options.height) : '100%';
-
 $(scr).after('<div class="chart_wrap"><div id="chartWrap" style="height:' + HEIGHT + ';width:' + WIDTH + '" ></div></div>');
+
 getChartData(id);
+
 
 // 获取单一图表数据
 function getChartData(chartId) {
@@ -46,106 +84,108 @@ function getChartData(chartId) {
     chart: chartId
   }, function(res) {
     if (res.data.background) {
-      $('.chart_wrap').css('background',res.data.background.backgroundColor)
+      $('.chart_wrap').css('background', res.data.background.backgroundColor)
     }
     if (res.data.option) {
-      // TODO: 缺少table
+      optionData = res.data.option
       resize();
+      chartType = res.data.type;
       // 图表时数据处理
       if (res.data.type == 'table') {
         var queryInfo = JSON.stringify(res.data.query),
           viewId = res.data.tableName.sql
-          getJson("/query.do",{
-            view: viewId,
-            query: queryInfo
-          }, function(data) {
-            // 处理数据
-            var chartData = replaceNull(data.data.data)
-            // renderTmp('#chart' + chartId, 'tableViewTpl', chartData);
-            var rows = chartData.rows;
-            var columns = chartData.columns;
-            // 最多显示500条
-            if (rows.length > 500) {
-              rows.length = 500
-            }
+        getJson("/query.do", {
+          view: viewId,
+          query: queryInfo
+        }, function(data) {
+          // 处理数据
+          var chartData = replaceNull(data.data.data)
+          // renderTmp('#chart' + chartId, 'tableViewTpl', chartData);
+          var rows = chartData.rows;
+          var columns = chartData.columns;
+          // 最多显示500条
+          if (rows.length > 500) {
+            rows.length = 500
+          }
 
-            var html = '';
-            html+='<div class="table_title">'+ res.data.option.title.text+'</div>'
-            html += '<table class="chart_table">'
-            html += '<thead>'
-            html += '<tr>'
-            for (var i = 0; i < columns.length; i++) {
-              html += '<td>' + columns[i].source.text + '</td>'
+          var html = '';
+          html += '<div class="table_title">' + res.data.option.title.text + '</div>'
+          html += '<table class="chart_table">'
+          html += '<thead>'
+          html += '<tr>'
+          for (var i = 0; i < columns.length; i++) {
+            html += '<td>' + columns[i].source.text + '</td>'
+          }
+          html += '</tr>'
+          html += '</thead>'
+          // 合并
+          var num = [];
+          for (var j = 0; j < columns.length; j++) {
+            num[j] = 0
+          }
+
+          function comp(rows1, rows2, index) {
+            // 循环对比
+            var ind = index
+            if (ind > 0) {
+              if (rows1[columns[ind - 1].name] == rows2[columns[ind - 1].name]) {
+                comp(rows1, rows2, ind - 1)
+                if (ind - 1 == 0) {
+                  return true
+                }
+              } else {
+                return false
+              }
+            }
+          }
+          for (var i = 0; i < rows.length; i++) {
+            html += '<tr>';
+            for (var j = 0; j < columns.length; j++) {
+              if (i < num[j]) {
+                continue
+              } else {
+                var rowspan = 1;
+                if (i + 1 < rows.length) {
+                  for (var k = i + 1; k < rows.length; k++) {
+                    if (rows[i][columns[j].name] == rows[k][columns[j].name]) {
+                      if (j == 0) {
+                        rowspan++;
+                        num[j]++;
+                      } else if (rows[i][columns[j].name] == rows[k][columns[j].name] && comp(rows[i], rows[k], j)) {
+                        rowspan++;
+                        num[j]++;
+                      }
+                    } else {
+                      num[j]++;
+                      break
+                    }
+
+                  }
+                  html += '<td rowspan="' + rowspan + '">' + rows[i][columns[j].name] + '</td>'
+                } else {
+                  // 最后一个
+                  if (rows[i][columns[j].name] != rows[i - 1][columns[j].name]) {
+                    html += '<td rowspan="' + rowspan + '">' + rows[i][columns[j].name] + '</td>'
+
+                  }
+
+                }
+              }
             }
             html += '</tr>'
-            html += '</thead>'
-            // 合并
-            var num = [];
-            for (var j = 0; j < columns.length; j++) {
-              num[j] = 0
-            }
-            function comp(rows1, rows2, index) {
-              // 循环对比
-              var ind = index
-              if (ind > 0) {
-                if (rows1[columns[ind - 1].name] == rows2[columns[ind - 1].name]) {
-                  comp(rows1, rows2, ind - 1)
-                  if (ind - 1 == 0) {
-                    return true
-                  }
-                } else {
-                  return false
-                }
-              }
-            }
-            for (var i = 0; i < rows.length; i++) {
-              html += '<tr>';
-              for (var j = 0; j < columns.length; j++) {
-                if (i < num[j]) {
-                  continue
-                } else {
-                  var rowspan = 1;
-                  if (i + 1 < rows.length) {
-                    for (var k = i + 1; k < rows.length; k++) {
-                      if (rows[i][columns[j].name] == rows[k][columns[j].name]) {
-                        if (j == 0) {
-                          rowspan++;
-                          num[j]++;
-                        } else if (rows[i][columns[j].name] == rows[k][columns[j].name] && comp(rows[i], rows[k], j)) {
-                          rowspan++;
-                          num[j]++;
-                        }
-                      } else {
-                        num[j]++;
-                        break
-                      }
-
-                    }
-                    html += '<td rowspan="' + rowspan + '">' + rows[i][columns[j].name] + '</td>'
-                  } else {
-                    // 最后一个
-                    if (rows[i][columns[j].name] != rows[i - 1][columns[j].name]) {
-                      html += '<td rowspan="' + rowspan + '">' + rows[i][columns[j].name] + '</td>'
-
-                    }
-
-                  }
-                }
-              }
-              html += '</tr>'
-            }
-            // 不合并
-            // for (var j = 0; j < rows.length; j++) {
-            //   html+='<tr>'
-            //   for(var i=0;i<columns.length;i++){
-            //       html+='<td rowspan="">'+rows[j][columns[i].name]+'</td>'
-            //   }
-            //   html+='</tr>'
-            // }
-            $('#chartWrap').append(html).addClass('ova')
-          })
+          }
+          // 不合并
+          // for (var j = 0; j < rows.length; j++) {
+          //   html+='<tr>'
+          //   for(var i=0;i<columns.length;i++){
+          //       html+='<td rowspan="">'+rows[j][columns[i].name]+'</td>'
+          //   }
+          //   html+='</tr>'
+          // }
+          $('#chartWrap').append(html).addClass('ova')
+        })
       } else {
-        var myChart = echarts.init(document.getElementById('chartWrap'));
+        myChart = echarts.init(document.getElementById('chartWrap'));
         myChart.setOption(res.data.option);
         myChart.resize();
       }
@@ -153,8 +193,17 @@ function getChartData(chartId) {
       window.onresize = function() {
         //重置容器高宽
         resize();
-        myChart?myChart.resize():'';
+        myChart ? myChart.resize() : '';
       };
+
+      // TODO: 渲染右侧设置, 与本地合并，每设置完一个保存本地      
+      if (window.localStorage) {
+        theme = local.get(chartId)
+      }
+      console.log(theme)
+      $('#themeSelect').val(theme).trigger('change')
+
+
     }
   });
 }
@@ -225,3 +274,58 @@ function replaceNull(chartData) {
   }
   return chartData
 }
+
+function setOption(data) {
+  renderTmp('#settingBox', 'settingBoxTpl', data);
+}
+
+$(function() {
+  $('select').select2({
+    minimumResultsForSearch: -1
+  });
+
+  $('.fa-info-circle').on('click', function() {
+    $('#setting').toggleClass('active')
+  });
+
+  $('.title').on('click', function() {
+    $(this).next().slideToggle();
+  });
+  $('#themeSelect').on('change', function() {
+    // 使用echarts的theme的话无法覆盖部分样式
+    var val = $(this).val();
+    console.log($(this).val());
+    if (chartType != 'table') {
+      // 非报表
+      var option;
+      if (val == 'dark') {
+        // 与特殊样式合并，
+        option = $.extend(true, {}, optionData, themeData);
+        console.log(option);
+      } else {
+        option = $.extend(true, {}, optionData);
+      }
+      myChart.clear();
+      myChart.setOption(option);
+      myChart.resize();
+
+
+    } else {
+      // 报表
+      if (val == 'dark') {
+        $('.chart_wrap').css({'background':themeData.backgroundColor,color:'#fff'})
+      } else {
+        if (optionData.background) {
+          $('.chart_wrap').css({'background': optionData.background.backgroundColor,color:'#333'})
+        }else{
+          $('.chart_wrap').css({'background':'#fff',color:'#333'})          
+        }
+      }
+    }
+    
+    if (window.localStorage) {
+      local.set(id, val)
+    }
+  });
+
+})

@@ -43,13 +43,19 @@
         box-sizing: border-box;
         padding: 30px 0 0 0;
         height: 60px;
-        .el-icon-success{
+        .el-icon-success,.fa{
             position: absolute;
             right:0;
             top:35px;
             color:#808080;
             &.on{
                 color:#42b983;
+            }
+        }
+        .fa{
+            cursor: pointer;
+            &.on{
+                color:#3582e3;
             }
         }
     }
@@ -85,6 +91,11 @@
         color: #fff;
         background: #3582e3;
         border: none;
+        cursor: pointer;
+        transition: all .3s ease;
+        &:hover{
+            opacity: 0.8;
+        }
     }
     .login_btn .btn_go{
         margin-top: 44px;

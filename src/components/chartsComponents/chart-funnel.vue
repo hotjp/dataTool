@@ -10,8 +10,8 @@
 </template>
 
 <script>
-import seriesDefault from "../../vendor/seriesFunnel.json";
-import "../../vendor/jsVendor/seriesFunnel.js";
+import seriesDefault from '../../vendor/seriesFunnel.json';
+import '../../vendor/jsVendor/seriesFunnel.js';
 
 export default {
   created() {
@@ -33,15 +33,15 @@ export default {
     // 数据
     chartData: {},
     // 默认配置项展开
-    activeNames: ["1"],
+    activeNames: ['1'],
     // 图表类型
-    type: "funnel",
-    pageName: "漏斗图"
+    type: 'funnel',
+    pageName: '漏斗图'
   }),
   watch: {
     seriesOption: {
       handler: function(newVal, oldVal) {
-        this.$emit("getSeries", newVal.option);
+        this.$emit('getSeries', newVal.option);
       },
       deep: true
     },
@@ -93,11 +93,11 @@ export default {
         true
       );
 
-      that.$set(this.seriesOption.option, "grid", seriesDefault.grid);
-      this.$emit("getSeries", that.seriesOption.option);
+      that.$set(this.seriesOption.option, 'grid', seriesDefault.grid);
+      this.$emit('getSeries', that.seriesOption.option);
     }
   },
-  props: ["option", "data"]
+  props: ['option', 'data']
 };
 </script>
 <style>

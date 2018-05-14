@@ -4,7 +4,7 @@
             <el-form v-loading="loading" :model="form" onsubmit="return false">
                 <input v-model="form.id" type="hidden">
                 <el-form-item label="数据源类型" :label-width="formLabelWidth">
-                    <el-input @input="saveFlagFalse" v-model="form.dbType" readonly="readonly" auto-complete="off"></el-input>
+                    <el-input class="no_select" @input="saveFlagFalse" v-model="form.dbType" :disabled="true" readonly="readonly" auto-complete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="名称" :label-width="formLabelWidth">
                     <el-input @input="saveFlagFalse" v-model="form.name" auto-complete="off"></el-input>
@@ -24,6 +24,13 @@
                 <el-form-item label="密码" :label-width="formLabelWidth">
                     <el-input @input="saveFlagFalse" v-model="form.password" type="password" auto-complete="off"></el-input>
                 </el-form-item>
+                <el-form-item label="链接超时" :label-width="formLabelWidth">
+                    <el-input @input="saveFlagFalse" v-model="form.loginTimeout" type="text" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="查询超时" :label-width="formLabelWidth">
+                    <el-input @input="saveFlagFalse" v-model="form.queryTimeout" type="text" auto-complete="off"></el-input>
+                </el-form-item>
+
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <span class="tipText" :class="{opcityP:!saveFlag}">测试成功，请点击保存</span>
@@ -34,7 +41,7 @@
     </div>
 </template>
 <script type="text/babel">
-import { getJson } from "../../router/utils";
+import { getJson } from '../../router/utils';
 export default {
   data: () => ({
     // 页面控制
@@ -44,7 +51,7 @@ export default {
     dialogFormVisible: true,
     loading: false,    
     // 数据流
-    formLabelWidth: "120px"
+    formLabelWidth: '120px'
   }),
   watch: {
     dialogFormVisible: function(val) {
@@ -59,7 +66,7 @@ export default {
       let that = this;
       that.loading = true;
       getJson(
-        "/datasource/test.do",
+        '/datasource/test.do',
         {
           id: that.form.id,
           name: that.form.name,
@@ -68,17 +75,22 @@ export default {
           port: that.form.jdbcPort,
           user: that.form.jdbcUser,
           password: that.form.password,
-          database: that.form.jdbcDatabase
+          database: that.form.jdbcDatabase,
+          loginTimeout: that.form.loginTimeout,
+          queryTimeout: that.form.queryTimeout
         },
         function(res) {
           that.loading = false;
           if (res.success) {
-            that.$message("测试成功");
+            that.$message('测试成功');
             that.saveFlag = true;
             //   console.log(resData.data.rows);
           } else {
             // console.log(res);
-            that.$message("测试失败" + res.errorMessage);
+            that.$message({
+              message:'测试失败' + res.errorMessage,
+              duration:6000
+            });
             that.saveFlag = false;
           }
         }
@@ -89,7 +101,7 @@ export default {
       if (that.saveFlag) {
         that.loading = true;
         getJson(
-          "/datasource/save.do",
+          '/datasource/save.do',
           {
             id: that.form.id,
             name: that.form.name,
@@ -98,31 +110,33 @@ export default {
             port: that.form.jdbcPort,
             user: that.form.jdbcUser,
             password: that.form.password,
-            database: that.form.jdbcDatabase
+            database: that.form.jdbcDatabase,
+            loginTimeout: that.form.loginTimeout,
+            queryTimeout: that.form.queryTimeout
           },
           function(res) {
             that.loading = false;
             if (res.success) {
               that.dialogFormVisible = false;
-              that.$message("保存成功");
+              that.$message('保存成功');
             } else {
-              that.$message("保存未成功");
+              that.$message('保存未成功');
             }
           }
         );
       } else {
-        this.$message("测试链接未通过，请通过测试后再保存");
+        this.$message('测试链接未通过，请通过测试后再保存');
       }
     },
     changeFatherDialogFormVisible(value) {
       //向父组件传值
-      this.$emit("changeDialogFormVisible", value);
+      this.$emit('changeDialogFormVisible', value);
     },
     saveFlagFalse() {
       this.saveFlag = false;
     }
   },
-  props: ["form"]
+  props: ['form']
 };
 </script>
 <style scoped>

@@ -11,7 +11,7 @@
         数据视图
         <i class="el-icon-more r"></i>
         <i class="el-icon-plus r" @click="addSouch()"></i>
-        <div class="search_box r">
+        <div class="search_box r" :class="{hover:search.length}">
           <i class="el-icon-search"></i>
           <input type="text" v-model="search" class="search_input">
         </div>
@@ -47,12 +47,12 @@
 
     <el-dialog class="common_dialog chart_add_dialog" title="添加数据视图" :visible.sync="addVisible">
       <form action onsubmit="return false">
-        <el-input v-model="newName.text" class="new_name" type="text" placeholder="请输入视图名称"></el-input>
+        <el-input v-model="newName.text" class="new_name" type="text" placeholder="请输入视图名称"  title="请输入视图名称"></el-input>
         <i class="required">*</i>
         <div class="tit">
           选择数据源
           <i class="required">*</i>
-          <div class="search_box r">
+          <div class="search_box r" :class="{hover:searchView.length}">
             <i class="el-icon-search"></i>
             <input type="text" class="search_input" v-model="searchView">
           </div>
@@ -74,6 +74,7 @@ export default {
   mounted() {
     // 挂载后
     let that = this;
+    window.vm=this;
     getJson('/dataview/list.do', {
       folder: ''
     }, function (res) {
@@ -83,7 +84,7 @@ export default {
         }
         that.list = res.data;
         let params = that.$route.params;
-        if (!params.viewId) {
+        if (!params.viewId&&res.data&&res.data.length&&res.data[0].id ) {
           // 获取不到当前id时默认取第一个
           that.$router.replace({
             path: '/empty',
@@ -193,6 +194,9 @@ export default {
             folder: ''
           }, function (res) {
             if (res.success) {
+              for (let i = 0; i < res.data.length; i++) {
+                res.data[i].show = true;
+              }
               that.list = res.data;
               that.$message({
                 message: '删除成功',
@@ -251,6 +255,9 @@ export default {
             folder: ''
           }, function (res) {
             if (res.success) {
+              for (let i = 0; i < res.data.length; i++) {
+                res.data[i].show = true;
+              }
               that.list = res.data;
               that.$router.replace({ path: '/dataview/' + ress.data.id });
               let src = vars.src + '/data_editor/index.html?sourceId=' + that.sqlId + '&view=' + ress.data.id;

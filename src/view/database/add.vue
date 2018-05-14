@@ -38,15 +38,15 @@
   </div>
 </template>
 <script>
-import dataSourceDialog from "../../components/dataSource/dataSourceDialog.vue";
-import dataSourceList from "../../vendor/dataSourceList.json";
+import dataSourceDialog from '../../components/dataSource/dataSourceDialog.vue';
+import dataSourceList from '../../vendor/dataSourceList.json';
 export default {
   components: {
     dataSourceDialog
   },
   mounted() {
     for(let i=0;i<dataSourceList.length;i++){
-      dataSourceList[i].show = true
+      dataSourceList[i].show = true;
     }
     this.list = dataSourceList;
   },
@@ -59,14 +59,14 @@ export default {
     // 数据流
     vars: vars,
     fileList: [],
-    pageName: "数据源添加",
+    pageName: '数据源添加',
     // 数据源列表
     list: [],
-    pageType: "",
+    pageType: '',
     form: {},
-    formLabelWidth: "120px",
+    formLabelWidth: '120px',
     // 搜索
-    search: ""
+    search: ''
   }),
   watch:{
     search:function(val){
@@ -85,10 +85,14 @@ export default {
     },
     addDataSource(type, name) {
       this.pageType = type;
+      this.form={};
       this.form.dbType = name;
-      if (type === "form") {
+      this.form.loginTimeout = 10000;
+      this.form.queryTimeout = 30000;
+
+      if (type === 'form') {
         this.dialogFormVisible = true;
-      } else if (type === "upload") {
+      } else if (type === 'upload') {
         this.dialogUploadVisible = true;
       }
     },

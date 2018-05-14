@@ -6,7 +6,7 @@
           数据源
           <i class="el-icon-more r"></i>
           <i class="el-icon-plus r" @click="onAddSourceClick"></i>
-          <div class="search_box r">
+          <div class="search_box r" :class="{hover:search.length}">
             <i class="el-icon-search"></i>
             <input type="text" v-model="search" class="search_input">
           </div>
@@ -20,7 +20,7 @@
             <i class="el-icon-more" @mouseenter="mouseenter(index)" @mouseleave="mouseleave()" ></i>
             <div class="cover" @mouseenter="mouseenter(index)" @mouseleave="mouseleave()" >
               <a href="javascript:;" @click="onEditClick(item.id)">修改</a>
-              <a href="javascript:;" @click="onCreateSourceClick(item.id)">创建</a>
+              <a href="javascript:;" @click="onCreateSourceClick(item.id)">删除</a>
             </div>
           </li>
         </ul>
@@ -38,8 +38,8 @@
   </div>
 </template>
 <script>
-import { getJson } from "../../router/utils";
-import dataSourceDialog from "../../components/dataSource/dataSourceDialog.vue";
+import { getJson } from '../../router/utils';
+import dataSourceDialog from '../../components/dataSource/dataSourceDialog.vue';
 export default {
   components: {
     dataSourceDialog
@@ -58,17 +58,17 @@ export default {
     dialogFormVisible: false,
     // 数据流
     //是否可保存
-    pageName: "数据源添加",
+    pageName: '数据源添加',
     // 数据源列表
     list: [],
-    pageType: "index",
+    pageType: 'index',
     form: {},
-    formLabelWidth: "120px",
+    formLabelWidth: '120px',
     hoverIndex: null,
     search:''
   }),
   watch:{
-     search:function(val){
+    search:function(val){
       for(let i=0;i<this.list.length;i++){
         if(this.list[i].name.indexOf(val)<0){
           this.list[i].show=false;
@@ -81,10 +81,10 @@ export default {
   methods: {
     updateList() {
       let that = this;
-      getJson("/datasource/list.do", {}, function(res) {
+      getJson('/datasource/list.do', {}, function(res) {
         if (res.success) {
           for(let i=0;i<res.data.length;i++){
-            res.data[i].show = true
+            res.data[i].show = true;
           }
           that.list = res.data;
         }
@@ -92,7 +92,7 @@ export default {
     },
     // 添加数据源
     onAddSourceClick() {
-      this.$router.push("/database/add");
+      this.$router.push('/database/add');
     },
     onCreateSourceClick(id) {
       // TODO: 链接不对
@@ -102,13 +102,15 @@ export default {
     onEditClick(paramId) {
       let that = this;
       getJson(
-        "/datasource/info.do",
+        '/datasource/info.do',
         {
           datasource: paramId
         },
         function(res) {
           if (res.success) {
             that.form = res.data;
+            that.form.loginTimeout = res.data.loginTimeout?res.data.loginTimeout : 10000;
+            that.form.queryTimeout = res.data.queryTimeout?res.data.queryTimeout : 30000;
             that.dialogFormVisible = true;
           }
         }

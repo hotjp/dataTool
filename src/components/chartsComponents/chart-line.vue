@@ -17,10 +17,10 @@
 </template>
 
 <script>
-import seriesDefault from "../../vendor/seriesLine.json";
-import "../../vendor/jsVendor/seriesLine.js";
+import seriesDefault from '../../vendor/seriesLine.json';
+import '../../vendor/jsVendor/seriesLine.js';
 
-import colorPicker from "../chartEditor/propSelect/colorPicker.vue";
+import colorPicker from '../chartEditor/propSelect/colorPicker.vue';
 
 export default {
   components: {
@@ -48,17 +48,17 @@ export default {
     // 数据
     chartData: {},
     // 默认配置项展开
-    activeNames: ["1"],
+    activeNames: ['1'],
     // 图表类型
-    type: "line",
-    pageName: "折线图",
+    type: 'line',
+    pageName: '折线图',
     // 是否平滑曲线
     smooth: false
   }),
   watch: {
     seriesOption: {
       handler: function(newVal, oldVal) {
-        this.$emit("getSeries", this.seriesOption.option);
+        this.$emit('getSeries', this.seriesOption.option);
       },
       deep: true
     },
@@ -74,7 +74,7 @@ export default {
       handler: function(newVal, oldVal) {
         for(let i=0;i<newVal.length;i++){
           if(newVal[i].itemStyle.normal.color == 'transparent'){
-            this.seriesOption.option.series[i].itemStyle.normal.color=null
+            this.seriesOption.option.series[i].itemStyle.normal.color=null;
           }
         }
         
@@ -89,7 +89,7 @@ export default {
         this.seriesOption.option.series[i].smooth = data;
       }
       this.seriesOption.option = Object.assign({}, this.seriesOption.option);
-      this.$emit("getSeries", this.seriesOption.option);
+      this.$emit('getSeries', this.seriesOption.option);
     },
     // 数据处理
     dataChange() {
@@ -135,22 +135,22 @@ export default {
         newData.xAxis.data = arr;
       }
       // series.data的数据
-        newData.series = seriesLine(
-          columns,
-          rows,
-          queryNameKeyX,
-          queryNameKeyY,
-          seriesDefault,
-          that.option.series,
-          true
-        );
+      newData.series = seriesLine(
+        columns,
+        rows,
+        queryNameKeyX,
+        queryNameKeyY,
+        seriesDefault,
+        that.option.series,
+        true
+      );
       
-      that.$set(this.seriesOption.option, "grid", seriesDefault.grid);
-      that.$set(this.seriesOption.option, "xAxis", newData.xAxis);
-      that.$set(this.seriesOption.option, "series", newData.series);
-      that.$emit("getSeries", that.seriesOption.option);
+      that.$set(this.seriesOption.option, 'grid', seriesDefault.grid);
+      that.$set(this.seriesOption.option, 'xAxis', newData.xAxis);
+      that.$set(this.seriesOption.option, 'series', newData.series);
+      that.$emit('getSeries', that.seriesOption.option);
     }
   },
-  props: ["option", "data"]
+  props: ['option', 'data']
 };
 </script>

@@ -24,7 +24,7 @@
             字段
             <!-- TODO: 添加-->
             <i class="el-icon-plus r"  @click=""></i>
-            <div class="search_box r">
+            <div class="search_box r" :class="{hover:search.length}">
               <i class="el-icon-search"></i>
               <input type="text" v-model="search" class="search_input">
             </div>
@@ -164,13 +164,10 @@
       <div class="full chart_right">
         <div class="grid-content">
           <!-- TODO: 3D图表配置 -->
-          <!-- 图表类型 -->
-          <!-- <chartsTypes ref="chartsTypes" :charts="charts" :echartsShow="echartsShow" :tableShow="tableShow" @gettableShow="gettableShow" @getechartsShow="getechartsShow" @getCharts="getCharts" :setqueryInfo="queryInfo"></chartsTypes> -->
-          <!-- 序列风格 -->
-          <!-- <seriesStyles v-if="charts.type!='table'" :charts="charts" @seriesStyles="seriesStyles"></seriesStyles> -->
+          <chartsTypes ref="chartsTypes" :charts="charts" :echartsShow="echartsShow" :tableShow="tableShow" :setqueryInfo="queryInfo" @gettableShow="gettableShow" @getechartsShow="getechartsShow" @getCharts="getCharts"></chartsTypes>
           <!-- 面板属性 -->
-          <!-- <chartConfig @getProp="getProp" :setProp="graphData" :charts="charts"></chartConfig> -->
-
+          <chartConfig @getProp="getProp" :setProp="graphData" :charts="charts"></chartConfig>
+          
         </div>
       </div>
     </div>
@@ -348,14 +345,12 @@ import _ from 'lodash';
 import IEcharts from 'vue-echarts-v3/src/full';
 import 'echarts-wordcloud';
 import 'echarts-gl';
+
 import tableView from '../../components/chartEditor/tableView.vue';
-import chartTypeOption from '../../components/chartEditor/chartTypeOption.vue';
+// 图表类型
+import chartsTypes from '../../components/chartEditor/chartsTypesPrime.vue';
 // 属性面板
 import chartConfig from '../../components/chartEditor/chartConfig.vue';
-// 序列风格
-import seriesStyles from '../../components/chartEditor/seriesStyles.vue';
-// 图表类型
-import chartsTypes from '../../components/chartEditor/chartsTypes.vue';
 //引入echarts皮肤
 //import 'echarts/theme/dark.js'
 //import 'echarts/theme/infographic.js'
@@ -377,43 +372,41 @@ import numShow from '../../components/chartEditor/yAxis/numShow.vue';
 import chartTitle from '../../components/chartEditor/title.vue';
 
 // 历史记录工具
-import TimeLine from '../../assets/js/objectTimeLine';
+// import TimeLine from '../../assets/js/objectTimeLine';
 
 export default {
   components: {
     chartTitle,
     IEcharts,
     tableView,
-    chartTypeOption,
-    chartConfig,
-    seriesStyles,
     chartsTypes,
     settingXfield,
     settingYfield,
     resultScreen,
-    numShow
+    numShow,
+    chartConfig
   },
   mounted() {
-    let that = window.vm = this,
+    let that = (window.vm = this),
       params = that.$route.params;
     // TODO: 完成历史记录工具
-    this.timeLine = new TimeLine({
-      treasures: this.chats,
-      backupOpt: {
-        backupCallback: function() {
-          console.log('自动备份');
-        }
-      }
-    });
+    // this.timeLine = new TimeLine({
+    //   treasures: this.chats,
+    //   backupOpt: {
+    //     backupCallback: function () {
+    //       console.log('自动备份');
+    //     }
+    //   }
+    // });
 
     if (Object.keys(params).length) {
       that.charts.id = params.viewId;
     }
-    window.onresize = function() {
+    window.onresize = function () {
       that.onresizeWindow();
     };
 
-    this.menuStatus = _.debounce(function() {
+    this.menuStatus = _.debounce(function () {
       this.$set(
         this.queryInfo.categoryColumns[this._index],
         'selectedItemSwitch',
@@ -425,7 +418,7 @@ export default {
         false
       );
     }, 200);
-    this.menuChildrenStatus = _.debounce(function() {
+    this.menuChildrenStatus = _.debounce(function () {
       // this.$set(this.queryInfo.categoryColumns[this._index], 'selectedItemSwitch', false);
       this.$set(
         this.queryInfo.categoryColumns[this._index],
@@ -433,7 +426,7 @@ export default {
         -1
       );
     }, 200);
-    this.valMenuStatus = _.debounce(function() {
+    this.valMenuStatus = _.debounce(function () {
       this.$set(
         this.queryInfo.valueColumns[this.val_index],
         'selectedItemSwitch',
@@ -445,7 +438,7 @@ export default {
         false
       );
     }, 200);
-    this.valMenuChildrenStatus = _.debounce(function() {
+    this.valMenuChildrenStatus = _.debounce(function () {
       // selectedChildrenSwitch
       // this.$set(this.queryInfo.valueColumns[this.val_index], 'selectedItemSwitch', false);
       this.$set(
@@ -454,24 +447,22 @@ export default {
         -1
       );
     }, 200);
-    this.getChartDataChangeView = _.debounce(function() {
+    this.getChartDataChangeView = _.debounce(function () {
       this.getChartData();
     }, 500);
 
     // 选择表
-    getJson(
-      '/dataview/list.do',
-      {
-        params: {
-          folder: '',
-          dataview: true
-        }
-      },
-      function(res) {
-        if (res.success) {
-          that.listFolders.list = res.data;
-        }
+    getJson('/dataview/list.do', {
+      params: {
+        folder: '',
+        dataview: true
       }
+    },
+    function (res) {
+      if (res.success) {
+        that.listFolders.list = res.data;
+      }
+    }
     );
     if (that.charts.id != '') {
       getJson(
@@ -479,11 +470,11 @@ export default {
         {
           chart: that.charts.id
         },
-        function(res) {
-          if (res.success&&res.data) {
+        function (res) {
+          if (res.success && res.data) {
             that.charts = Object.assign({}, that.charts, res.data);
             that.queryInfo = Object.assign({}, that.queryInfo, res.data.query);
-            that.$nextTick(function() {
+            that.$nextTick(function () {
               that.getTopHeight();
               that.getChartDataChangeView();
             });
@@ -493,7 +484,7 @@ export default {
             {
               view: that.charts.tableName.sql
             },
-            function(res) {
+            function (res) {
               if (res.success) {
                 that.nums = [];
                 that.dates = [];
@@ -523,8 +514,8 @@ export default {
   destroyed() {
     // 销毁后
     window.onresize = null;
-    window.screenWidth=null;
-    window.chartsHeight=null;
+    window.screenWidth = null;
+    window.chartsHeight = null;
   },
   data: () => ({
     // 页面控制
@@ -540,7 +531,7 @@ export default {
     tableShow: false,
     // 数据流
     // 表格用数据
-    chartData:{},
+    chartData: {},
     // 数值 显示格式弹出框
     YnumOption: {
       valueDisplayFormat: false,
@@ -792,7 +783,8 @@ export default {
         title: {
           text: '未命名图表',
           textStyle: {
-            fontSize: 14
+            fontSize: 14,
+            color: '#333'
           }
         }
       },
@@ -835,12 +827,12 @@ export default {
         palette: [],
         type: ''
       },
-      // 图表背景 
-      background:{
-        backgroundColor:'#fff',
+      // 图表背景
+      background: {
+        backgroundColor: '#fff',
         // TODO: 背景图
-        backgroundRepeat:'no-repeat',
-        backgroundImage:''
+        backgroundRepeat: 'no-repeat',
+        backgroundImage: ''
       }
     },
     // pageName: '图表编辑',
@@ -863,23 +855,23 @@ export default {
       checkId: ''
     },
     // 搜索
-    search:''
+    search: ''
   }),
   watch: {
     // 如果 charts 改变，函数运行
     charts: {
-      handler: function(newCharts) {
+      handler: function (newCharts) {
         // FIXME:监听对象变动没法做撤销重做的功能，需要在用户操作里记录
         // this.timeLine.snapshoot(newCharts);
       },
       deep: true
     },
-    search:function(val,oldVal){
-      for(let i = 0; i < this.columns.length; i++){
-        if(this.columns[i].text.indexOf(val)<0){
-          this.columns[i].show=false;
-        }else{
-          this.columns[i].show=true;          
+    search: function (val, oldVal) {
+      for (let i = 0; i < this.columns.length; i++) {
+        if (this.columns[i].text.indexOf(val) < 0) {
+          this.columns[i].show = false;
+        } else {
+          this.columns[i].show = true;
         }
       }
     }
@@ -898,7 +890,7 @@ export default {
       if (0 <= index) {
         this.queryInfo.categoryColumns.splice(index, 1);
       }
-      this.$nextTick(function() {
+      this.$nextTick(function () {
         that.getTopHeight();
         that.getChartDataChangeView();
       });
@@ -910,12 +902,12 @@ export default {
       if (0 <= index) {
         this.queryInfo.valueColumns.splice(index, 1);
       }
-      this.$nextTick(function() {
+      this.$nextTick(function () {
         that.getTopHeight();
         that.getChartDataChangeView();
       });
     },
-    // 查询图表源 数据    
+    // 查询图表源 数据
     getChartData() {
       let that = this;
       getJson(
@@ -924,15 +916,11 @@ export default {
           view: that.charts.tableName.sql,
           query: JSON.stringify(that.queryInfo)
         },
-        function(res) {
+        function (res) {
           if (res.success) {
             that.chartData = Object.assign({}, res.data);
             that.graphData = Object.assign({}, res.data);
             that.$refs.chartsTypes.checkChartType();
-            // that.checkChartType();
-            if (Object.keys(that.charts.option).length) {
-              // that.echartsShow = true;
-            }
             if (!Object.keys(res.data.data).length) {
               that.echartsShow = false;
               that.tableShow = false;
@@ -978,10 +966,10 @@ export default {
       if (res) {
         this.queryInfo.categoryColumns.push(res);
       }
-      this.$nextTick(function() {
+      this.$nextTick(function () {
         that.getTopHeight();
       });
-      this.$nextTick(function() {
+      this.$nextTick(function () {
         that.getChartDataChangeView();
       });
       that.charts.query = Object.assign({}, that.queryInfo);
@@ -1002,10 +990,10 @@ export default {
       if (res) {
         this.queryInfo.valueColumns.push(res);
       }
-      this.$nextTick(function() {
+      this.$nextTick(function () {
         that.getTopHeight();
       });
-      this.$nextTick(function() {
+      this.$nextTick(function () {
         that.getChartDataChangeView();
       });
       that.charts.query = Object.assign({}, that.queryInfo);
@@ -1022,12 +1010,12 @@ export default {
           folder: '/',
           config: JSON.stringify(that.charts)
         },
-        function(data) {
+        function (data) {
           if (data.success) {
             that.charts.id = data.data.id;
-            if('function'==typeof callback){
+            if ('function' == typeof callback) {
               callback();
-            }else{
+            } else {
               that.$message({ message: '保存成功', type: 'success' });
             }
           }
@@ -1035,13 +1023,13 @@ export default {
       );
     },
     // 图表背景
-    getBackground: function(data){
-      this.instance?this.instance.clear():'';      
+    getBackground: function (data) {
+      this.instance ? this.instance.clear() : '';
       this.charts.background = Object.assign({}, this.charts.background, data);
     },
     // 属性面板数据
-    getProp: function(data) {
-      this.instance?this.instance.clear():'';      
+    getProp: function (data) {
+      this.instance ? this.instance.clear() : '';
       this.charts.option = Object.assign({}, this.charts.option, data);
     },
     // 弹出框选择日期型
@@ -1089,23 +1077,23 @@ export default {
     //   // console.log(data);
     // },
     // 序列风格
-    seriesStyles: function(data) {
-      this.instance?this.instance.clear():''; 
+    seriesStyles: function (data) {
+      this.instance ? this.instance.clear() : '';
       this.charts.option = Object.assign({}, this.charts.option, {
         color: data.value,
         colorName: data.name
       });
     },
-    getCharts: function(data) {
+    getCharts: function (data) {
       this.charts.type = data.type;
-      this.instance?this.instance.clear():''; 
+      this.instance ? this.instance.clear() : '';
       this.charts.option = Object.assign({}, this.charts.option, data.option);
     },
-    gettableShow: function(data) {
+    gettableShow: function (data) {
       this.tableShow = data;
-      this.instance?this.instance.clear():'';       
+      this.instance ? this.instance.clear() : '';
     },
-    getechartsShow: function(data) {
+    getechartsShow: function (data) {
       this.echartsShow = data;
     },
     onClickSetItemSort(index, val) {
@@ -1151,16 +1139,16 @@ export default {
       this.menuChildrenStatus();
     },
     // 维度设置字段弹窗
-    Xfield: function(data) {
+    Xfield: function (data) {
       this.XfieldOption = Object.assign({}, this.XfieldOption, data);
     },
-    Yfield: function(data) {
+    Yfield: function (data) {
       this.YfieldOption = Object.assign({}, this.YfieldOption, data);
     },
-    YScreen: function(data) {
+    YScreen: function (data) {
       this.ScreenOption = Object.assign({}, this.ScreenOption, data);
     },
-    Ynum: function(data) {
+    Ynum: function (data) {
       this.YnumOption = Object.assign({}, this.YnumOption, data);
     },
     //数值下拉框
@@ -1183,8 +1171,7 @@ export default {
       } else {
         val = indexItem;
       }
-      this.$set(
-        this.queryInfo.valueColumns[index],
+      this.$set(this.queryInfo.valueColumns[index],
         'selectedChildrenSwitch',
         val
       );
@@ -1219,7 +1206,7 @@ export default {
       this.$set(this.queryInfo.valueColumns[index], 'sort', item.value);
       this.toggleValueSelectedItem(index);
 
-      this.$nextTick(function() {
+      this.$nextTick(function () {
         that.getChartDataChangeView();
       });
     },
@@ -1296,7 +1283,7 @@ export default {
         this.onAddValueClick(checkedNums[i]);
       }
       this.batchAddColumsDialogVisible = false;
-      this.$nextTick(function() {
+      this.$nextTick(function () {
         that.checkedDates = [];
         that.checkedTexts = [];
         that.checkedNums = [];
@@ -1319,7 +1306,7 @@ export default {
         this.onAddColumnClick(checkedNums[i]);
       }
       this.batchAddCategoryColumsDialogVisible = false;
-      this.$nextTick(function() {
+      this.$nextTick(function () {
         that.checkedCategoryDates = [];
         that.checkedCategoryTexts = [];
         that.checkedCategoryNums = [];
@@ -1376,7 +1363,7 @@ export default {
             {
               view: that.charts.tableName.sql
             },
-            function(res) {
+            function (res) {
               if (res.success) {
                 that.columns = res.data.columns;
                 that.workTableDialogVisible = false;
@@ -1385,7 +1372,7 @@ export default {
           );
         }
         if (that.charts.id == '') {
-          that.charts.query = that.queryInfo||{};
+          that.charts.query = that.queryInfo || {};
           that.charts.text = that.charts.option.title.text;
           that.charts.layout.type = that.charts.type;
           getJson(
@@ -1394,7 +1381,7 @@ export default {
               folder: '/',
               config: JSON.stringify(that.charts)
             },
-            function(data) {
+            function (data) {
               if (data.success) {
                 that.charts.id = data.data.id;
                 that.$router.push('/chart_editor/' + data.data.id);
@@ -1408,35 +1395,36 @@ export default {
         that.workTableDialogVisible = false;
       }
     },
-    getqueryInfo: function(data) {
+    getqueryInfo: function (data) {
       let that = this;
       if (this.ScreenOption.useFilter) {
-        this.$nextTick(function() {
+        this.$nextTick(function () {
           that.getTopHeight();
         });
-        this.$nextTick(function() {
+        this.$nextTick(function () {
           that.getChartDataChangeView();
         });
       }
     },
-    summaryFilter: function(data) {
+    summaryFilter: function (data) {
       this.ScreenOption.summaryFilter = data;
     },
-    onresizeWindow: function() {
+    onresizeWindow: function () {
       let that = this;
       let pathStr = that.$route.path;
       let pathArr = pathStr.split('/');
       // console.log(pathArr);
 
       if (pathArr[1] === 'chart_editor') {
-        _.debounce(function() {
+        _.debounce(function () {
           window.screenWidth = document.body.clientWidth;
           that.screenWidth = window.screenWidth;
           window.chartsHeight = document.body.clientHeight;
           // console.log('---------tip-------------');
           // console.log(document.getElementsByClassName('query')[0]);
           // if(document.getElementsByClassName('query')[0]!=undefined){
-          let nowTopHeight = document.getElementsByClassName('query')[0].offsetHeight;
+          let nowTopHeight = document.getElementsByClassName('query')[0]
+            .offsetHeight;
           // grid-content的padding + el-card__body的padding + top的高度
           let padding = 45 + 40 + 90;
           let Dvalue = nowTopHeight + padding;
@@ -1449,20 +1437,20 @@ export default {
       }
     },
     // 获取图表标题的值
-    getTitle: function(data) {
-      this.instance?this.instance.clear():''; 
+    getTitle: function (data) {
+      this.instance ? this.instance.clear() : '';
       Object.assign(this.charts.option.title, data);
     },
     // 预览跳转
     preview() {
       // 预览前先保存
       let that = this;
-      var href = vars.src + "/viewer/chart.html?id=" + that.charts.id;
+      var href = vars.src + '/viewer/chart.html?id=' + that.charts.id;
       that.saveChartData(openPrevView);
       function openPrevView() {
         window.open(href);
       }
-    },
+    }
   }
 };
 </script>

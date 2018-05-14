@@ -13,10 +13,8 @@
 </template>
 
 <script>
-import axios from "axios";
-
-import seriesDefault from "../../vendor/seriesWordCloud.json";
-import "../../vendor/jsVendor/seriesWordCloud.js";
+import seriesDefault from '../../vendor/seriesWordCloud.json';
+import '../../vendor/jsVendor/seriesWordCloud.js';
 
 export default {
   created() {
@@ -37,15 +35,15 @@ export default {
     // 数据
     chartData: {},
     // 默认配置项展开
-    activeNames: ["1"],
+    activeNames: ['1'],
     // 图表类型
-    pageName: "计量图",
-    type: "wordCloud"
+    pageName: '计量图',
+    type: 'wordCloud'
   }),
   watch: {
     seriesOption: {
       handler: function(newVal, oldVal) {
-        this.$emit("getSeries", this.seriesOption.option);
+        this.$emit('getSeries', this.seriesOption.option);
       },
       deep: true
     },
@@ -114,12 +112,12 @@ export default {
         true
       );
 
-      that.$set(this.seriesOption.option, "xAxis", newData.xAxis);
-      that.$set(this.seriesOption.option, "series", newData.series);
-      that.$emit("getSeries", that.seriesOption.option);
+      that.$set(this.seriesOption.option, 'xAxis', newData.xAxis);
+      that.$set(this.seriesOption.option, 'series', newData.series);
+      that.$emit('getSeries', that.seriesOption.option);
     }
   },
-  props: ["option", "data"]
+  props: ['option', 'data']
 };
 </script>
 <style scoped>

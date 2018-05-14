@@ -8,7 +8,9 @@ const publicPath = '';
 
 module.exports = (options = {}) => ({
   entry: {
-    // vendor: './src/vendor',
+    vendor: ['vue', 'vue-router','element-ui','animate.css','stats.js','moment'],
+    lib: ['jquery','lodash'],
+    echarts: ['echarts','vue-echarts-v3','echarts-gl','echarts-wordcloud'],
     index: './src/main.js'
   },
   output: {

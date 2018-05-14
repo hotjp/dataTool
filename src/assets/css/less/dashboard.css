@@ -473,6 +473,81 @@ audio:not([controls]),
 #dashboard .table_container {
   overflow: auto;
 }
+#dashboard .chart_type_dialog .el-dialog__body {
+  padding-top: 0;
+}
+#dashboard .chart_type_dialog .tit {
+  margin-top: 0;
+}
+#dashboard .chart_types {
+  margin-top: 7px;
+  margin-right: -5px;
+}
+#dashboard .chart_types .type {
+  float: left;
+  width: 96px;
+  height: 42px;
+  text-align: center;
+  line-height: 40px;
+  position: relative;
+  border: 1px #DCDFE6 solid;
+  margin-right: 24px;
+  color: #606266;
+  font-size: 13px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all .3s ease;
+}
+#dashboard .chart_types .type:last-child {
+  margin-right: 0;
+}
+#dashboard .chart_types .type.vip:after {
+  content: '可用';
+  position: absolute;
+  right: -12px;
+  top: 3px;
+  height: 16px;
+  line-height: 16px;
+  font-size: 10px;
+  color: #ffffff;
+  width: 46px;
+  background-color: #fca34b;
+  transform: rotate(45deg);
+}
+#dashboard .chart_types .type:hover,
+#dashboard .chart_types .type.active {
+  border-color: #1989FA;
+}
+#dashboard .other_types {
+  background-color: #F5F7FA;
+  overflow-y: auto;
+  height: 185px;
+  padding-left: 9px;
+  padding-top: 9px;
+}
+#dashboard .other_types li {
+  float: left;
+  width: 96px;
+  height: 60px;
+  line-height: 58px;
+  text-align: center;
+  border: 1px solid #DCDFE6;
+  margin-bottom: 10px;
+  margin-right: 10px;
+  cursor: pointer;
+  transition: all .3s ease;
+}
+#dashboard .other_types li:hover,
+#dashboard .other_types li.active {
+  border-color: #1989FA;
+}
+#dashboard .other_types li:nth-child(3n) {
+  margin-right: 0;
+}
+#dashboard .other_types .empty_child {
+  text-align: center;
+  padding: 20px 0;
+}
 .dialog_content {
   background-color: #f5f7fa;
   overflow-y: auto;

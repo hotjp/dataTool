@@ -1,23 +1,21 @@
 <template>
-<el-collapse  v-model="activeNames" id="chartsComponents">
-  <el-collapse-item title="百分比堆叠柱状图" name="1">
+<!-- <el-collapse  v-model="activeNames" id="chartsComponents">
+  <el-collapse-item title="柱状图" name="1">
     <div class="comp_group fix">
       <div v-for="(item,index) in seriesOption.option.series" :key="index" class="colums_list">
-        <colorPicker class="color_picker" :color.sync="item.itemStyle.normal.color" ></colorPicker>
-        <p class="l item_name">{{item.name}}</p>
+          <colorPicker class="color_picker" :color.sync="item.itemStyle.normal.color" ></colorPicker>
+          <p class="l item_name">{{item.name}}</p>
       </div>
     </div>
   </el-collapse-item>
-</el-collapse>
+</el-collapse> -->
 </template>
 
 <script>
-import axios from 'axios';
+import seriesDefault from "../../vendor/seriesBar3D.json";
+import "../../vendor/jsVendor/seriesBar3D.js";
 
-import seriesDefault from '../../vendor/seriesBar.json';
-import '../../vendor/jsVendor/seriesPercentStackbar.js';
-
-import colorPicker from '../chartEditor/propSelect/colorPicker.vue';
+import colorPicker from "../chartEditor/propSelect/colorPicker.vue";
 
 export default {
   components: {
@@ -38,18 +36,20 @@ export default {
         xAxis: {}
       }
     },
+    //默认series数据
+    seriesItem: seriesDefault,
     // 数据
     chartData: {},
     // 默认配置项展开
-    activeNames: ['1'],
+    activeNames: ["1"],
     // 图表类型
-    type: 'bar',
-    pageName: '百分比堆叠柱状图'
+    type: "bar3D",
+    pageName: "3D柱状图"
   }),
   watch: {
     seriesOption: {
       handler: function(newVal, oldVal) {
-        this.$emit('getSeries', this.seriesOption.option);
+        this.$emit("getSeries", this.seriesOption.option);
       },
       deep: true
     },
@@ -57,17 +57,6 @@ export default {
       // 父级传来的图表数据
       handler: function(newVal, oldVal) {
         this.dataChange();
-      },
-      deep: true
-    },
-    'seriesOption.option.series': {
-      // 父级传来的图表数据
-      handler: function(newVal, oldVal) {
-        for (let i = 0; i < newVal.length; i++) {
-          if (newVal[i].itemStyle.normal.color == 'transparent') {
-            this.seriesOption.option.series[i].itemStyle.normal.color = null;
-          }
-        }
       },
       deep: true
     }
@@ -103,37 +92,54 @@ export default {
         }
       });
       that.seriesOption.option.series = [];
-
-      // xAxis数据 数组
-      // that.seriesOption.option.xAxis
-      //   ? (that.seriesOption.option.xAxis.data = [])
-      //   : (that.seriesOption.option.xAxis = {});
-      newData.xAxis = that.seriesOption.option.xAxis;
-      for (let i = 0; i < queryNameKeyX.length; i++) {
-        let arr = [];
-        for (let j = 0; j < rows.length; j++) {
-          arr.push(rows[j][queryNameKeyX[i]]);
-        }
-        newData.xAxis.data = arr;
+      // x，y，z轴数据
+      newData.xAxis3D = that.seriesOption.option.xAxis3D||{};
+      newData.yAxis3D = that.seriesOption.option.yAxis3D||{};
+      newData.zAxis3D = that.seriesOption.option.zAxis3D||{};
+      newData.grid3D = that.seriesOption.option.grid3D||{};
+      // newData.grid3D = that.seriesItem.grid3D||{};
+      
+      if(!queryNameKeyX.length ==2 || !queryNameKeyY.length==1){
+        return
       }
+      if (queryNameKeyX.length) {
+        for (let i = 0; i < queryNameKeyX.length; i++) {
+          let arr = [];
+          for (let j = 0; j < rows.length; j++) {
 
+            // FIXME: 接口需调整，目前根据x，y的值判断，如果存在重复值会出问题,最好返回x和y都包含什么值
+            if(arr.indexOf(rows[j][queryNameKeyX[i]])<0){
+              arr.push(rows[j][queryNameKeyX[i]]);
+            }
+          }
+          if(i==0){
+            newData.xAxis3D.data = arr;
+          }else if(i==1){
+            newData.yAxis3D.data = arr;
+          }
+        }
+      }
       // series.data的数据
-      newData.series = seriesPercentStackbar(
+      newData.series = seriesBar3D(
         columns,
         rows,
+        queryNameKeyX,
         queryNameKeyY,
         seriesDefault,
         that.option.series,
         true
       );
 
-      that.$set(this.seriesOption.option, 'grid', seriesDefault.grid);
-      that.$set(this.seriesOption.option, 'xAxis', newData.xAxis);
-      that.$set(this.seriesOption.option, 'series', newData.series);
-      that.$emit('getSeries', that.seriesOption.option);
+      that.$set(this.seriesOption.option, "xAxis3D", newData.xAxis3D);
+      that.$set(this.seriesOption.option, "yAxis3D", newData.yAxis3D);
+      that.$set(this.seriesOption.option, "zAxis3D", newData.zAxis3D);
+      that.$set(this.seriesOption.option, "grid3D", newData.grid3D);
+      
+      that.$set(this.seriesOption.option, "series", newData.series);
+      that.$emit("getSeries", that.seriesOption.option);
     }
   },
-  props: ['option', 'data']
+  props: ["option", "data"]
 };
 </script>
 <style>

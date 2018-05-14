@@ -25,10 +25,10 @@
 </template>
 
 <script>
-import seriesDefault from "../../vendor/seriesArea.json";
-import "../../vendor/jsVendor/seriesArea.js";
+import seriesDefault from '../../vendor/seriesArea.json';
+import '../../vendor/jsVendor/seriesArea.js';
 
-import colorPicker from "../chartEditor/propSelect/colorPicker.vue";
+import colorPicker from '../chartEditor/propSelect/colorPicker.vue';
 
 export default {
   components: {
@@ -56,17 +56,17 @@ export default {
     // 数据
     chartData: {},
     // 默认配置项展开
-    activeNames: ["1"],
+    activeNames: ['1'],
     // 图表类型
-    type: "line",
-    pageName: "面积图",
+    type: 'line',
+    pageName: '面积图',
     // 是否平滑曲线
     smooth: false
   }),
   watch: {
     seriesOption: {
       handler: function(newVal, oldVal) {
-        this.$emit("getSeries", this.seriesOption.option);
+        this.$emit('getSeries', this.seriesOption.option);
       },
       deep: true
     },
@@ -86,7 +86,7 @@ export default {
         this.seriesOption.option.series[i].smooth = data;
       }
       this.seriesOption.option = Object.assign({}, this.seriesOption.option);
-      this.$emit("getSeries", this.seriesOption.option);
+      this.$emit('getSeries', this.seriesOption.option);
     },
     // 数据处理
     dataChange() {
@@ -143,13 +143,13 @@ export default {
         true
       );
 
-      that.$set(this.seriesOption.option, "grid", seriesDefault.grid);
-      that.$set(this.seriesOption.option, "xAxis", newData.xAxis);
-      that.$set(this.seriesOption.option, "series", newData.series);
-      that.$emit("getSeries", that.seriesOption.option);
+      that.$set(this.seriesOption.option, 'grid', seriesDefault.grid);
+      that.$set(this.seriesOption.option, 'xAxis', newData.xAxis);
+      that.$set(this.seriesOption.option, 'series', newData.series);
+      that.$emit('getSeries', that.seriesOption.option);
     }
   },
-  props: ["option", "data"]
+  props: ['option', 'data']
 };
 </script>
 <style>

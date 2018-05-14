@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import colorPicker from "../chartEditor/propSelect/colorPicker.vue";
+import colorPicker from '../chartEditor/propSelect/colorPicker.vue';
 
 export default {
   components: {
@@ -35,17 +35,17 @@ export default {
     let that = this;
   },
   data: () => ({
-    activeNames: "1",
-    imageUrl: ""
+    activeNames: '1',
+    imageUrl: ''
   }),
   watch: {
     backgroundStyle: {
       // 父级传来的图表数据
       handler: function(newVal, oldVal) {
         if (!newVal.backgroundColor) {
-          newVal.backgroundColor = "transparent";
+          newVal.backgroundColor = 'transparent';
         }
-        this.$emit("backgroundOption", newVal);
+        this.$emit('backgroundOption', newVal);
       },
       deep: true
     }
@@ -55,7 +55,7 @@ export default {
       this.imageUrl = URL.createObjectURL(file.raw);
     },
     beforeAvatarUpload(file) {
-      const isJPG = file.type === "image/jpeg";
+      const isJPG = file.type === 'image/jpeg';
       const isLt2M = file.size / 1024 / 1024 < 2;
 
       // if (!isJPG) {
@@ -65,13 +65,13 @@ export default {
       //   this.$message.error("上传头像图片大小不能超过 2MB!");
       // }
       // return isJPG && isLt2M;
-      return true
+      return true;
     },
     delUpload(){
-      this.imageUrl=''
+      this.imageUrl='';
     }
   },
-  props: ["backgroundStyle"]
+  props: ['backgroundStyle']
 };
 </script>
 <style >

@@ -31,19 +31,19 @@ var vb = {
 	 */
   load: function (viewId) {
     // extractViewDef返回当前视图数据
-    var view=page.url.get('view') ? page.url.get('view') : 0;
+    var view=page.url.get('view')&&'string'==typeof page.url.get('view') ? page.url.get('view') : 0;
     if(view){
       getJson('/dataview/design/info.do',{
-          view: view
-        },
-        function(res) {
-          if(res.success){
-            vb.showView(res.data.structure);
-            getNewViewProvider(VIEW_TYPE_USER_COMPOSITE);
-            $('#viewName').val(res.data.name);
-            vb._layout=res.data.layout;
-            // vb._folder=res.data.folder;
-          }
+        view: view
+      },
+      function(res) {
+        if(res.success){
+          vb.showView(res.data.structure);
+          getNewViewProvider(VIEW_TYPE_USER_COMPOSITE);
+          $('#viewName').val(res.data.name);
+          vb._layout=res.data.layout;
+          // vb._folder=res.data.folder;
+        }
       });
     }else{
       vb.showView(vb._view);
@@ -1029,7 +1029,7 @@ vb.viewRefEditor = {
       list: this._viewRef.columns
     };
     renderTmp('#t-viewRef', 'viewRefTpl', data);
-    $('#t-viewRef input').trigger('change')
+    $('#t-viewRef input').trigger('change');
     // 刚进来初始化右侧
     if(data.list.length){
       for(var i=0;i<data.list.length;i++){

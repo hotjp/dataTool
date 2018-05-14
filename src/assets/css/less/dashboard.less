@@ -169,6 +169,9 @@
                 }
             }
         }
+        .charts_container>div:first-child{
+            // height: 100%!important;
+        }
     }
     .top {
         &.common_top{
@@ -371,6 +374,81 @@
     }
     .table_container{
         overflow: auto;
+    }
+    .chart_type_dialog{
+        .el-dialog__body{
+            padding-top: 0;
+        }
+        .tit{
+            margin-top: 0;
+        }
+    }
+    .chart_types{
+        margin-top: 7px;
+        margin-right: -5px;
+        .type{
+            float: left;
+            width: 96px;
+            height: 42px;
+            text-align: center;
+            line-height: 40px;
+            position: relative;
+            border: 1px #DCDFE6 solid;
+            margin-right: 24px;
+            color: #606266;
+            font-size: 13px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all .3s ease;
+            &:last-child{
+                margin-right: 0;
+            }
+            &.vip:after{
+                content:'可用';
+                position: absolute;
+                right: -12px;
+                top: 3px;
+                height: 16px;
+                line-height: 16px;
+                font-size: 10px;
+                color: #ffffff;
+                width: 46px;
+                background-color: #fca34b;
+                transform: rotate(45deg);
+            }
+            &:hover,&.active{
+                border-color: #1989FA;
+            }
+        }
+    }
+    .other_types{
+        background-color: #F5F7FA;
+        overflow-y: auto;
+        height: 185px;padding-left: 9px;
+        padding-top: 9px;
+        li{
+            float: left;
+            width: 96px;
+            height: 60px;
+            line-height: 58px;
+            text-align: center;
+            border: 1px solid #DCDFE6;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            margin-right: 10px;
+            cursor: pointer;
+            transition: all .3s ease;
+            &:hover,&.active{
+                border-color: #1989FA;
+            }
+            &:nth-child(3n){
+                margin-right: 0;
+            }
+        }
+        .empty_child{
+            text-align:center;
+            padding: 20px 0;
+        }
     }
 }
 .dialog_content{

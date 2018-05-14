@@ -28,8 +28,8 @@
 </template>
 
 <script>
-import seriesDefault from "../../vendor/seriesRosePie.json";
-import "../../vendor/jsVendor/seriesRosePie.js";
+import seriesDefault from '../../vendor/seriesRosePie.json';
+import '../../vendor/jsVendor/seriesRosePie.js';
 
 export default {
   created() {
@@ -59,10 +59,10 @@ export default {
     // 数据
     chartData: {},
     // 默认配置项展开
-    activeNames: ["1"],
+    activeNames: ['1'],
     // 图表类型
-    type: "pie",
-    pageName: "南丁格尔玫瑰图",
+    type: 'pie',
+    pageName: '南丁格尔玫瑰图',
     // 玫瑰图类型
     roseType: seriesDefault.roseType,
     // 半径
@@ -71,7 +71,7 @@ export default {
   watch: {
     seriesOption: {
       handler: function(newVal, oldVal) {
-        this.$emit("getSeries", newVal.option);
+        this.$emit('getSeries', newVal.option);
       },
       deep: true
     },
@@ -130,8 +130,8 @@ export default {
         true
       );
 
-      that.$set(this.seriesOption.option, "grid", seriesDefault.grid);
-      this.$emit("getSeries", that.seriesOption.option);
+      that.$set(this.seriesOption.option, 'grid', seriesDefault.grid);
+      this.$emit('getSeries', that.seriesOption.option);
     },
     // 切换玫瑰图种类
     selectRoseType(command) {
@@ -140,7 +140,7 @@ export default {
         this.seriesOption.option.series[i].roseType = this.roseType;
       }
       this.seriesOption.option = Object.assign({}, this.seriesOption.option);
-      this.$emit("getSeries", this.seriesOption.option);
+      this.$emit('getSeries', this.seriesOption.option);
     },
     // 内径
     radiusInside(data) {
@@ -149,7 +149,7 @@ export default {
         this.seriesOption.option.series[i].radius = this.radius;
       }
       this.seriesOption.option = Object.assign({}, this.seriesOption.option);
-      this.$emit("getSeries", this.seriesOption.option);
+      this.$emit('getSeries', this.seriesOption.option);
     },
     // 外径
     radiusOutside(data) {
@@ -158,9 +158,9 @@ export default {
         this.seriesOption.option.series[i].radius = this.radius;
       }
       this.seriesOption.option = Object.assign({}, this.seriesOption.option);
-      this.$emit("getSeries", this.seriesOption.option);
+      this.$emit('getSeries', this.seriesOption.option);
     }
   },
-  props: ["option", "data"]
+  props: ['option', 'data']
 };
 </script>

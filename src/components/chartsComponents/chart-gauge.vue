@@ -27,12 +27,12 @@
 </template>
 
 <script>
-import axios from "axios";
+import axios from 'axios';
 
-import seriesDefault from "../../vendor/seriesGauge.json";
-import "../../vendor/jsVendor/seriesGauge.js";
+import seriesDefault from '../../vendor/seriesGauge.json';
+import '../../vendor/jsVendor/seriesGauge.js';
 
-import colorPicker from "../chartEditor/propSelect/colorPicker.vue";
+import colorPicker from '../chartEditor/propSelect/colorPicker.vue';
 
 export default {
   components: {
@@ -56,15 +56,15 @@ export default {
     // 数据
     chartData: {},
     // 默认配置项展开
-    activeNames: ["1"],
+    activeNames: ['1'],
     // 图表类型
-    pageName: "计量图",
-    type: "gauge"
+    pageName: '计量图',
+    type: 'gauge'
   }),
   watch: {
     seriesOption: {
       handler: function(newVal, oldVal) {
-        this.$emit("getSeries", this.seriesOption.option);
+        this.$emit('getSeries', this.seriesOption.option);
       },
       deep: true
     },
@@ -75,12 +75,12 @@ export default {
       },
       deep: true
     },
-    "seriesOption.option.series": {
+    'seriesOption.option.series': {
       // 父级传来的图表数据
       handler: function(newVal, oldVal) {
         for (let i = 0; i < newVal.length; i++) {
           for (let j = 0; j < newVal[i].axisLine.lineStyle.color.length; j++) {
-            if (newVal[i].axisLine.lineStyle.color[j][1] == "transparent") {
+            if (newVal[i].axisLine.lineStyle.color[j][1] == 'transparent') {
               this.seriesOption.option.series[i].axisLine.lineStyle.color[
                 j
               ][1] = null;
@@ -148,13 +148,13 @@ export default {
         true
       );
 
-      that.$set(this.seriesOption.option, "grid", seriesDefault.grid);
-      that.$set(this.seriesOption.option, "xAxis", newData.xAxis);
-      that.$set(this.seriesOption.option, "series", newData.series);
-      that.$emit("getSeries", that.seriesOption.option);
+      that.$set(this.seriesOption.option, 'grid', seriesDefault.grid);
+      that.$set(this.seriesOption.option, 'xAxis', newData.xAxis);
+      that.$set(this.seriesOption.option, 'series', newData.series);
+      that.$emit('getSeries', that.seriesOption.option);
     }
   },
-  props: ["option", "data"]
+  props: ['option', 'data']
 };
 </script>
 <style scoped>
