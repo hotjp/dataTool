@@ -2,21 +2,23 @@ const resolve = require('path').resolve;
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const PreloadWebpackPlugin = require('preload-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const url = require('url');
 const publicPath = '';
 
 module.exports = (options = {}) => ({
   entry: {
-    vendor: ['vue', 'vue-router','element-ui','animate.css','stats.js','moment'],
+    vue: ['vue', 'vue-router','element-ui'],
     lib: ['jquery','lodash'],
-    echarts: ['echarts','vue-echarts-v3','echarts-gl','echarts-wordcloud'],
+    echarts: ['echarts','echarts-gl','echarts-wordcloud'],
     index: './src/main.js'
   },
   output: {
     path: resolve(__dirname, 'dist'),
     filename: options.dev ? '[name].js' : '[name].js?[chunkhash]',
-    chunkFilename: '[id].js?[chunkhash]',
+    chunkFilename: '[name].js?[chunkhash]',
     publicPath: options.dev ? '/assets/' : publicPath
   },
   module: {
@@ -53,13 +55,28 @@ module.exports = (options = {}) => ({
     }
     ]
   },
+
   plugins: [
-    new webpack.optimize.CommonsChunkPlugin({
-      names: ['vendor', 'manifest']
-    }),
     new HtmlWebpackPlugin({
       template: 'src/index.html'
     }),
+
+    new webpack.optimize.CommonsChunkPlugin({
+      name: ['vue','lib','echarts','manifest']
+    }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name:'vendor',
+      minChunks: ({ resource }) => (
+        resource &&
+        resource.indexOf('node_modules') >= 0 &&
+        resource.match(/\.js$/)
+      )
+    }),
+    // new ExtractTextPlugin('styles.css'),
+    // new PreloadWebpackPlugin({
+    //   rel: 'preload',
+    //   include: 'allChunks'
+    // }),
     new CopyWebpackPlugin([{
       from: 'src/assets',
       to:'assets'
@@ -73,7 +90,8 @@ module.exports = (options = {}) => ({
     },{
       from: 'src/vendor',
       to:'vendor'
-    }])
+    }]),
+    new BundleAnalyzerPlugin()
   ],
   resolve: {
     alias: {
@@ -97,5 +115,5 @@ module.exports = (options = {}) => ({
     }
   },
   // devtool: options.dev ? '#source-map' : ''
-  devtool: options.dev ? '#eval-source-map' : '#source-map'
+  devtool: '#source-map'
 });

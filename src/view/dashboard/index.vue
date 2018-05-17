@@ -131,9 +131,9 @@
 // 引入公用配置
 import { getJson } from '../../router/utils';
 // 引入组件
-import IEcharts from 'vue-echarts-v3/src/full';
-import 'echarts-wordcloud';
-import 'echarts-gl';
+const IEcharts = () => import('vue-echarts-v3/src/full');
+import('echarts-wordcloud');
+import('echarts-gl');
 import dashboardDir from '../../components/dashboard/dashboardDir.vue';
 import tableView from '../../components/chartEditor/tableView.vue';
 import colorPicker from '../../components/chartEditor/propSelect/colorPicker.vue';

@@ -4,9 +4,13 @@ import VueRouter from 'vue-router';
 
 // 通用组件
 // import commonHeader from '../components/commonHeader.vue';
-const commonHeader = () => import('../components/commonHeader.vue');
+const commonHeader = () => import(
+  /* webpackChunkName: "commonHeader" */
+  '../components/commonHeader.vue');
 // import indexHeader from '../components/indexHeader.vue';
-const indexHeader = () => import('../components/indexHeader.vue');
+const indexHeader = () => import(
+  /* webpackChunkName: "indexHeader" */
+  '../components/indexHeader.vue');
 
 Vue.component('commonHeader', commonHeader);
 Vue.component('indexHeader', indexHeader);
@@ -20,7 +24,9 @@ const routes = [];
 // 页面路由
 // 用户注册
 // import register from '../view/register/index.vue';
-const register = () => import('../view/register/index.vue');
+const register = () => import(
+  /* webpackChunkName: "register" */
+  '../view/register/index.vue');
 routes.push({
   path: '/register',
   name: '用户注册',
@@ -41,7 +47,9 @@ routes.push({
 
 // 用户登录
 // import login from '../view/login/index.vue';
-const login = () => import('../view/login/index.vue');
+const login = () => import(
+  /* webpackChunkName: "login" */  
+  '../view/login/index.vue');
 routes.push({
   path: '/login',
   name: '登录页',
@@ -52,7 +60,9 @@ routes.push({
 
 // 仪表盘
 // import dashboard from '../view/dashboard/index.vue';
-const dashboard = () => import('../view/dashboard/index.vue');
+const dashboard = () => import(
+  /* webpackChunkName: "dashboard" */    
+  '../view/dashboard/index.vue');
 
 routes.push({
   path: '/',
@@ -79,7 +89,9 @@ routes.push({
 
 // 图表编辑
 // import chart_editor from '../view/chart_editor/index.vue';
-const chart_editor = () => import('../view/chart_editor/index.vue');
+const chart_editor = () => import(
+  /* webpackChunkName: "chart_editor" */    
+  '../view/chart_editor/index.vue');
 
 routes.push({
   name: '图表编辑',
@@ -102,7 +114,9 @@ routes.push({
 
 // 特殊图表编辑
 // import chart_editor_prime from '../view/chart_editor_prime/index.vue';
-const chart_editor_prime = () => import('../view/chart_editor_prime/index.vue');
+const chart_editor_prime = () => import(
+  /* webpackChunkName: "chart_editor_prime" */    
+  '../view/chart_editor_prime/index.vue');
 
 routes.push({
   name: '图表编辑',
@@ -116,7 +130,9 @@ routes.push({
 
 // 数据源列表
 // import database from '../view/database/index.vue';
-const database = () => import('../view/database/index.vue');
+const database = () => import(
+  /* webpackChunkName: "database" */    
+  '../view/database/index.vue');
 
 routes.push({
   // 数据源列表
@@ -130,7 +146,9 @@ routes.push({
 
 // 添加数据源
 // import database_add from '../view/database/add.vue';
-const database_add = () => import('../view/database/add.vue');
+const database_add = () => import(
+  /* webpackChunkName: "database_add" */    
+  '../view/database/add.vue');
 
 routes.push({
   // 添加数据源
@@ -144,7 +162,9 @@ routes.push({
 
 // 数据视图列表
 // import dataview from '../view/dataview/index.vue';
-const dataview = () => import('../view/dataview/index.vue');
+const dataview = () => import(
+  /* webpackChunkName: "dataview" */    
+  '../view/dataview/index.vue');
 
 routes.push({
   // 数据视图列表

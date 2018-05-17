@@ -12,7 +12,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 
 import seriesDefault from '../../vendor/seriesBar.json';
 import '../../vendor/jsVendor/seriesPercentStackbar.js';

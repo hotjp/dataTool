@@ -6,15 +6,63 @@
     <title>大数据可视化工具</title>
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <!-- <script src="https://js.fundebug.cn/fundebug.0.3.4.min.js" apikey="db6ecfb52989f5c3bf12880c0e1dcc619a778aa2cb94402fd38ebc247da79150"></script> -->
-
+    <style>
+        body{
+            background-color: #f1f5f8;
+        }
+        #loadingLogo{
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-left: -100px;
+            margin-top: -100px;
+            width: 200px;
+            height: 200px;
+        }
+        #Oval1{
+            animation:cubic-bezier(0.19, 1, 0.22, 1) Oval1 3s infinite;
+            -webkit-animation:cubic-bezier(0.19, 1, 0.22, 1) Oval1 3s infinite;
+        }
+        #Oval2{
+            animation:cubic-bezier(0.19, 1, 0.22, 1) Oval2 3s infinite;
+            -webkit-animation:cubic-bezier(0.19, 1, 0.22, 1) Oval2 3s infinite;
+        }
+        #Oval3{
+            animation: cubic-bezier(0.19, 1, 0.22, 1) Oval3 3s infinite;
+            -webkit-animation: cubic-bezier(0.19, 1, 0.22, 1) Oval3 3s infinite;
+        }
+        @keyframes Oval1 {
+            0%   {cx:256;cy:206;}
+            33%  {cx:306;cy:296;}
+            66%  {cx:206;cy:296;}
+            100% {cx:256;cy:206;}
+        }
+        @keyframes Oval2 {
+            0%   {cx:206;cy:296;}
+            33%  {cx:256;cy:206;}
+            66%  {cx:306;cy:296;}
+            100% {cx:206;cy:296;}
+        }
+        @keyframes Oval3 {
+            0%   {cx:306;cy:296;}
+            33%  {cx:206;cy:296;}
+            66%  {cx:256;cy:206;}
+            100% {cx:306;cy:296;}
+        }
+    </style>
 </head>
 
 <body>
     <div id="app">
-        <img src="./assets/images/loading.gif" alt="loading" style="width: 200px;height: 200px;position: absolute;left: 50%;top: 50%;margin-left: -100px;margin-top: -100px;">
+        <svg id="loadingLogo" width="339px" height="329px" viewBox="0 0 339 329" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" fill-opacity="0.3">
+                <g id="play/ic_launcher_APP" transform="translate(-87.000000, -87.000000)">
+                    <circle id="Oval1" fill="#6600FF" cx="256" cy="206" r="120"></circle>
+                    <circle id="Oval2" fill="#FF0066" cx="206" cy="296" r="120"></circle>
+                    <circle id="Oval3" fill="#0066FF" cx="306" cy="296" r="120"></circle>
+                </g>
+            </g>
+        </svg>
     </div>
 </body>
-<script>
-    
-</script>
 </html>

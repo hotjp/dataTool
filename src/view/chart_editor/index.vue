@@ -347,10 +347,10 @@
 </template>
 <script>
 import { getJson } from '../../router/utils';
-import _ from 'lodash';
-import IEcharts from 'vue-echarts-v3/src/full';
-import 'echarts-wordcloud';
-import 'echarts-gl';
+const _ = () => import('lodash');
+const IEcharts = () => import('vue-echarts-v3/src/full');
+import('echarts-wordcloud');
+import('echarts-gl');
 import tableView from '../../components/chartEditor/tableView.vue';
 import chartTypeOption from '../../components/chartEditor/chartTypeOption.vue';
 // 属性面板

@@ -13,9 +13,6 @@
   "plugins": [
     "vue"
   ],
-  "globals": {
-    "import":true
-  },
   "extends": "eslint:recommended",
   "rules": {
     "indent": ["error", 2],

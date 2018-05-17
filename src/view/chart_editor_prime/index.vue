@@ -341,10 +341,11 @@
 </template>
 <script>
 import { getJson } from '../../router/utils';
-import _ from 'lodash';
-import IEcharts from 'vue-echarts-v3/src/full';
-import 'echarts-wordcloud';
-import 'echarts-gl';
+const _ = () => import('lodash');
+// import IEcharts from 'vue-echarts-v3/src/full';
+const IEcharts = () => import('vue-echarts-v3/src/full');
+import('echarts-wordcloud');
+import('echarts-gl');
 
 import tableView from '../../components/chartEditor/tableView.vue';
 // 图表类型

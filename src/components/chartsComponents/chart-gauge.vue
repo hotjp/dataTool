@@ -27,7 +27,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 
 import seriesDefault from '../../vendor/seriesGauge.json';
 import '../../vendor/jsVendor/seriesGauge.js';

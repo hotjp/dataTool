@@ -11,7 +11,6 @@
   </div>
 </template>
 <script type="text/babel">
-import axios from 'axios';
 
 export default {
   mounted() {
