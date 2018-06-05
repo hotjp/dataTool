@@ -187,6 +187,9 @@ export default {
         that.userNameTitle=res.data.regularExpression[0].regDesc;
         that.telRegTitle=res.data.regularExpression[1].regDesc;
         that.pwdRegTitle=res.data.regularExpression[2].regDesc;
+      }else{
+        that.$message({ message: res.errorMessage || '系统错误', type: 'warning' });
+        
       }
     });
   },

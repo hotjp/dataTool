@@ -19,36 +19,37 @@
             width: 200px;
             height: 200px;
         }
-        #Oval1{
-            animation:cubic-bezier(0.19, 1, 0.22, 1) Oval1 3s infinite;
-            -webkit-animation:cubic-bezier(0.19, 1, 0.22, 1) Oval1 3s infinite;
-        }
-        #Oval2{
-            animation:cubic-bezier(0.19, 1, 0.22, 1) Oval2 3s infinite;
-            -webkit-animation:cubic-bezier(0.19, 1, 0.22, 1) Oval2 3s infinite;
-        }
-        #Oval3{
-            animation: cubic-bezier(0.19, 1, 0.22, 1) Oval3 3s infinite;
-            -webkit-animation: cubic-bezier(0.19, 1, 0.22, 1) Oval3 3s infinite;
-        }
-        @keyframes Oval1 {
+        @keyframes Oval1move {
             0%   {cx:256;cy:206;}
             33%  {cx:306;cy:296;}
             66%  {cx:206;cy:296;}
             100% {cx:256;cy:206;}
         }
-        @keyframes Oval2 {
+        @keyframes Oval2move {
             0%   {cx:206;cy:296;}
             33%  {cx:256;cy:206;}
             66%  {cx:306;cy:296;}
             100% {cx:206;cy:296;}
         }
-        @keyframes Oval3 {
+        @keyframes Oval3move {
             0%   {cx:306;cy:296;}
             33%  {cx:206;cy:296;}
             66%  {cx:256;cy:206;}
             100% {cx:306;cy:296;}
         }
+        #Oval1{
+            animation:cubic-bezier(0.19, 1, 0.22, 1) Oval1move 3s infinite;
+            -webkit-animation:cubic-bezier(0.19, 1, 0.22, 1) Oval1move 3s infinite;
+        }
+        #Oval2{
+            animation:cubic-bezier(0.19, 1, 0.22, 1) Oval2move 3s infinite;
+            -webkit-animation:cubic-bezier(0.19, 1, 0.22, 1) Oval2move 3s infinite;
+        }
+        #Oval3{
+            animation: cubic-bezier(0.19, 1, 0.22, 1) Oval3move 3s infinite;
+            -webkit-animation: cubic-bezier(0.19, 1, 0.22, 1) Oval3move 3s infinite;
+        }
+
     </style>
 </head>
 

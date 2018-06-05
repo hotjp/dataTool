@@ -1,4 +1,5 @@
-import { assign as Assign } from 'lodash';
+import assign from 'lodash/Assign';
+// const _ = () => import('lodash');
 export default {
   option: {
     color: ['#000', '#333', '#666'],
@@ -26,7 +27,7 @@ export default {
     }
   },
   extendOption(data, style = {}) {
-    return Assign(this.option, data, style);
+    return assign(this.option, data, style);
   }
 
 

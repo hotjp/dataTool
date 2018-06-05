@@ -11,8 +11,8 @@ const publicPath = '';
 module.exports = (options = {}) => ({
   entry: {
     vue: ['vue', 'vue-router','element-ui'],
-    lib: ['jquery','lodash'],
-    echarts: ['echarts','echarts-gl','echarts-wordcloud'],
+    lib: ['jquery'],
+    echart: ['echarts','echarts-gl','echarts-wordcloud'],
     index: './src/main.js'
   },
   output: {
@@ -38,7 +38,7 @@ module.exports = (options = {}) => ({
     },
     {
       test: /\.css$/,
-      use: ['style-loader', 'css-loader', 'postcss-loader']
+      use: ['style-loader', 'css-loader', 'postcss-loader']  
     },
     {
       test: /\.(png|jpg|jpeg|gif|eot|ttf|woff|woff2|svg|svgz)(\?.+)?$/,
@@ -51,7 +51,8 @@ module.exports = (options = {}) => ({
     },
     {
       test: /\.html$/,
-      use: ['html-loader']
+      use: ['html-loader'],
+      exclude: [resolve(__dirname, 'src/index.html')]    
     }
     ]
   },
@@ -62,7 +63,7 @@ module.exports = (options = {}) => ({
     }),
 
     new webpack.optimize.CommonsChunkPlugin({
-      name: ['vue','lib','echarts','manifest']
+      name: ['lib','vue','echart','manifest']
     }),
     new webpack.optimize.CommonsChunkPlugin({
       name:'vendor',
@@ -90,8 +91,8 @@ module.exports = (options = {}) => ({
     },{
       from: 'src/vendor',
       to:'vendor'
-    }]),
-    new BundleAnalyzerPlugin()
+    }])
+    // new BundleAnalyzerPlugin()
   ],
   resolve: {
     alias: {

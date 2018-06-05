@@ -3,14 +3,14 @@
     <div class="full">
       <div class="dashboard_left">
         <div class="grid-content full">
-          <dashboardDir :activeId="dashboardId" :dataList="dashboardList" @itemClick="itemClick" @toggleAddDashboardDialog="toggleAddDashboardDialog" @showTitleEditor="showTitleEditor" ></dashboardDir>
+          <dashboardDir :activeId="dashboardId" :dataList="dashboardList" @toggleAddDashboardDialog="toggleAddDashboardDialog" @showTitleEditor="showTitleEditor" @deleteDashboard="deleteDashboard"></dashboardDir>
         </div>
       </div>
       <div class="dashboard_main">
         <div class="new_user" v-show="dashboardEmpty">
           <!-- <img src="../../assets/images/dashboard_e.png" alt=""> -->
         </div>
-        <div class="grid-content" :class="{editing:editStatus}"  v-loading.lock="fullscreenLoading">
+        <div class="grid-content content_right" :class="{editing:editStatus}"  v-loading.lock="fullscreenLoading">
           <div class="common_top top fix">
             <span class="name l ">{{dashboardName}}</span>
             <button type="button" class="r preview top_btn" @click="preview()">预览分享</button>
@@ -21,8 +21,9 @@
           <div class="edit_box" :class="{active:editStatus}">
             <div class="_top">
               仪表盘设计
-              <el-radio v-model="model" label="waterfall">瀑布流模式</el-radio>
-              <el-radio v-model="model" label="ppt" disabled >ppt模式</el-radio>
+              <span class="el_radio" :class="{active:model=='waterfall'}" @click="modelChange('waterfall')">瀑布流模式</span>
+              <span class="el_radio" :class="{active:model=='ppt'}"  @click="modelChange('ppt')">ppt模式</span>
+
               <button type="button" class="_save"  @click="toggleEdit()"><i class="fa fa-check-square-o"></i>保存</button>
             </div>
             <div class="_items">
@@ -30,26 +31,10 @@
               <colorPicker :color.sync="dashboardBgcolor" ></colorPicker>仪表盘背景色
             </div>
           </div>
-          <!-- 背景放在 dash_wrap上 -->
-          <div class="dash_wrap" :style="{'background-color':dashboardBgcolor}">
-            <div id="dash" class="grid-stack grid-stack-6" data-gs-animate="yes" >
-              <div v-for="(item,index) in chartList" :key="index" :data-index="index" :data-isload="item.isload" class="grid-stack-item" :data-gs-auto-position="item.isAutoPosition" :data-id="item.id"  :data-gs-x="item.x" :data-gs-y="item.y" :data-gs-width="item.width" :data-gs-height="item.height" data-gs-min-height="3" data-gs-min-width="2" >
-                <div class="_wrap" :style="item.background">
-                  <div class="chart_tit">{{item.title}}</div>
-                  <div class="edit_bar fix">
-                    <!-- 普通图表和3D图表判断，跳转不同页面 -->
-                    <router-link v-if="item.isSpec" class="edit_bar_btn r el-icon-edit" :to="'/chart_editor_prime/'+item.id" title="编辑"></router-link>
-                    <router-link v-else class="edit_bar_btn r el-icon-edit" :to="'/chart_editor/'+item.id" title="编辑"></router-link>
-                    
-                    <span class=" edit_bar_btn r el-icon-refresh" @click="onClickRefreshChartData(item.id,index,$event)" title="刷新"></span>
-                    <span class="el-icon-delete r edit_bar_btn" @click="onClickDeleteChart(item.id,index,$event)" title="删除"></span>
-                  </div>
-                  <tableView v-if="item.type =='table'" class="full table_container" :myMessage="item.chartData"></tableView>
-                  <IEcharts v-else class="full charts_container" :resizable="true" :option="item.option" :loading="item.loading"></IEcharts>
-                </div>
-              </div>
-            </div>
-          </div>
+
+          <ppt v-if="model=='ppt'" ref="ppt" :editStatus="editStatus" :dashboardBgcolor="dashboardBgcolor" :chartList="chartList" @saveDashboard="saveDashboard" @onClickDeleteChart="onClickDeleteChart" @onClickRefreshChartData="onClickRefreshChartData" @pptPage="pptPage"></ppt>
+          <waterfall v-else :editStatus="editStatus" :dashboardBgcolor="dashboardBgcolor" :chartList="chartList" @saveDashboard="saveDashboard" @onClickDeleteChart="onClickDeleteChart" @onClickRefreshChartData="onClickRefreshChartData"></waterfall>
+          
         </div>
       </div>
     </div>
@@ -131,20 +116,12 @@
 // 引入公用配置
 import { getJson } from '../../router/utils';
 // 引入组件
-const IEcharts = () => import('vue-echarts-v3/src/full');
-import('echarts-wordcloud');
-import('echarts-gl');
+
 import dashboardDir from '../../components/dashboard/dashboardDir.vue';
-import tableView from '../../components/chartEditor/tableView.vue';
+import waterfall from '../../components/dashboard/waterfall.vue';
+import ppt from '../../components/dashboard/ppt.vue';
 import colorPicker from '../../components/chartEditor/propSelect/colorPicker.vue';
 
-// 引入拖拽网格
-import '../../assets/css/gridstack.min.css';
-import '../../assets/css/gridstack-extra.min.css';
-import '../../assets/js/jquery-1.11.0';
-import '../../assets/js/jquery-ui.min';
-import '../../assets/js/gridstack';
-import '../../assets/js/gridstack.jQueryUI';
 // 引入图表类型
 import '../../vendor/jsVendor/seriesBar.js';
 import seriesBarDefault from '../../vendor/seriesBar.json';
@@ -170,16 +147,16 @@ import seriesGaugeDefault from '../../vendor/seriesGauge.json';
 import '../../vendor/jsVendor/seriesWordCloud.js';
 import seriesWordCloudDefault from '../../vendor/seriesWordCloud.json';
 import '../../vendor/jsVendor/seriesPercentStackbar.js';
-
 import '../../vendor/jsVendor/seriesBar3D.js';
 import seriesBar3DDefault from '../../vendor/seriesBar3D.json';
 
 export default {
-  components: { IEcharts, dashboardDir, tableView, colorPicker },
+  components: { dashboardDir, colorPicker, waterfall, ppt },
   mounted() {
     let that = window.vm = this,
       params = that.$route.params;
     that.loadDashboard();
+
     // 加载已有chart 列表
     getJson(
       '/chart/list.do',
@@ -322,17 +299,19 @@ export default {
     }],
     activeChildren: [],
     // 新用户的帮助
-    dashboardEmpty: false
+    dashboardEmpty: false,
+    // ppt模式当前页码
+    page: 1
   }),
   watch: {
-    editStatus: function (newVal, oldVal) {
-      if (newVal) {
-        this.toggleGridEdit(true);
-      } else {
-        this.toggleGridEdit();
-        this.saveDashboard();
-      }
-    },
+    // editStatus: function (newVal, oldVal) {
+    //   if (newVal) {
+    //     this.toggleGridEdit(true);
+    //   } else {
+    //     this.toggleGridEdit();
+    //     this.saveDashboard();
+    //   }
+    // },
     searchCharts: function (val, oldVal) {
       for (let i = 0; i < this.charts.length; i++) {
         if (this.charts[i].text && this.charts[i].text.indexOf(val) < 0) {
@@ -347,15 +326,6 @@ export default {
     }
   },
   methods: {
-    // 设置图表禁止和允许拖拽缩放
-    toggleGridEdit(e) {
-      if (e) {
-        this.dash.movable('.grid-stack-item', true);
-        this.dash.resizable('.grid-stack-item', true);
-      } else {
-        this.dash.disable();
-      }
-    },
     // 加载拖拽栅格
     loadGrid() {
       let that = this;
@@ -370,12 +340,14 @@ export default {
       getJson('/dashboard/list.do', {}, function (res) {
         if (res.success) {
           that.dashboardList = Object.assign([], res.data);
-           
           for (let i = 0; i < that.dashboardList.length; i++) {
             that.dashboardList[i].active = false;
             that.dashboardList[i].show = true;
             if (that.dashboardList[i].id == params.viewId) {
-              that.chartList = that.dashboardList[i].layout || [];
+              // layout改为对象，处理之前数组的数据 TODO: dashboardBgcolor也放到layout里
+              // that.chartList = that.dashboardList[i].layout || [];
+              that.chartList = that.dashboardList[i].layout.data || that.dashboardList[i].layout || [];
+              that.model = that.dashboardList[i].layout.model || 'waterfall';
               that.dashboardName = that.dashboardList[i].text;
               that.dashboardId = that.dashboardList[i].id;
               that.dashboardBgcolor = that.dashboardList[i].dashboardBgcolor || '';
@@ -416,8 +388,9 @@ export default {
           that.chartList[i].option =
             result[i] && result[i].option ? result[i].option : {};
           that.chartList[i].loading = false;
+          that.chartList[i].isload = false;
           that.chartList[i].type = result[i].type || '';
-          that.chartList[i].sql = result[i].tableName?result[i].tableName.sql:'';
+          that.chartList[i].sql = result[i].tableName ? result[i].tableName.sql : '';
           that.chartList[i].query = result[i].query || {};
           that.chartList[i].isSpec = result[i].isSpec;
 
@@ -446,7 +419,7 @@ export default {
           }
         }
 
-        that.loadGrid();
+        // that.loadGrid();
         that.toggleFullScreen();
         that.lazyload();
         if ('function' == typeof callback) {
@@ -534,67 +507,6 @@ export default {
         }
       );
     },
-    onClickRefreshChartData(chartId, i, $event) {
-      let that = this,
-        loadingInstance;
-      loadingInstance = that.$loading({
-        target: $($event.target).closest('._wrap')[0]
-      });
-      // TODO: loading使用elementUI的，但是关闭事件用了延时
-      // that.chartList[i].loading = true;
-      // that.chartList.splice(i, 1, this.chartList[i])
-      // that.chartList = Object.assign([],that.chartList)
-
-      // 查询图表源 数据
-      getJson(
-        '/chart/info.do',
-        {
-          chart: chartId
-        },
-        function (data) {
-          if (data.success && data.data) {
-            that.chartList[i].isload = false;
-            that.chartList[i].option =
-              data.data && data.data.option ? data.data.option : {};
-            that.chartList[i].loading = false;
-            that.chartList[i].type = data.data.type;
-            that.chartList[i].sql = data.data.tableName.sql;
-            that.chartList[i].query = data.data.query;
-            that.chartList[i].title = that.chartList[i].option.title
-              ? that.chartList[i].option.title.text
-              : '';
-            // 清空title，把title提出来
-            that.chartList[i].option.title = '';
-            // 手动清空series.data里数据
-            if (that.chartList[i].option && that.chartList[i].option.series) {
-              for (let j = 0; j < that.chartList[i].option.series.length; j++) {
-                that.chartList[i].option.series[j].data = [];
-              }
-            }
-            getJson(
-              '/query.do',
-              {
-                view: data.data.tableName.sql,
-                query: JSON.stringify(data.data.query)
-              },
-              function (res) {
-                if (res.success) {
-                  if (res.data.dataError || !res.data.data) {
-                    return;
-                  }
-                  that.dataHandler(res, i, data.data.type);
-                }
-              }
-            );
-          }
-        }
-      );
-      setTimeout(function () {
-        that.$nextTick(function () {
-          loadingInstance.close();
-        });
-      }, 1000);
-    },
     // 选择工作表
     handleNodeClick(data) {
       this.newCharts.tableName.sql = data.id;
@@ -618,20 +530,23 @@ export default {
                 list = {
                   id: that.dashboardId,
                   text: that.dashboardName,
-                  layout: []
+                  layout: {
+                    data:[],
+                    model:that.model
+                  }
                 };
               // 获取各图表x,y,w,h
               $('.grid-stack-item').each(function (i, e) {
-                list.layout.push({
-                  id: $(e).data('id'),
-                  x: $(e).data('gs-x'),
-                  y: $(e).data('gs-y'),
-                  width: $(e).data('gs-width'),
-                  height: $(e).data('gs-height'),
+                list.layout.data.push({
+                  id: $(e).attr('data-id'),
+                  x: $(e).attr('data-gs-x'),
+                  y: $(e).attr('data-gs-y'),
+                  width: $(e).attr('data-gs-width'),
+                  height: $(e).attr('data-gs-height'),
                   isAutoPosition: false
                 });
               });
-              list.layout.push({
+              list.layout.data.push({
                 id: data.data.id,
                 x: 0,
                 y: 0,
@@ -667,18 +582,24 @@ export default {
           id: that.dashboardId,
           text: that.dashboardName,
           dashboardBgcolor: that.dashboardBgcolor,
-          layout: []
+          layout: {
+            data: [],
+            model: that.model
+          }
         };
       // 获取各图表x,y,w,h
       $('.grid-stack-item').each(function (i, e) {
-        list.layout.push({
-          id: $(e).data('id'),
-          x: $(e).data('gs-x'),
-          y: $(e).data('gs-y'),
-          width: $(e).data('gs-width'),
-          height: $(e).data('gs-height'),
-          isAutoPosition: false
-        });
+        var chart = {};
+        chart.id = $(e).attr('data-id');
+        chart.x = $(e).attr('data-gs-x');
+        chart.y = $(e).attr('data-gs-y');
+        chart.width = $(e).attr('data-gs-width');
+        chart.height = $(e).attr('data-gs-height');
+        chart.isAutoPosition = false;
+        if (that.model == 'ppt') {
+          chart.pptPage = $(e).attr('data-pptpage');
+        }
+        list.layout.data.push(chart);
       });
       getJson(
         '/dashboard/save.do',
@@ -691,6 +612,9 @@ export default {
               callback();
             } else {
               that.$message({ message: '保存成功', type: 'success' });
+            }
+            if (that.model == 'ppt') {
+              that.$refs.ppt.renderThumbnail();
             }
             that.editStatus = false;
           }
@@ -707,7 +631,10 @@ export default {
       let list = {
         id: '',
         text: that.newDashboardName,
-        layout: []
+        layout: {
+          data:[],
+          model:'waterfall'
+        }
       };
       getJson(
         '/dashboard/save.do',
@@ -717,12 +644,14 @@ export default {
         function (res) {
           if (res.success) {
             that.$message({ message: '新建成功', type: 'success' });
-            that.dashboardDialogVisible = false;
             // that.$router.replace({ path: '/dashboard/'+resData.data.id });
             that.$router.replace({
               path: '/empty',
               query: { link: '/dashboard/' + res.data.id }
             });
+          } else {
+            that.$message({ message: res.errorMessage, type: 'success' });
+            that.dashboardDialogVisible = false;
           }
         }
       );
@@ -730,12 +659,12 @@ export default {
     // 显示/隐藏添加图表弹窗
     toggleAddChartDialog(addFlag) {
       // 添加图表前判断有没有选择dashboard
-      if('boolean' == typeof addFlag && !this.dashboardId){
+      if ('boolean' == typeof addFlag && !this.dashboardId) {
         this.$message({ message: '请先选择仪表盘', type: 'warning' });
         return;
       }
       this.addChartVisible = !this.addChartVisible;
-      
+
     },
     // 显示/隐藏选择图表类型弹窗
     toggleChooseTypeDialog() {
@@ -776,12 +705,9 @@ export default {
     },
     // 打开/关闭设计模式
     toggleEdit() {
-      if(this.dashboardId){
+      if (this.dashboardId) {
         this.editStatus = !this.editStatus;
-        if (this.editStatus) {
-          this.toggleGridEdit(true);
-        } else {
-          this.toggleGridEdit();
+        if (!this.editStatus) {
           this.saveDashboard();
         }
       }
@@ -790,10 +716,10 @@ export default {
     preview() {
       // 预览前先保存
       let that = this;
-      if(that.dashboardId){
+      if (that.dashboardId) {
         var href = vars.src + '/viewer/dashboard.html?id=' + that.dashboardId;
         that.saveDashboard(openPrevView);
-      }else{
+      } else {
         this.$message({ message: '请先选择仪表盘', type: 'warning' });
       }
       function openPrevView() {
@@ -836,17 +762,41 @@ export default {
       } else {
         that.addChartVisible = false;
         that.toggleFullScreen(true);
-        that.chartList.push({
-          id: chartId,
-          x: 0,
-          y: 0,
-          width: 3,
-          height: 4,
-          isAutoPosition: true
-        });
-        that.dash.destroy(false);
-        $('#dash').data('gridstack', '');
-        that.getDashboardData(that.saveDashboard);
+        if (that.model == 'ppt') {
+          // 调用子页面方法， 判断当前页码有没有空位，没有则加入其它页
+          if (!that.$refs.ppt.checkIsAreaEmpty(3, 4)) {
+            //  有空 添加
+            // 没空 新建？
+            that.page = that.$refs.ppt.addNewPage();
+          }
+          that.chartList.push({
+            id: chartId,
+            x: 0,
+            y: 0,
+            width: 3,
+            height: 4,
+            isAutoPosition: true,
+            pptPage: that.page
+          });
+          that.getDashboardData();
+          // 需要等到grid渲染完后再保存
+          setTimeout(function () {
+            that.saveDashboard();
+          }, 1000);
+
+        } else {
+          that.chartList.push({
+            id: chartId,
+            x: 0,
+            y: 0,
+            width: 3,
+            height: 4,
+            isAutoPosition: true
+          });
+          that.getDashboardData(that.saveDashboard);
+
+        }
+
       }
     },
     // 拖拽区遮罩
@@ -860,27 +810,6 @@ export default {
     // 添加弹窗显示
     toggleAddDashboardDialog(data) {
       this.dashboardDialogVisible = data;
-    },
-    // 左侧列表点击事件
-    itemClick(data) {
-      if (data != this.dashboardId) {
-        this.$router.push({
-          path: '/empty',
-          query: { link: '/dashboard/' + data }
-        });
-      }
-
-    },
-    // 删除图表
-    onClickDeleteChart(chartId, i, $event) {
-      let that = this;
-      this.chartList.splice(i, 1);
-      setTimeout(() => {
-        that.saveDashboard(callback);
-      }, 300);
-      function callback() {
-        that.$message({ message: '删除成功', type: 'success' });
-      }
     },
     // 编辑标题弹窗显示
     showTitleEditor(data) {
@@ -913,8 +842,8 @@ export default {
             } else {
               list.active = false;
             }
-            list.show=true;
-            that.dashboardList.splice(that.editIndex, 1, list);
+            list.show = true;
+            that.dashboardList.splice(that.editIndex, 1, ...list);
           }
         }
       );
@@ -1135,7 +1064,7 @@ export default {
         console.warn('类型错误！');
       }
       that.chartList[index].option = Object.assign({}, that.chartList[index].option);
-      that.$set(that.chartList, index, that.chartList[index]);
+      that.chartList.splice(0, that.chartList.length, ...that.chartList);
     },
     // 选择视图搜索
     filterView(value, data) {
@@ -1145,24 +1074,155 @@ export default {
     // 懒加载
     lazyload() {
       let that = this;
-      $('.grid-content').on('scroll', function () {
-        // 滚动的距离
-        let scrollTop = Math.abs($('#dash').position().top);
-        var h = $('.grid-content').height();
-        $('.grid-stack-item').each(function () {
-          let position = $(this).position().top;
-          let index = $(this).attr('data-index');
-          let isload = that.chartList[index].isload;
-          let id = $(this).attr('data-id');
-          if (position < scrollTop + h && !isload) {
-            that.chartList[index].isload = true;
-            let type = that.chartList[index].type;
-            let queryInfo = JSON.stringify(that.chartList[index].query);
-            let sql = that.chartList[index].sql;
-            that.getChartSeriesData(sql, queryInfo, index, type);
+      if (that.model == 'waterfall') {
+        $('.content_right').on('scroll', function () {
+          // 滚动的距离
+          let scrollTop = Math.abs($('#dash').position().top);
+          let isload = true;
+          var h = $('.content_right').height();
+          $('.grid-stack-item').each(function () {
+            let position = $(this).position().top;
+            let index = $(this).attr('data-index');
+            if (!that.chartList[index].isload) {
+              isload = that.chartList[index].isload;
+              let id = $(this).attr('data-id');
+              if (position < scrollTop + h) {
+                that.chartList[index].isload = true;
+                let type = that.chartList[index].type;
+                let queryInfo = JSON.stringify(that.chartList[index].query);
+                let sql = that.chartList[index].sql;
+                that.getChartSeriesData(sql, queryInfo, index, type);
+              }
+            }
+          });
+          if (!isload) {
+            $('.content_right').off('scroll');
+          }
+        }).trigger('scroll');
+      } else {
+        for (var i = 0; i < that.chartList.length; i++) {
+          let type = that.chartList[i].type;
+          let queryInfo = JSON.stringify(that.chartList[i].query);
+          let sql = that.chartList[i].sql;
+          that.getChartSeriesData(sql, queryInfo, i, type);
+        }
+      }
+
+    },
+    // 删除图表
+    onClickDeleteChart(data) {
+      let that = this;
+      this.chartList.splice(data.index, 1);
+      setTimeout(() => {
+        that.saveDashboard(callback);
+      }, 300);
+      function callback() {
+        that.$message({ message: '删除成功', type: 'success' });
+      }
+    },
+    // 刷新单个图表
+    onClickRefreshChartData(emitData) {
+      let that = this,
+        loadingInstance;
+      let chartId = emitData.id, i = emitData.index, $event = emitData.event;
+      loadingInstance = that.$loading({
+        target: $($event.target).closest('._wrap')[0]
+      });
+      // TODO: loading使用elementUI的，但是关闭事件用了延时
+      // that.chartList[i].loading = true;
+      // that.chartList.splice(i, 1, this.chartList[i])
+      // that.chartList = Object.assign([],that.chartList)
+
+      // 查询图表源 数据
+      getJson(
+        '/chart/info.do',
+        {
+          chart: chartId
+        },
+        function (data) {
+          if (data.success && data.data) {
+            that.chartList[i].isload = false;
+            that.chartList[i].option =
+              data.data && data.data.option ? data.data.option : {};
+            that.chartList[i].loading = false;
+            that.chartList[i].type = data.data.type;
+            that.chartList[i].sql = data.data.tableName.sql;
+            that.chartList[i].query = data.data.query;
+            that.chartList[i].title = that.chartList[i].option.title
+              ? that.chartList[i].option.title.text
+              : '';
+            // 清空title，把title提出来
+            that.chartList[i].option.title = '';
+            // 手动清空series.data里数据
+            if (that.chartList[i].option && that.chartList[i].option.series) {
+              for (let j = 0; j < that.chartList[i].option.series.length; j++) {
+                that.chartList[i].option.series[j].data = [];
+              }
+            }
+            getJson(
+              '/query.do',
+              {
+                view: data.data.tableName.sql,
+                query: JSON.stringify(data.data.query)
+              },
+              function (res) {
+                if (res.success) {
+                  if (res.data.dataError || !res.data.data) {
+                    return;
+                  }
+                  that.dataHandler(res, i, data.data.type);
+                }
+              }
+            );
+          }
+        }
+      );
+      setTimeout(function () {
+        that.$nextTick(function () {
+          loadingInstance.close();
+        });
+      }, 1000);
+    },
+    modelChange(val) {
+      let that = this;
+      this.$confirm('切换模式将清除本仪表盘数据，确认切换么?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        that.model = val;
+        that.chartList=[];
+      }).catch(() => {
+
+      });
+    },
+    pptPage(data) {
+      this.page = data;
+    },
+    // 仪表盘删除
+    deleteDashboard(data) {
+      let that = this;
+      this.$confirm('删除的仪表盘不可恢复，是否删除该仪表盘?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        that.dashboardList.splice(data.index, 1);
+        
+        getJson('/dashboard/delete.do', {
+          dashboard: data.id
+        }, function (res) {
+          if (res.success) {
+            that.$message({ message: '删除成功', type: 'success' });
+            that.dashboardList.splice(data.index, 1);
+          } else {
+            that.$message({ message: res.errorMessage, type: 'warning' });
           }
         });
-      }).trigger('scroll');
+      }).catch(() => {
+
+      });
+
     }
   }
 };
@@ -1172,7 +1232,28 @@ export default {
   width: 100%;
   height: 500px;
   margin-top: 40px;
-  background: url('../../assets/images/dashboard_e.png') no-repeat;
+  background: url("../../assets/images/dashboard_e.png") no-repeat;
   background-position: 5px 5px;
+}
+.el_radio {
+  display: inline-block;
+  line-height: 26px;
+  vertical-align: middle;
+  margin-left: 10px;
+}
+.el_radio:before {
+  content: "";
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1px solid #d8dce5;
+  vertical-align: middle;
+  margin-right: 5px;
+}
+.el_radio.active:before {
+  width: 4px;
+  height: 4px;
+  border: 5px solid #1989fa;
 }
 </style>

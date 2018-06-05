@@ -4,50 +4,82 @@ if (!id.length) {
 }
 
 // 预留lesson
-if ('lesson') {
+// if ('lesson') {
 
-}
+// }
 // 栅格设置
-var dash, dashOptions = {
-  draggable: false,
-  resizable: false,
-  cellHeight: 80,
-  verticalMargin: 0,
-  width: 6
-};
+var dash, model, dashOptions = {
+    draggable: false,
+    resizable: false,
+    cellHeight: 80,
+    verticalMargin: 0,
+    width: 6
+  },
+  dashList = [];
 
 getChartList(id);
 
 function getChartList(chartId) {
-  getJson('/dashboard/info.do',{
-      dashboard: chartId
-    }, function(res) {
-      if (res.success) {
-        $('.top .title').text(res.data.text);
-        if(res.data.dashboardBgcolor){
-          $('.dash_wrap').css('background',res.data.dashboardBgcolor)
-        }
-        var data = {
-          xData: res.data.layout
-        };
-        renderTmp('#dash', 'gridItem', data);
+  getJson('/share/dashboard/info.do', {
+    dashboard: chartId
+  }, function(res) {
+    if (res.success) {
+      $('.top .title').text(res.data.text);
+      if (res.data.dashboardBgcolor) {
+        $('.dash_wrap').css('background', res.data.dashboardBgcolor);
+      }
+      var list = res.data.layout.data || res.data.layout;
+      var data = {
+        xData: list
+      };
+      model = res.data.layout.model || 'waterfall';
+      if (model == 'waterfall') {
+        renderTmp('#dashBox', 'gridItem', data);
         loadGrid();
-        var chartIdArr = []
-        $('.grid-stack-item').each(function() {
-          var chartId = $(this).data('id');
-          chartIdArr.push(chartId)
-          getChartData(chartId)
+      } else {
+        dashOptions.height = 6;
+        var pageSize = 1;
+        for (var i = 0; i < list.length; i++) {
+          var pptPage = parseInt(list[i].pptPage);
+          pageSize = pptPage && pptPage > pageSize ? pptPage : pageSize;
+        }
+        data.pageSize = pageSize;
+        $('#dashBox').addClass('swiper-container');
+        $('.swiper-pagination').show();
+        $('.swiper-button-prev').show();
+        $('.swiper-button-next').show();
+        renderTmp('#dashBox', 'gridItemPpt', data);
+        loadAllGrid();
+        new Swiper('.swiper-container', {
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev'
+          },
+          allowTouchMove: false,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true
+          }
         });
 
-
       }
-    })
+
+      var chartIdArr = [];
+      $('.grid-stack-item').each(function() {
+        var chartId = $(this).data('id');
+        chartIdArr.push(chartId);
+        getChartData(chartId);
+      });
+
+
+    }
+  });
 }
 
 // 获取单一图表数据
 function getChartData(chartId) {
   // 查询图表源 数据
-  getJson('/chart/info.do', {
+  getJson('/share/chart/info.do', {
     chart: chartId
   }, function(res) {
     if (res.data.option) {
@@ -59,118 +91,118 @@ function getChartData(chartId) {
       }
       var queryInfo = JSON.stringify(res.data.query),
         viewId = res.data.tableName.sql;
-        getJson('/query.do',{
-          view: viewId,
-          query: queryInfo
-        }, function(data) {
-          if (res.data.type == 'table') {
-            res.data.chartData = dataHandler(data.data, res.data.option.series, res.data.type);
-            // 处理表格数据
-            var chartData = res.data.chartData;
-            var rows = chartData.rows;
-            var columns = chartData.columns;
-            // 最多显示500条
-            if (rows.length > 500) {
-              rows.length = 500
+      getJson('/share/queryDatasource.do', {
+        view: viewId,
+        query: queryInfo
+      }, function(data) {
+        if (res.data.type == 'table') {
+          res.data.chartData = dataHandler(data.data, res.data.option.series, res.data.type);
+          // 处理表格数据
+          var chartData = res.data.chartData;
+          var rows = chartData.rows;
+          var columns = chartData.columns;
+          // 最多显示500条
+          if (rows.length > 500) {
+            rows.length = 500;
+          }
+          var html = '';
+          html += '<table class="chart_table">';
+          html += '<thead>';
+          html += '<tr>';
+          for (var i = 0; i < columns.length; i++) {
+            html += '<td>' + columns[i].source.text + '</td>';
+          }
+          html += '</tr>';
+          html += '</thead>';
+          // 以下为两种处理方式，是否合并相同数值
+          // 合并
+          var num = [];
+          for (var j = 0; j < columns.length; j++) {
+            num[j] = 0;
+          }
+
+          function comp(rows1, rows2, index) {
+            // 循环对比
+            var ind = index;
+            if (ind > 0) {
+              if (rows1[columns[ind - 1].name] == rows2[columns[ind - 1].name]) {
+                comp(rows1, rows2, ind - 1);
+                if (ind - 1 == 0) {
+                  return true;
+                }
+              } else {
+                return false;
+              }
             }
-            var html = '';
-            html += '<table class="chart_table">'
-            html += '<thead>'
-            html += '<tr>'
-            for (var i = 0; i < columns.length; i++) {
-              html += '<td>' + columns[i].source.text + '</td>'
-            }
-            html += '</tr>'
-            html += '</thead>'
-            // 以下为两种处理方式，是否合并相同数值
-            // 合并
-            var num = [];
+          }
+          for (var i = 0; i < rows.length; i++) {
+            html += '<tr>';
             for (var j = 0; j < columns.length; j++) {
-              num[j] = 0
-            }
-
-            function comp(rows1, rows2, index) {
-              // 循环对比
-              var ind = index
-              if (ind > 0) {
-                if (rows1[columns[ind - 1].name] == rows2[columns[ind - 1].name]) {
-                  comp(rows1, rows2, ind - 1)
-                  if (ind - 1 == 0) {
-                    return true
-                  }
-                } else {
-                  return false
-                }
-              }
-            }
-            for (var i = 0; i < rows.length; i++) {
-              html += '<tr>';
-              for (var j = 0; j < columns.length; j++) {
-                if (i < num[j]) {
-                  continue
-                } else {
-                  var rowspan = 1;
-                  if (i + 1 < rows.length) {
-                    for (var k = i + 1; k < rows.length; k++) {
-                      if (rows[i][columns[j].name] == rows[k][columns[j].name]) {
-                        if (j == 0) {
-                          rowspan++;
-                          num[j]++;
-                        } else if (rows[i][columns[j].name] == rows[k][columns[j].name] && comp(rows[i], rows[k], j)) {
-                          rowspan++;
-                          num[j]++;
-                        }
-                      } else {
+              if (i < num[j]) {
+                continue;
+              } else {
+                var rowspan = 1;
+                if (i + 1 < rows.length) {
+                  for (var k = i + 1; k < rows.length; k++) {
+                    if (rows[i][columns[j].name] == rows[k][columns[j].name]) {
+                      if (j == 0) {
+                        rowspan++;
                         num[j]++;
-                        break
+                      } else if (rows[i][columns[j].name] == rows[k][columns[j].name] && comp(rows[i], rows[k], j)) {
+                        rowspan++;
+                        num[j]++;
                       }
-
-                    }
-                    html += '<td rowspan="' + rowspan + '">' + rows[i][columns[j].name] + '</td>'
-                  } else {
-                    // 最后一个
-                    if (rows[i][columns[j].name] != rows[i - 1][columns[j].name]) {
-                      html += '<td rowspan="' + rowspan + '">' + rows[i][columns[j].name] + '</td>'
-
+                    } else {
+                      num[j]++;
+                      break;
                     }
 
                   }
+                  html += '<td rowspan="' + rowspan + '">' + rows[i][columns[j].name] + '</td>';
+                } else {
+                  // 最后一个
+                  if (rows[i][columns[j].name] != rows[i - 1][columns[j].name]) {
+                    html += '<td rowspan="' + rowspan + '">' + rows[i][columns[j].name] + '</td>';
+
+                  }
+
                 }
               }
-              html += '</tr>'
             }
-            // 不合并
-            // for (var j = 0; j < rows.length; j++) {
-            //   html+='<tr>'
-            //   for(var i=0;i<columns.length;i++){
-            //       html+='<td rowspan="">'+rows[j][columns[i].name]+'</td>'
-            //   }
-            //   html+='</tr>'
-            // }
-            $('#chart' + chartId).append(html).addClass('ova')
+            html += '</tr>';
+          }
+          // 不合并
+          // for (var j = 0; j < rows.length; j++) {
+          //   html+='<tr>'
+          //   for(var i=0;i<columns.length;i++){
+          //       html+='<td rowspan="">'+rows[j][columns[i].name]+'</td>'
+          //   }
+          //   html+='</tr>'
+          // }
+          $('#chart' + chartId).append(html).addClass('ova');
 
-          } else {
-            res.data.option.series = dataHandler(data.data, res.data.option.series, res.data.type);
-            res.data.option.title.text = ''
-            var myChart = echarts.init(document.getElementById('chart' + chartId));
-            myChart.setOption(res.data.option);
-            myChart.resize();
-          }
-          $('#chart' + chartId).closest('.grid-stack-item').find('.chart_tit').text(res.data.text)
-          res.data.background?res.data.background:{
-            backgroundColor:'#fff',
-            backgroundRepeat:'no-repeat',
-            backgroundImage:''
-          }
-          $('#chart' + chartId).closest('._wrap').css({
-            'background-color':res.data.background.backgroundColor,
-            'background-repeat':res.data.background.backgroundRepeat,
-            'background-image':res.data.background.backgroundImage
-          })
-        })
+        } else {
+          res.data.option.series = dataHandler(data.data, res.data.option.series, res.data.type);
+          res.data.option.title.text = '';
+          var myChart = echarts.init(document.getElementById('chart' + chartId));
+          myChart.setOption(res.data.option);
+          myChart.resize();
+        }
+        $('#chart' + chartId).closest('.grid-stack-item').find('.chart_tit').text(res.data.text);
+        res.data.background = res.data.background ? res.data.background : {
+          backgroundColor: '#fff',
+          backgroundRepeat: 'no-repeat',
+          backgroundImage: ''
+        };
+        $('#chart' + chartId).closest('._wrap').css({
+          'background-color': res.data.background.backgroundColor,
+          'background-repeat': res.data.background.backgroundRepeat,
+          'background-image': res.data.background.backgroundImage
+        });
+      });
     }
 
-  })
+  });
 
 }
 
@@ -263,38 +295,46 @@ function dataHandler(data, series, type) {
       seriesStackbar(columns, rows, queryNameKeyY, {}, series)
     );
     return series;
-  }else if (type == 'gauge') {
+  } else if (type == 'gauge') {
     series = Object.assign(
       [],
       seriesGauge(columns, rows, queryNameKeyX, queryNameKeyY, {}, series)
     );
     return series;
-  }else if (type == 'wordCloud') {
+  } else if (type == 'wordCloud') {
     series = Object.assign(
       [],
       seriesWordCloud(columns, rows, queryNameKeyX, queryNameKeyY, {}, series)
     );
     return series;
-  }else if (type == 'percentStackbar') {
+  } else if (type == 'percentStackbar') {
     series = Object.assign(
       [],
       seriesPercentStackbar(columns, rows, queryNameKeyY, {}, series)
     );
     return series;
-  }else if (type == 'bar3D') {
+  } else if (type == 'bar3D') {
     series = Object.assign(
       [],
       seriesBar3D(columns, rows, queryNameKeyX, queryNameKeyY, {}, series)
     );
     return series;
   }
-  
+
 }
 
 // 禁用栅格
 function disable() {
   dash.disable();
 }
+// 禁用栅格
+function disableAll() {
+  for (var i = 1; i < dashList.length; i++) {
+    dashList[i].disable();
+  }
+
+}
+
 // 启用栅格
 function enable() {
   dash.movable('.grid-stack-item', true);
@@ -307,6 +347,15 @@ function loadGrid() {
   disable();
 }
 
+function loadAllGrid() {
+  $('.swiper-slide').each(function(ind, e) {
+    var i = ind + 1;
+    $('#dash' + i).gridstack(dashOptions);
+    dashList[i] = $('#dash' + i).data('gridstack');
+  });
+  disableAll();
+}
+
 // 点击展示单个图表
 var singleChart = echarts.init(document.getElementById('singleChart'));
 
@@ -315,63 +364,63 @@ $('body').on('dblclick', '.grid-stack-item', function() {
   $('.chart_box').show();
   $('body').addClass('ovh');
   var chartId = $(this).attr('data-id');
-  getJson('/chart/info.do', {
+  getJson('/share/chart/info.do', {
     chart: chartId
   }, function(res) {
     if (res.data.option) {
       var viewId = res.data.tableName.sql,
         queryInfo = JSON.stringify(res.data.query);
-      getJson('/query.do',{
-          view: viewId,
-          query: queryInfo
-        }, function(data) {
-          if (res.data.type == 'table') {
-            res.data.chartData = dataHandler(data.data, res.data.option.series, res.data.type);
-            $('#singleChart').hide();
-            $('#singleTable').show();
-            singleChart.clear()
-            var chartData = res.data.chartData;
-            $('#singleTable').html('');
-            renderTmp('#singleTable', 'tableViewTpl', chartData);
-            res.data.background?res.data.background:res.data.background={
-              backgroundColor:'#fff',
-              backgroundRepeat:'no-repeat',
-              backgroundImage:''
-            }
-            $('#singleTable').css({
-              'background-color':res.data.background.backgroundColor,
-              'background-repeat':res.data.background.backgroundRepeat,
-              'background-image':res.data.background.backgroundImage
-            })
-          } else {
-            res.data.option.series = dataHandler(data.data, res.data.option.series, res.data.type);
-            $('#singleChart').show();
-            $('#singleTable').hide();
-            singleChart.clear()
-            singleChart.setOption(res.data.option);
-            singleChart.resize();
-            res.data.background?res.data.background:res.data.background={
-              backgroundColor:'#fff',
-              backgroundRepeat:'no-repeat',
-              backgroundImage:''
-            }
-            $('#singleChart').css({
-              'background-color':res.data.background.backgroundColor,
-              'background-repeat':res.data.background.backgroundRepeat,
-              'background-image':res.data.background.backgroundImage
-            })
-          }
-          
-        })
+      getJson('/share/queryDatasource.do', {
+        view: viewId,
+        query: queryInfo
+      }, function(data) {
+        if (res.data.type == 'table') {
+          res.data.chartData = dataHandler(data.data, res.data.option.series, res.data.type);
+          $('#singleChart').hide();
+          $('#singleTable').show();
+          singleChart.clear();
+          var chartData = res.data.chartData;
+          $('#singleTable').html('');
+          renderTmp('#singleTable', 'tableViewTpl', chartData);
+          res.data.background = res.data.background ? res.data.background : res.data.background = {
+            backgroundColor: '#fff',
+            backgroundRepeat: 'no-repeat',
+            backgroundImage: ''
+          };
+          $('#singleTable').css({
+            'background-color': res.data.background.backgroundColor,
+            'background-repeat': res.data.background.backgroundRepeat,
+            'background-image': res.data.background.backgroundImage
+          });
+        } else {
+          res.data.option.series = dataHandler(data.data, res.data.option.series, res.data.type);
+          $('#singleChart').show();
+          $('#singleTable').hide();
+          singleChart.clear();
+          singleChart.setOption(res.data.option);
+          singleChart.resize();
+          res.data.background = res.data.background ? res.data.background : res.data.background = {
+            backgroundColor: '#fff',
+            backgroundRepeat: 'no-repeat',
+            backgroundImage: ''
+          };
+          $('#singleChart').css({
+            'background-color': res.data.background.backgroundColor,
+            'background-repeat': res.data.background.backgroundRepeat,
+            'background-image': res.data.background.backgroundImage
+          });
+        }
+
+      });
     }
-  })
+  });
 });
 
 // 关闭单图表弹窗
 $('body').on('click', '.close', function() {
   $('.chart_box').hide();
   $('body').removeClass('ovh');
-  $('#singleTable').attr('css','')
+  $('#singleTable').attr('css', '');
 
 });
 

@@ -55,3 +55,6 @@ body{
 .ova{
     overflow: auto;
 }
+#dashboard .swiper-pagination,#dashboard .swiper-button-prev,#dashboard .swiper-button-next{
+    display: none;
+}

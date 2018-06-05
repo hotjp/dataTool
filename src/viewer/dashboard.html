@@ -8,6 +8,7 @@
     <link href="../assets/css/gridstack.min.css" rel="stylesheet">
     <link href="../assets/css/gridstack-extra.min.css" rel="stylesheet">
     <link href="../assets/css/less/dashboard.css" rel="stylesheet">
+    <link href="./css/swiper.min.css" rel="stylesheet">
     <link href="./css/dashboard.css" rel="stylesheet">
 </head>
 
@@ -16,9 +17,11 @@
         <div class="l title">大数据</div>
         <!-- <div class="r">返回首页</div> -->
     </div>
-    <div class="dash_wrap">
-        <div id="dash" class="grid-stack grid-stack-6" data-gs-animate="yes">
-        </div>
+
+    <div class="dash_wrap" id="dashBox">
+        <div class="swiper-pagination"></div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
     </div>
     <!-- 单个chrats弹窗 -->
     <div class="chart_box">
@@ -30,15 +33,38 @@
     </div>
 
     <script id="gridItem" type="text/html">
-        <%for(i=0;i<xData.length;i++){%>
-            <div class="grid-stack-item" id="" data-id="<%=xData[i].id%>" data-gs-auto-position="false" data-gs-x="<%=xData[i].x%>" data-gs-y="<%=xData[i].y%>" data-gs-width="<%=xData[i].width%>" data-gs-height="<%=xData[i].height%>" data-gs-min-height="2">
-                <div class="_wrap">
-                    <div class="chart_tit"><%=xData[i].title%></div>                    
-                    <div id="chart<%=xData[i].id%>"></div>
+        <div id="dash" class="grid-stack grid-stack-6" data-gs-animate="yes">
+            <%for(i=0;i<xData.length;i++){%>
+                <div class="dash_item grid-stack-item" id="" data-id="<%=xData[i].id%>" data-gs-auto-position="false" data-gs-x="<%=xData[i].x%>" data-gs-y="<%=xData[i].y%>" data-gs-width="<%=xData[i].width%>" data-gs-height="<%=xData[i].height%>" data-gs-min-height="2">
+                    <div class="_wrap">
+                        <div class="chart_tit"><%=xData[i].title%></div>                    
+                        <div id="chart<%=xData[i].id%>"></div>
+                    </div>
                 </div>
-            </div>
-        <%}%>
+            <%}%>
+        </div>
     </script>
+
+    <script id="gridItemPpt" type="text/html">
+        <div class="swiper-wrapper">
+            <%for(j=1;j<=pageSize;j++){%>
+                <div id="dash<%=j%>" class="swiper-slide grid-stack grid-stack-6" data-gs-animate="yes">
+                    <%for(i=0;i<xData.length;i++){%>
+                        <%if(xData[i].pptPage == j){%>
+                        <div class="dash_item grid-stack-item" id="" data-id="<%=xData[i].id%>" data-gs-auto-position="false" data-gs-x="<%=xData[i].x%>" data-gs-y="<%=xData[i].y%>" data-gs-width="<%=xData[i].width%>" data-gs-height="<%=xData[i].height%>" data-gs-min-height="2">
+                            <div class="_wrap">
+                                <div class="chart_tit"><%=xData[i].title%></div>                    
+                                <div id="chart<%=xData[i].id%>"></div>
+                            </div>
+                        </div>
+                        <%}%>
+                        
+                    <%}%>
+                </div>
+            <%}%>
+        </div>
+    </script>
+
 </body>
 <script src="../assets/js/jquery-1.11.0.js"></script>
 <script src="../assets/js/jquery-ui.min.js"></script>
@@ -52,6 +78,7 @@
 <script src="./js/echarts.js"></script>
 <script src="./js/echarts-wordcloud.min.js"></script>
 <script src="./js/echarts-gl.js"></script>
+<script src="./js/swiper.min.js"></script>
 
 <script src="./js/viewer_common.js"></script>
 <script src="../vendor/jsVendor/seriesBar.js"></script>

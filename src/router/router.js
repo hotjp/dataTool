@@ -142,6 +142,13 @@ routes.push({
     default: database,
     header: indexHeader
   }
+},{
+  name: '数据源',
+  path: '/database/:viewId',
+  components: {
+    default: database,
+    header: indexHeader
+  }
 });
 
 // 添加数据源
@@ -153,7 +160,7 @@ const database_add = () => import(
 routes.push({
   // 添加数据源
   name: '添加数据源',
-  path: '/database/add',
+  path: '/databaseAdd',
   components: {
     default: database_add,
     header: indexHeader

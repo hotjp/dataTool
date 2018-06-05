@@ -80,61 +80,61 @@ getChartData(id);
 // 获取单一图表数据
 function getChartData(chartId) {
   // 查询图表源 数据
-  getJson('/chart/info.do', {
+  getJson('/share/chart/info.do', {
     chart: chartId
   }, function(res) {
     if (res.data.background) {
-      $('.chart_wrap').css('background', res.data.background.backgroundColor)
+      $('.chart_wrap').css('background', res.data.background.backgroundColor);
     }
     if (res.data.option) {
-      optionData = res.data.option
+      optionData = res.data.option;
       resize();
       chartType = res.data.type;
       // 图表时数据处理
       if (res.data.type == 'table') {
         var queryInfo = JSON.stringify(res.data.query),
-          viewId = res.data.tableName.sql
-        getJson("/query.do", {
+          viewId = res.data.tableName.sql;
+        getJson('/share/queryDatasource.do', {
           view: viewId,
           query: queryInfo
         }, function(data) {
           // 处理数据
-          var chartData = replaceNull(data.data.data)
+          var chartData = replaceNull(data.data.data);
           // renderTmp('#chart' + chartId, 'tableViewTpl', chartData);
           var rows = chartData.rows;
           var columns = chartData.columns;
           // 最多显示500条
           if (rows.length > 500) {
-            rows.length = 500
+            rows.length = 500;
           }
 
           var html = '';
-          html += '<div class="table_title">' + res.data.option.title.text + '</div>'
-          html += '<table class="chart_table">'
-          html += '<thead>'
-          html += '<tr>'
+          html += '<div class="table_title">' + res.data.option.title.text + '</div>';
+          html += '<table class="chart_table">';
+          html += '<thead>';
+          html += '<tr>';
           for (var i = 0; i < columns.length; i++) {
-            html += '<td>' + columns[i].source.text + '</td>'
+            html += '<td>' + columns[i].source.text + '</td>';
           }
-          html += '</tr>'
-          html += '</thead>'
+          html += '</tr>';
+          html += '</thead>';
           // 合并
           var num = [];
           for (var j = 0; j < columns.length; j++) {
-            num[j] = 0
+            num[j] = 0;
           }
 
           function comp(rows1, rows2, index) {
             // 循环对比
-            var ind = index
+            var ind = index;
             if (ind > 0) {
               if (rows1[columns[ind - 1].name] == rows2[columns[ind - 1].name]) {
-                comp(rows1, rows2, ind - 1)
+                comp(rows1, rows2, ind - 1);
                 if (ind - 1 == 0) {
-                  return true
+                  return true;
                 }
               } else {
-                return false
+                return false;
               }
             }
           }
@@ -142,7 +142,7 @@ function getChartData(chartId) {
             html += '<tr>';
             for (var j = 0; j < columns.length; j++) {
               if (i < num[j]) {
-                continue
+                continue;
               } else {
                 var rowspan = 1;
                 if (i + 1 < rows.length) {
@@ -157,22 +157,22 @@ function getChartData(chartId) {
                       }
                     } else {
                       num[j]++;
-                      break
+                      break;
                     }
 
                   }
-                  html += '<td rowspan="' + rowspan + '">' + rows[i][columns[j].name] + '</td>'
+                  html += '<td rowspan="' + rowspan + '">' + rows[i][columns[j].name] + '</td>';
                 } else {
                   // 最后一个
                   if (rows[i][columns[j].name] != rows[i - 1][columns[j].name]) {
-                    html += '<td rowspan="' + rowspan + '">' + rows[i][columns[j].name] + '</td>'
+                    html += '<td rowspan="' + rowspan + '">' + rows[i][columns[j].name] + '</td>';
 
                   }
 
                 }
               }
             }
-            html += '</tr>'
+            html += '</tr>';
           }
           // 不合并
           // for (var j = 0; j < rows.length; j++) {
@@ -182,8 +182,8 @@ function getChartData(chartId) {
           //   }
           //   html+='</tr>'
           // }
-          $('#chartWrap').append(html).addClass('ova')
-        })
+          $('#chartWrap').append(html).addClass('ova');
+        });
       } else {
         myChart = echarts.init(document.getElementById('chartWrap'));
         myChart.setOption(res.data.option);
@@ -198,10 +198,10 @@ function getChartData(chartId) {
 
       // TODO: 渲染右侧设置, 与本地合并，每设置完一个保存本地      
       if (window.localStorage) {
-        theme = local.get(chartId)
+        theme = local.get(chartId);
       }
-      console.log(theme)
-      $('#themeSelect').val(theme).trigger('change')
+      console.log(theme);
+      $('#themeSelect').val(theme).trigger('change');
 
 
     }
@@ -268,11 +268,11 @@ function replaceNull(chartData) {
   for (var i = 0; i < chartData.rows.length; i++) {
     for (var key in chartData.rows[i]) {
       if (chartData.rows[i][key] === null) {
-        chartData.rows[i][key] = '-'
+        chartData.rows[i][key] = '-';
       }
     }
   }
-  return chartData
+  return chartData;
 }
 
 function setOption(data) {
@@ -285,7 +285,7 @@ $(function() {
   });
 
   $('.fa-info-circle').on('click', function() {
-    $('#setting').toggleClass('active')
+    $('#setting').toggleClass('active');
   });
 
   $('.title').on('click', function() {
@@ -313,19 +313,19 @@ $(function() {
     } else {
       // 报表
       if (val == 'dark') {
-        $('.chart_wrap').css({'background':themeData.backgroundColor,color:'#fff'})
+        $('.chart_wrap').css({'background':themeData.backgroundColor,color:'#fff'});
       } else {
         if (optionData.background) {
-          $('.chart_wrap').css({'background': optionData.background.backgroundColor,color:'#333'})
+          $('.chart_wrap').css({'background': optionData.background.backgroundColor,color:'#333'});
         }else{
-          $('.chart_wrap').css({'background':'#fff',color:'#333'})          
+          $('.chart_wrap').css({'background':'#fff',color:'#333'});          
         }
       }
     }
     
     if (window.localStorage) {
-      local.set(id, val)
+      local.set(id, val);
     }
   });
 
-})
+});

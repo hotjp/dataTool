@@ -43,6 +43,8 @@ var vb = {
           $('#viewName').val(res.data.name);
           vb._layout=res.data.layout;
           // vb._folder=res.data.folder;
+        }else{
+          alert('获取视图数据失败,'+res.errorMessages);
         }
       });
     }else{
@@ -402,7 +404,7 @@ var vb = {
   // },
   registerViewRef: function (viewRef) {
     if (this._viewRefMap[viewRef.alias]) {
-      alert('视图已存在');
+      // alert('视图已存在');
       return false;
     } else {
       this._viewRefMap[viewRef.alias] = viewRef;
@@ -1351,6 +1353,13 @@ vb.diagram = {
     console.info('diagram.addView :');
     console.info(view);
 
+    for(var i=0;i<vb._view.tables.length;i++){
+      if(vb._view.tables[i].alias==view.metadata.name){
+        alert('视图已存在');
+        return false;
+      }
+    }
+
     // 生成viewRef
     // vb.registerView(view);
 
@@ -1383,6 +1392,7 @@ vb.diagram = {
     var viewRefId = vb.newId('viewRefId'),
       reservedAliases = vb._view.tables.collect(function () { return this.viewAlias; }),
       viewAlias = view.name;
+
     var viewRef = {
       TYPE: 'REFERENCE',
       name: view.name,

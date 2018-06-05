@@ -428,6 +428,7 @@ audio:not([controls]),
   font-size: 12px;
   position: relative;
   padding-left: 30px;
+  min-height: 24px;
 }
 #dashboard .colums_list li:before {
   content: '';
@@ -570,7 +571,8 @@ audio:not([controls]),
   height: 30px;
   width: 30px;
 }
-.chart_add_dialog .tit .search_box:hover input {
+.chart_add_dialog .tit .search_box:hover input,
+.chart_add_dialog .tit .search_box.hover input {
   border: 1px solid #ccc;
 }
 .chart_add_dialog .tit .search_box .el-icon-search {
@@ -610,5 +612,190 @@ audio:not([controls]),
 }
 .dirTreeTitle .search_box:hover input {
   width: 120px;
+}
+.editing .ppt_box {
+  top: 120px;
+}
+.ppt_box {
+  position: absolute;
+  top: 40px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  overflow: auto;
+}
+.ppt_box .ppt_footer {
+  position: fixed;
+  bottom: -72px;
+  left: 180px;
+  right: 0;
+  height: 72px;
+  padding-right: 70px;
+  background-color: #ffffff;
+  z-index: 11;
+  transition: all .3s ease;
+}
+.ppt_box .ppt_footer.active {
+  bottom: 0;
+}
+.ppt_box .ppt_footer button {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 24px;
+  border: none;
+  outline: none;
+  background-color: #ebeef5;
+  cursor: pointer;
+  z-index: 10;
+}
+.ppt_box .ppt_footer .prev {
+  left: 0;
+}
+.ppt_box .ppt_footer .next {
+  left: 25px;
+}
+.ppt_box .ppt_footer .swiper-container {
+  margin-left: 50px;
+  z-index: 9;
+  padding-top: 6px;
+  padding-left: 10px;
+  background-color: #ffffff;
+}
+.ppt_box .ppt_footer .close_btn {
+  width: 30px;
+  height: 30px;
+  background: #1989fa;
+  box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+  z-index: 5;
+  position: absolute;
+  left: 60px;
+  top: -17px;
+  text-align: center;
+  color: #ffffff;
+  font-size: 16px;
+  cursor: pointer;
+  user-select: none;
+}
+.ppt_box .ppt_footer ul {
+  height: 60px;
+}
+.ppt_box .ppt_footer ul li {
+  height: 100%;
+  width: 96px;
+  border: 1px solid #D8D8D8;
+  position: relative;
+  float: left;
+  cursor: pointer;
+}
+.ppt_box .ppt_footer ul li:hover,
+.ppt_box .ppt_footer ul li.active {
+  border: 1px solid #1989FA;
+  box-shadow: 0px 0px 4px 0px rgba(25, 137, 250, 0.5);
+}
+.ppt_box .ppt_footer ul li .fa-plus {
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  border-radius: 50%;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -15px;
+  margin-top: -15px;
+}
+.ppt_box .ppt_footer ul li i {
+  position: absolute;
+}
+.ppt_box .ppt_footer ul li i:after {
+  content: '';
+  background-color: #EBEEF5;
+  position: absolute;
+  left: 10%;
+  top: 10%;
+  bottom: 10%;
+  right: 10%;
+}
+.ppt_box .ppt_footer ul li i[data-x="0"] {
+  left: 0;
+}
+.ppt_box .ppt_footer ul li i[data-x="1"] {
+  left: 16.67%;
+}
+.ppt_box .ppt_footer ul li i[data-x="2"] {
+  left: 33.33%;
+}
+.ppt_box .ppt_footer ul li i[data-x="3"] {
+  left: 50%;
+}
+.ppt_box .ppt_footer ul li i[data-x="4"] {
+  left: 66.67%;
+}
+.ppt_box .ppt_footer ul li i[data-x="5"] {
+  left: 33.33%;
+}
+.ppt_box .ppt_footer ul li i[data-y="0"] {
+  top: 0;
+}
+.ppt_box .ppt_footer ul li i[data-y="1"] {
+  top: 16.67%;
+}
+.ppt_box .ppt_footer ul li i[data-y="2"] {
+  top: 33.33%;
+}
+.ppt_box .ppt_footer ul li i[data-y="3"] {
+  top: 50%;
+}
+.ppt_box .ppt_footer ul li i[data-y="4"] {
+  top: 66.67%;
+}
+.ppt_box .ppt_footer ul li i[data-y="5"] {
+  top: 33.33%;
+}
+.ppt_box .ppt_footer ul li i[data-width="0"] {
+  width: 0;
+}
+.ppt_box .ppt_footer ul li i[data-width="1"] {
+  width: 16.67%;
+}
+.ppt_box .ppt_footer ul li i[data-width="2"] {
+  width: 33.33%;
+}
+.ppt_box .ppt_footer ul li i[data-width="3"] {
+  width: 50%;
+}
+.ppt_box .ppt_footer ul li i[data-width="4"] {
+  width: 66.67%;
+}
+.ppt_box .ppt_footer ul li i[data-width="5"] {
+  width: 33.33%;
+}
+.ppt_box .ppt_footer ul li i[data-height="0"] {
+  height: 0;
+}
+.ppt_box .ppt_footer ul li i[data-height="1"] {
+  height: 16.67%;
+}
+.ppt_box .ppt_footer ul li i[data-height="2"] {
+  height: 33.33%;
+}
+.ppt_box .ppt_footer ul li i[data-height="3"] {
+  height: 50%;
+}
+.ppt_box .ppt_footer ul li i[data-height="4"] {
+  height: 66.67%;
+}
+.ppt_box .ppt_footer ul li i[data-height="5"] {
+  height: 33.33%;
+}
+.ppt_box .ppt_footer ul .newPage .fa-plus {
+  background-color: #ebeef5;
+  color: #5e6d82;
+}
+.ppt_box .ppt_footer ul .newPage:hover .fa-plus {
+  background-color: #1989FA;
+  color: #fff;
 }
 /*# sourceMappingURL=./dashboard.css.map */

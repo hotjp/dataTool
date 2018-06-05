@@ -328,6 +328,7 @@
             font-size: 12px;
             position: relative;
             padding-left: 30px;
+            min-height: 24px;
             &:before{
                 content:'';
                 position: absolute;
@@ -472,7 +473,7 @@
         .search_box{
             height: 30px;
             width: 30px;
-            &:hover input{
+            &:hover input,&.hover input{
                 border: 1px solid #ccc;
             }
             .el-icon-search{
@@ -519,3 +520,197 @@
         }
     }
 }
+
+// ppt模式
+.editing{
+    .ppt_box{
+        top: 120px;
+    }    
+}
+.ppt_box{
+    position: absolute;
+    top: 40px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow: auto;
+    .ppt_footer{
+        position: fixed;
+        bottom: -72px;
+        left: 180px;
+        right: 0;
+        height: 72px;
+        padding-right:70px;
+        background-color: #ffffff;
+        z-index: 11;
+        transition: all .3s ease;
+        &.active{
+            bottom: 0;
+        }
+        button{
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 24px;
+            border: none;
+            outline: none;
+            background-color: #ebeef5;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .prev{
+            left: 0;
+        }
+        .next{
+            left: 25px;
+        }
+        .swiper-container{
+            margin-left:50px;
+            z-index: 9;
+            padding-top: 6px;
+            padding-left: 10px;
+            background-color: #ffffff;
+        }
+        .close_btn{
+            width:30px;
+            height:30px; 
+            background:rgba(25,137,250,1);
+            box-shadow: 0px 0px 4px 0px rgba(0,0,0,0.5);
+            border-radius: 5px; 
+            z-index: 5;
+            position: absolute;
+            left: 60px;
+            top: -17px;
+            text-align: center;
+            color: #ffffff;
+            font-size: 16px;
+            cursor: pointer;
+            user-select: none;
+        }
+        ul{
+            height: 60px;
+            
+            li{
+                height: 100%;
+                width: 96px;
+                border: 1px solid #D8D8D8;
+                position: relative;
+                float: left;
+                // margin-left: 10px;
+                cursor: pointer;
+                &:hover,&.active{
+                    border: 1px solid #1989FA;      
+                    box-shadow: 0px 0px 4px 0px rgba(25,137,250,0.5)               
+                }
+                .fa-plus{
+                    width: 30px;
+                    height: 30px;
+                    line-height: 30px;
+                    text-align: center;
+                    border-radius: 50%;
+                    position: absolute;
+                    left: 50%;
+                    top: 50%;
+                    margin-left: -15px;
+                    margin-top: -15px;
+                }
+                i{
+                    position: absolute;
+                    &:after{
+                        content:'';
+                        background-color: #EBEEF5;
+                        position: absolute;
+                        left: 10%;
+                        top: 10%;
+                        bottom: 10%;
+                        right: 10%;
+                    }
+                    &[data-x="0"]{
+                        left: 0;
+                    }
+                    &[data-x="1"]{
+                        left: 16.67%;
+                    }
+                    &[data-x="2"]{
+                        left: 33.33%;
+                    }
+                    &[data-x="3"]{
+                        left: 50%;
+                    }
+                    &[data-x="4"]{
+                        left: 66.67%;
+                    }
+                    &[data-x="5"]{
+                        left: 33.33%;
+                    }
+                    &[data-y="0"]{
+                        top: 0;
+                    }
+                    &[data-y="1"]{
+                        top: 16.67%;
+                    }
+                    &[data-y="2"]{
+                        top: 33.33%;
+                    }
+                    &[data-y="3"]{
+                        top: 50%;
+                    }
+                    &[data-y="4"]{
+                        top: 66.67%;
+                    }
+                    &[data-y="5"]{
+                        top: 33.33%;
+                    }
+                    &[data-width="0"]{
+                        width: 0;
+                    }
+                    &[data-width="1"]{
+                        width: 16.67%;
+                    }
+                    &[data-width="2"]{
+                        width: 33.33%;
+                    }
+                    &[data-width="3"]{
+                        width: 50%;
+                    }
+                    &[data-width="4"]{
+                        width: 66.67%;
+                    }
+                    &[data-width="5"]{
+                        width: 33.33%;
+                    }
+                    &[data-height="0"]{
+                        height: 0;
+                    }
+                    &[data-height="1"]{
+                        height: 16.67%;
+                    }
+                    &[data-height="2"]{
+                        height: 33.33%;
+                    }
+                    &[data-height="3"]{
+                        height: 50%;
+                    }
+                    &[data-height="4"]{
+                        height: 66.67%;
+                    }
+                    &[data-height="5"]{
+                        height: 33.33%;
+                    }
+                }
+            }
+            .newPage{
+                .fa-plus{
+                    background-color: #ebeef5;
+                    color: #5e6d82;
+                }
+                &:hover .fa-plus{
+                    background-color: #1989FA;
+                    color: #fff;
+                }
+            }
+            
+        }
+    }
+}
+

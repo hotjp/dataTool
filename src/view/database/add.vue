@@ -22,14 +22,47 @@
         </div>
       </el-col>
     </el-row>
-    <el-dialog title="上传excel文件" :visible.sync="dialogUploadVisible" width="30%">
+    <el-dialog class="upload_dialog" title="上传excel文件" :visible.sync="dialogUploadVisible">
       <!-- TODO: 上传 -->
-      <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/" :on-preview="handlePreview" :on-remove="handleRemove" multiple :limit="3" :on-exceed="handleExceed" :file-list="fileList" accept=".xls,.xlsx">
+      <el-upload class="upload-demo" :action="vars.api+'/datasource/addFile.do'" :on-success="uploadSuccess" ref="upload" :with-credentials="true" :auto-upload="false" name="fileUpload" :on-preview="handlePreview" :on-remove="handleRemove" multiple :limit="1" :on-exceed="handleExceed" :file-list="fileList" accept=".xls,.xlsx,.csv">
         <el-button size="small" type="primary">点击上传</el-button>
-        <!--<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>-->
+        <span slot="tip" class="upload_tip">点击<b>选择文件</b>选择上传文件</span>
+        <div slot="tip" class="el-upload__tip">
+          <div class="temp">
+            <table>
+              <tr>
+                <th>日期@Date</th>
+                <th>城市@String</th>
+                <th>数量@Number</th>
+              </tr>
+              <tr>
+                <td>2020-05-21</td>
+                <td>烟台</td>
+                <td>10</td>
+              </tr>
+              <tr>
+                <td>2020-05-21</td>
+                <td>烟台</td>
+                <td>10</td>
+              </tr>
+              <tr>
+                <td>2020-05-21</td>
+                <td>烟台</td>
+                <td>10</td>
+              </tr>
+              
+            </table>
+            <div class="download_wrap">
+              <a target="_blank" :href="vars.src+'/assest/Maxtest.xls'" download="Maxtest.xls" >点击下载示例模板</a>
+            </div>
+          </div>
+          <div class="info">
+          *文件第一行为表头，每个列头的格式为“名称”+ “@” +“类型”，类型共有 Date、 String、 Number 三种分别代表日期、文本 和数字。</div>
+          </div>
       </el-upload>
       <span slot="footer" class="dialog-footer">
-        <el-button class="btn-confirm" type="primary">确 定</el-button>
+        <el-button class="btn-confirm" type="primary" @click="submitUpload">确 定</el-button>
+        <el-button class="btn-cancel" @click="uploadCancle">取 消</el-button>
       </span>
     </el-dialog>
 
@@ -107,10 +140,31 @@ export default {
     },
     handleExceed(files, fileList) {
       this.$message.warning(
-        `当前限制选择 3 个文件，本次选择了 ${
-          files.length
-        } 个文件，共选择了 ${files.length + fileList.length} 个文件`
+        `当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`
       );
+    },
+    uploadCancle(){
+      this.dialogUploadVisible = false;
+    },
+    submitUpload() {
+      this.$refs.upload.submit();
+    },
+    // 上传成功
+    uploadSuccess(response, file, fileList){
+      console.log(response);
+      if(response.success){
+        this.dialogUploadVisible = false;
+        this.$message({ message: '上传成功', type: 'success' });
+        this.$refs.upload.clearFiles();
+        this.$router.push({
+          path: '/empty',
+          query: { link: '/database/' + response.data.datasource.id }
+        });
+      }else{
+        this.$message({ message: response.errorMessage||'上传失败', type: 'warning' });
+        
+      }
+      
     }
   }
 };

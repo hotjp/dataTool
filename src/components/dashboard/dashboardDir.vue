@@ -48,13 +48,15 @@
         <li class="dirChildren right" v-for="(child,childIndex) in dataList" :key="childIndex" v-if="child.show" :class="{active:child.active,hover:hoverIndex == childIndex,cur:child.id==activeId}"  >
           <el-tooltip class="item" effect="light" :content="'名称：'+child.text" placement="right">
             <div>
-              <div class="childrenText" @click="itemClick(childIndex)">
+              <div class="childrenText" @click="itemClick(child.id)">
                 <i class="el-icon-document"></i>
                 {{child.text}}
               </div>
               <i class="el-icon-more" @mouseenter="mouseenter(childIndex)" @mouseleave="mouseleave()" ></i>
               <div class="cover" @mouseenter="mouseenter(childIndex)" @mouseleave="mouseleave()" >
                 <p class="cover_item" @click="editDashboard(childIndex)">编辑</p>
+                <p class="cover_item" @click="deleteDashboard(child.id,childIndex)">删除</p>
+
               </div>
             </div>
           </el-tooltip>
@@ -64,6 +66,8 @@
   </div>
 </template>
 <script type="text/babel">
+import { getJson } from '../../router/utils';
+
 export default {
   data: () => ({
     // 仪表盘层级
@@ -151,9 +155,16 @@ export default {
     showAddDialog() {
       this.$emit('toggleAddDashboardDialog', true);
     },
-    // 列表点击，传id到浮层做处理
-    itemClick(index) {
-      this.$emit('itemClick', this.dataList[index].id);
+    // 左侧列表点击事件
+    itemClick(id) {
+      // this.$emit('itemClick', id);
+      if (id != this.activeId) {
+        this.$router.push({
+          path: '/empty',
+          query: { link: '/dashboard/' + id }
+        });
+      }
+
     },
     // 鼠标指向
     mouseenter(index){
@@ -166,8 +177,16 @@ export default {
     // 仪表盘编辑
     editDashboard(index){
       this.$emit('showTitleEditor', {status:true,index:index});
+    },
+    // 仪表盘删除
+    deleteDashboard(id,index){
+      this.$emit('deleteDashboard', {
+        id:id,
+        index:index
+      });
     }
+    
   },
-  props: ['dataList','activeId']  
+  props: ['dataList','activeId']
 };
 </script>

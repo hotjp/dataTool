@@ -18,19 +18,24 @@
                     <i class="icon_btn_close"></i>
                     关闭
                 </a> -->
-            <a href="javascript:;" class="block r menu_container">
-                    <i class="icon_btn_menu"></i>
-                </a>
+            <a href="javascript:;" class=" r menu_container">
+                <i class="icon_btn_menu"></i>
+                <div class="menus">
+                    <div class="menu_item share">
+                        共享
+                    </div>
+                </div>
+            </a>
             <a id="saveView" href="javascript:;" class="block l save_container">
-                    <i class="icon_btn_save"></i>
-                    <!-- <i class="el-icon-circle-check-outline"></i> -->
-                    保存
-                </a>
+                <i class="icon_btn_save"></i>
+                <!-- <i class="el-icon-circle-check-outline"></i> -->
+                保存
+            </a>
             <a id="advView" href="javascript:;" class="block r adv_container">
-                    <i class="icon_btn_adv"></i>
-                    <!-- <i class="el-icon-circle-check-outline"></i> -->
-                    预览
-                </a>
+                <i class="icon_btn_adv"></i>
+                <!-- <i class="el-icon-circle-check-outline"></i> -->
+                预览
+            </a>
         </div>
     </div>
     <div class="editor_left">
@@ -302,6 +307,22 @@
             </div>
         </div>
     </div>
+    <!-- 共享功能 -->
+    <div class="dialog hide" id="shareDialog">
+        <div class="dialog_content">
+            <a href="javascript:;" class="block r dialog_close cancal"></a>
+            <div class="title">选择共享人</div>
+            <form onsubmit="return false">
+                <input type="text" class="share_user" placeholder="请输入共享人" title="请输入共享人">
+            </form>
+            <div class="dialog-button">
+                <a class="confirm" href="javascript:;">确定</a>
+                <a class="cancal" href="javascript:;">取消</a>
+            </div>
+        </div>
+    </div>
+
+
     <div class="el-alert">
         <i></i>保存成功
     </div>
@@ -347,29 +368,37 @@
      */
     function loadDatatables() {
         datasourceId = page.url.get('datasource');
+        if(!page.url.get('sourceId')){
+            alert('数据源不存在');
+            return
+        }
         getJson('/datasource/metadata/listTables.do',{
             datasource: page.url.get('sourceId') ? page.url.get('sourceId') : 0
         },function(res) {
-            var data = {
-                tableList: res.data
-            };
-            $('#tableList').empty();
-            renderTmp('#tableList', 'tableListTpl', data);
-            // $.each(r.data, function () {
-            //   var li = $('<li></li>')
-            //     .data('table', this)
-            //     .text(this.name)
-            //     .append($(' <a href="javascript:;" title="add to graph">&gt;</a>')
-            //       .click(function () {
-            //         // 将所选table加入到关系图
-            //         addTableToGraph(datasourceId, $(this).parent().data('table'));
-            //       }));
-            //   $('#tables').append(li);
-            // });
+            if(res.success){
+                var data = {
+                    tableList: res.data
+                };
+                $('#tableList').empty();
+                renderTmp('#tableList', 'tableListTpl', data);
+                // $.each(r.data, function () {
+                //   var li = $('<li></li>')
+                //     .data('table', this)
+                //     .text(this.name)
+                //     .append($(' <a href="javascript:;" title="add to graph">&gt;</a>')
+                //       .click(function () {
+                //         // 将所选table加入到关系图
+                //         addTableToGraph(datasourceId, $(this).parent().data('table'));
+                //       }));
+                //   $('#tables').append(li);
+                // });
 
-            $('select').select2({
-                minimumResultsForSearch: -1
-            });
+                $('select').select2({
+                    minimumResultsForSearch: -1
+                });
+            }else{
+                alert('加载失败,' + res.errorMessage);
+            }
         });
     }
 
@@ -386,9 +415,13 @@
             refTables: refTables.join(',')
         },
         function(res) {
-            // 刷新预览
-            // previewData();
-            vb.diagram.addView(res.data);
+            if(res.success){
+                // 刷新预览
+                // previewData();
+                vb.diagram.addView(res.data);
+            }else{
+                alert('增加数据表失败,'+res.errorMessage);
+            }
         });
     }
     // FIXME: 以下方法，变量没有用到
@@ -631,6 +664,36 @@
                 alert('请填写视图名称');
                 return false
             }
+            var list=[];
+            if(vb._view.joins.length){
+                list.push(vb._view.joins[0]['left']);
+                list.push(vb._view.joins[0]['right']);
+                for(let i=1;i<vb._view.joins.length;i++){
+                    for(let j=0;j<list.length;j++){
+                        if(list[j]==vb._view.joins[i]['left']){
+                            list.push(vb._view.joins[i]['right']);
+                            break;
+                        }
+                        if(list[j]==vb._view.joins[i]['right']){
+                            list.push(vb._view.joins[i]['left']);
+                            break;
+                        }
+                    }
+                }
+                for(let i=1;i<vb._view.joins.length;i++){
+                    if(!list.find((n)=> n==vb._view.joins[i]['left']) && !list.find((n)=> n==vb._view.joins[i]['left'])){
+                        vb._view.joins.splice(i--,1);
+                    }
+                }
+                for(let i=0;i<vb._view.tables.length;i++){
+                    if(!list.find((n)=>n==vb._view.tables[i]['alias'])){
+                        vb._view.tables.splice(i--,1);
+                    }
+                }
+            }else{
+                vb._view.tables.splice(1,vb._view.tables.splice.length);
+            }
+            
             var data = {
                 id: getUrl(location.href, 'view'),
                 name: $.trim($('#viewName').val()),
@@ -644,17 +707,20 @@
                 config: JSON.stringify(data)
             },
             function(res) {
-                // 替换url
-                if (!getUrl(location.href, 'view')) {
-                    var url = page.url.url + '&view=' + res.data.id;
-                    var title = document.title;
-                    history.replaceState(null, title, url);
-                }
                 if(res.success){
-                    $('.el-alert').show();
-                    setTimeout(function(){
-                        $('.el-alert').hide();
-                    },3000)
+                    // 替换url
+                    if (!getUrl(location.href, 'view')) {
+                        var url = page.url.url + '&view=' + res.data.id;
+                        var title = document.title;
+                        history.replaceState(null, title, url);
+                    }else{
+                        $('.el-alert').show();
+                        setTimeout(function(){
+                            $('.el-alert').hide();
+                        },3000)
+                    }
+                }else{
+                    alert('操作失败,'+res.errorMessage);
                 }
             },
             function(err) {
@@ -679,6 +745,9 @@
                 var idx = $('#viewRefEditor').find('.right').attr('data-idx');
                 var checked = $this.find('.checkUse')[0].checked;
                 $('#t-viewRef').find('li').eq(idx).find('.check').prop('checked', checked).trigger('change');
+                if(checked){
+                    $this.siblings('input').val($('#t-viewRef').find('li').eq(idx).find('.name').text());
+                }
             },10)
             
         })
@@ -693,9 +762,15 @@
             $('#viewRefEditor').find('.right').show();
             $('#viewRefEditor').find('.right').attr('data-idx', $(this).index());
             var data = JSON.parse($(this).attr('data-list'));
-            $('#viewRefEditor').find('.checkUse').prop('checked', $(this).find('.check')[0].checked).trigger('change').trigger('change');
             $('#viewRefEditor').find('.right .text').val(data.text);
             var aliasTable = $('#viewRefViewAlias').val();
+            if($(this).find('.check')[0].checked && data.text===undefined){
+                $('#viewRefEditor .use .text').val($(this).find('.name').text());
+                data['text']=$(this).find('.name').text();
+                $(this).attr('data-list', JSON.stringify(data));
+            }
+            $('#viewRefEditor').find('.checkUse').prop('checked', $(this).find('.check')[0].checked).trigger('change').trigger('change');
+            
             // 筛选
             for (var i = 0; i < vb._filters.length; i++) {
                 if (vb._filters[i]['table'] == aliasTable && vb._filters[i]['column'] == data.alias) {
@@ -856,14 +931,17 @@
                 view: JSON.stringify(vb._view)
             },
             function(res) {
-                var data = {
-                    xData: res.data.data
+                if(res.success){
+                    var data = {
+                        xData: res.data.data
+                    }
+                    renderTmp('#tableView', 'tableViewTpl', data);
+                }else{
+                    alert('操作失败,'+res.errorMessage);
                 }
-                renderTmp('#tableView', 'tableViewTpl', data);
-
             },
             function(data) {
-                console.log(data);
+                console.err(data);
             });
         });
         $('[type="radio"]').on('change', function() {
@@ -904,8 +982,33 @@
             }else{
                 $('.search_box').removeClass('hover')                
             }
-        })
+        });
 
+        // 分享
+        $('body').on('click','.share',function(){
+            $('#shareDialog').show();
+        });
+        $('#shareDialog').on('click','.confirm',function(){
+            var shareUser = $('.share_user').val();
+            if(!shareUser){
+                alert('请输入分享人')
+                return
+            }
+            getJson('/saveUserAuth.do', {
+                bussiType: 'DataView',
+                bussiId: page.url.get('view'),
+                authUserName: shareUser
+            }, function (res) {
+                if (res.success) {
+                    alert('共享成功')
+                } else {
+                    alert(res.errorMessage || '系统错误')
+                }
+            });
+        }).on('click','.cancal',function(){
+            $('#shareDialog').hide()
+        });
+        
     }
     $(function() {
         loadDatatables();

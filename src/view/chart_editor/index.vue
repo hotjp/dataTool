@@ -32,9 +32,9 @@
           
           <ul v-for="(item,index) in columns" :key="index" v-if="item.show" class="colums_list">
             <li class="colums_item fix " draggable="true" @dragstart="itemOnDragstart(item,$event)" @selectstart="itemOnSelectstart">
-              <i class="icon el-icon-document" v-if="item.type=='String'"></i>
-              <i class="icon el-icon-date" v-if="item.type=='Date'"></i>
-              <i class="icon el-icon-edit-outline" v-if="item.type=='Number'"></i>
+              <i class="icon bdfont bdfont-string" v-if="item.type=='String'"></i>
+              <i class="icon bdfont bdfont-rili" v-if="item.type=='Date'"></i>
+              <i class="icon bdfont bdfont-number" v-if="item.type=='Number'"></i>
               {{item.text}}
               <!-- <a @click="onAddColumnClick(item)" href="javascript:;">添加到维度</a> -->
               <!-- <a @click="onAddValueClick(item)" href="javascript:;">添加到数值</a> -->
@@ -238,7 +238,7 @@
         <!--日期-->
         <div>
           <el-checkbox :indeterminate="isIndeterminateCategoryDates" v-model="checkAllCategoryDates" @change="handleCheckAllCategoryChangeDates">
-            <i class="el-icon-date"></i>日期</el-checkbox>
+            <i class="bdfont bdfont-rili"></i>日期</el-checkbox>
           <el-checkbox-group v-model="checkedCategoryDates" @change="handleCheckedCategoryDatesChange">
             <el-checkbox v-for="date in dates" :label="date" :key="date.text">{{date.text}}</el-checkbox>
           </el-checkbox-group>
@@ -246,7 +246,7 @@
         <!--文本-->
         <div>
           <el-checkbox :indeterminate="isIndeterminateCategoryTexts" v-model="checkAllCategoryTexts" @change="handleCheckAllCategoryChangeTexts">
-            <i class="el-icon-tickets"></i>文本</el-checkbox>
+            <i class="bdfont bdfont-string"></i>文本</el-checkbox>
           <el-checkbox-group v-model="checkedCategoryTexts" @change="handleCheckedCategoryTextsChange">
             <el-checkbox v-for="text in texts" :label="text" :key="text.text">{{text.text}}</el-checkbox>
           </el-checkbox-group>
@@ -254,7 +254,7 @@
         <!--数值-->
         <div>
           <el-checkbox :indeterminate="isIndeterminateCategoryNums" v-model="checkAllCategoryNums" @change="handleCheckAllCategoryChangeNums">
-            <i class="el-icon-edit-outline"></i>数值</el-checkbox>
+            <i class="bdfont bdfont-number"></i>数值</el-checkbox>
           <el-checkbox-group v-model="checkedCategoryNums" @change="handleCheckedCategoryNumsChange">
             <el-checkbox v-for="num in nums" :label="num" :key="num.text">{{num.text}}</el-checkbox>
           </el-checkbox-group>
@@ -279,7 +279,7 @@
         <!--日期-->
         <div>
           <el-checkbox :indeterminate="isIndeterminateDates" v-model="checkAllDates" @change="handleCheckAllChangeDates">
-            <i class="el-icon-date"></i>日期</el-checkbox>
+            <i class="bdfont bdfont-rili"></i>日期</el-checkbox>
           <el-checkbox-group v-model="checkedDates" @change="handleCheckedDatesChange">
             <el-checkbox v-for="date in dates" :label="date" :key="date.text">{{date.text}}</el-checkbox>
           </el-checkbox-group>
@@ -287,7 +287,7 @@
         <!--文本-->
         <div>
           <el-checkbox :indeterminate="isIndeterminateTexts" v-model="checkAllTexts" @change="handleCheckAllChangeTexts">
-            <i class="el-icon-tickets"></i>文本</el-checkbox>
+            <i class="bdfont bdfont-string"></i>文本</el-checkbox>
           <el-checkbox-group v-model="checkedTexts" @change="handleCheckedTextsChange">
             <el-checkbox v-for="text in texts" :label="text" :key="text.text">{{text.text}}</el-checkbox>
           </el-checkbox-group>
@@ -295,7 +295,7 @@
         <!--数值-->
         <div>
           <el-checkbox :indeterminate="isIndeterminateNums" v-model="checkAllNums" @change="handleCheckAllChangeNums">
-            <i class="el-icon-edit-outline"></i>数值</el-checkbox>
+            <i class="bdfont bdfont-number"></i>数值</el-checkbox>
           <el-checkbox-group v-model="checkedNums" @change="handleCheckedNumsChange">
             <el-checkbox v-for="num in nums" :label="num" :key="num.text">{{num.text}}</el-checkbox>
           </el-checkbox-group>
@@ -347,7 +347,7 @@
 </template>
 <script>
 import { getJson } from '../../router/utils';
-const _ = () => import('lodash');
+import debounce from 'lodash/debounce';
 const IEcharts = () => import('vue-echarts-v3/src/full');
 import('echarts-wordcloud');
 import('echarts-gl');
@@ -380,7 +380,7 @@ import numShow from '../../components/chartEditor/yAxis/numShow.vue';
 import chartTitle from '../../components/chartEditor/title.vue';
 
 // 历史记录工具
-import TimeLine from '../../assets/js/objectTimeLine';
+// import TimeLine from '../../assets/js/objectTimeLine';
 
 export default {
   components: {
@@ -400,14 +400,14 @@ export default {
     let that = window.vm = this,
       params = that.$route.params;
     // TODO: 完成历史记录工具
-    this.timeLine = new TimeLine({
-      treasures: this.chats,
-      backupOpt: {
-        backupCallback: function() {
-          console.log('自动备份');
-        }
-      }
-    });
+    // this.timeLine = new TimeLine({
+    //   treasures: this.chats,
+    //   backupOpt: {
+    //     backupCallback: function() {
+    //       console.log('自动备份');
+    //     }
+    //   }
+    // });
 
     if (Object.keys(params).length) {
       that.charts.id = params.viewId;
@@ -416,7 +416,7 @@ export default {
       that.onresizeWindow();
     };
 
-    this.menuStatus = _.debounce(function() {
+    this.menuStatus = debounce(function() {
       this.$set(
         this.queryInfo.categoryColumns[this._index],
         'selectedItemSwitch',
@@ -428,7 +428,7 @@ export default {
         false
       );
     }, 200);
-    this.menuChildrenStatus = _.debounce(function() {
+    this.menuChildrenStatus = debounce(function() {
       // this.$set(this.queryInfo.categoryColumns[this._index], 'selectedItemSwitch', false);
       this.$set(
         this.queryInfo.categoryColumns[this._index],
@@ -436,7 +436,7 @@ export default {
         -1
       );
     }, 200);
-    this.valMenuStatus = _.debounce(function() {
+    this.valMenuStatus = debounce(function() {
       this.$set(
         this.queryInfo.valueColumns[this.val_index],
         'selectedItemSwitch',
@@ -448,7 +448,7 @@ export default {
         false
       );
     }, 200);
-    this.valMenuChildrenStatus = _.debounce(function() {
+    this.valMenuChildrenStatus = debounce(function() {
       // selectedChildrenSwitch
       // this.$set(this.queryInfo.valueColumns[this.val_index], 'selectedItemSwitch', false);
       this.$set(
@@ -457,7 +457,7 @@ export default {
         -1
       );
     }, 200);
-    this.getChartDataChangeView = _.debounce(function() {
+    this.getChartDataChangeView = debounce(function() {
       this.getChartData();
     }, 500);
 
@@ -939,6 +939,8 @@ export default {
           }else{
             that.emptyShow=false;        
           }
+        }else{
+          that.$message({ message: res.errorMessage || '系统错误', type: 'warning' });          
         }
       });
       
@@ -1028,6 +1030,8 @@ export default {
             }else{
               that.$message({ message: '保存成功', type: 'success' });
             }
+          }else{
+            that.$message({ message: data.errorMessage || '系统错误', type: 'warning' });
           }
         }
       );
@@ -1370,6 +1374,8 @@ export default {
             if (res.success) {
               that.columns = res.data.columns;
               that.workTableDialogVisible = false;
+            }else{
+              that.$message({ message: res.errorMessage || '系统错误', type: 'warning' });
             }
           }
           );
@@ -1388,6 +1394,8 @@ export default {
               if (data.success) {
                 that.charts.id = data.data.id;
                 that.$router.push('/chart_editor/' + data.data.id);
+              }else{
+                that.$message({ message: res.errorMessage || '系统错误', type: 'warning' });
               }
             }
           );
@@ -1419,7 +1427,7 @@ export default {
       // console.log(pathArr);
 
       if (pathArr[1] === 'chart_editor') {
-        _.debounce(function() {
+        // debounce(function() {
           window.screenWidth = document.body.clientWidth;
           that.screenWidth = window.screenWidth;
           window.chartsHeight = document.body.clientHeight;
@@ -1433,7 +1441,7 @@ export default {
 
           // }
           that.chartsHeight = window.chartsHeight - Dvalue;
-        }, 500)();
+        // }, 500)();
       } else {
         return false;
       }

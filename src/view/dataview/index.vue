@@ -100,11 +100,16 @@ export default {
               if (res.success) {
                 that.activeIndex = i;
                 that.src = vars.src + '/data_editor/index.html?sourceId=' + res.data.datasourceId + '&view=' + params.viewId;
+              }else{
+                that.$message({ message: res.errorMessage || '系统错误', type: 'warning' });
+                
               }
             });
             break;
           }
         }
+      }else{
+        that.$message({ message: res.errorMessage || '系统错误', type: 'warning' });
       }
     });
 
@@ -173,6 +178,9 @@ export default {
           that.$refs.iframe.onload = function () {
             that.openFullScreen(0);
           };
+        }else{
+          that.$message({ message: res.errorMessage || '系统错误', type: 'warning' });
+          
         }
       });
     },
@@ -202,8 +210,14 @@ export default {
                 message: '删除成功',
                 type: 'success'
               });
+            }else{
+              that.$message({ message: res.errorMessage || '系统错误', type: 'warning' });
+              
             }
           });
+        }else{
+          that.$message({ message: res.errorMessage || '系统错误', type: 'warning' });
+          
         }
       });
     },
@@ -220,6 +234,9 @@ export default {
         if (res.success) {
           that.listFolders.list = res.data;
           that.addVisible = true;
+        }else{
+          that.$message({ message: res.errorMessage || '系统错误', type: 'warning' });
+          
         }
       });
     },
@@ -262,8 +279,14 @@ export default {
               that.$router.replace({ path: '/dataview/' + ress.data.id });
               let src = vars.src + '/data_editor/index.html?sourceId=' + that.sqlId + '&view=' + ress.data.id;
               that.src = src;
+            }else{
+              that.$message({ message: res.errorMessage || '系统错误', type: 'warning' });
+              
             }
           });
+        }else{
+          that.$message({ message: res.errorMessage || '系统错误', type: 'warning' });
+          
         }
       });
     },

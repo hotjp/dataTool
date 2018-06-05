@@ -87,10 +87,7 @@ export default {
             //   console.log(resData.data.rows);
           } else {
             // console.log(res);
-            that.$message({
-              message:'测试失败' + res.errorMessage,
-              duration:6000
-            });
+            that.$message({ message: res.errorMessage || '系统错误', type: 'warning' });
             that.saveFlag = false;
           }
         }
@@ -119,8 +116,15 @@ export default {
             if (res.success) {
               that.dialogFormVisible = false;
               that.$message('保存成功');
+              that.$router.push({
+                path: '/empty',
+                query: { link: '/database/' + res.data.id }
+              });
             } else {
-              that.$message('保存未成功');
+              that.$message({
+                message:'保存失败,' + res.errorMessage,
+                duration:6000
+              });
             }
           }
         );
