@@ -14,7 +14,7 @@
           </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item>
-              <a href="javascript:;" @click="showinfo()">账户设置</a>
+              <a href="javascript:;" @click="showinfo()">帐号设置</a>
             </el-dropdown-item>
             <el-dropdown-item>
               <a href="javascript:;" @click="toggleChangePwd()">修改密码</a>

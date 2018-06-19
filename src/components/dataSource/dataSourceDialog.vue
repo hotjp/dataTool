@@ -18,7 +18,7 @@
                 <el-form-item label="数据库" :label-width="formLabelWidth">
                     <el-input @input="saveFlagFalse" v-model="form.jdbcDatabase" auto-complete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="账号" :label-width="formLabelWidth">
+                <el-form-item label="帐号" :label-width="formLabelWidth">
                     <el-input @input="saveFlagFalse" v-model="form.jdbcUser" auto-complete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="密码" :label-width="formLabelWidth">

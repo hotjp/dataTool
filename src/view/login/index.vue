@@ -45,8 +45,8 @@
         </div>
         <div v-show="forgetPass">
           <el-menu active-text-color="#3582e3" :default-active="refindIndex" class="el-menu-demo" mode="horizontal" @select="refindSelect">
-            <el-menu-item index="1">邮箱找回</el-menu-item>
-            <el-menu-item index="2">手机找回</el-menu-item>
+            <el-menu-item index="1">手机找回</el-menu-item>
+            <!-- <el-menu-item index="2">手机找回</el-menu-item> -->
           </el-menu>
           <div v-show="refindActive">
             <form action onsubmit="return false">
@@ -77,64 +77,6 @@
             </div>
           </div>
         </div>
-        <div class="reg" v-show="reg">
-          <el-menu active-text-color="#3582e3" :default-active="refindIndex" class="el-menu-demo" mode="horizontal" @select="refindSelect">
-            <!-- <el-menu-item index="1">邮箱注册</el-menu-item> -->
-            <el-menu-item index="1">手机注册</el-menu-item>
-          </el-menu>
-          <div v-show="refindActive">
-            <form action onsubmit="return false">
-              <div class="login_ipt"><input type="text" placeholder="邮箱" autocomplete="off"></div>
-              <div class="login_ipt">
-                <input type="text" placeholder="验证码" autocomplete="off">
-                <div class="sent">获取验证码</div>
-                </div>
-              <div class="login_ipt"><input type="password" placeholder="设置密码" autocomplete="off"></div>
-              <div class="login_ipt"><input type="password" placeholder="再次输入密码" autocomplete="off"></div>
-              <div class="login_btn"><button>确定</button></div>
-            </form>
-            <div class="login_tip fix">
-              <!-- <div class="l">还没有帐号?<span class="reg">免费注册</span></div> -->
-              <div class="r forget" @click="goLogin()">立即登录</div>
-            </div>
-          </div>
-          <div v-show="!refindActive">
-            <form action onsubmit="return false">
-              <div class="login_ipt">
-                <el-tooltip class="item" effect="light" :content="userNameTitle" placement="left">
-                  <input type="text" v-model="userName"  placeholder="用户名" autocomplete="off">
-                </el-tooltip>
-                <i class="el-icon-success" :class="nameReg.test(userName)?'on':''"></i>
-              </div>
-              <div class="login_ipt">
-                <el-tooltip class="item" effect="light" :content="telRegTitle" placement="left">
-                  <input type="text" v-model="userTel" placeholder="手机号" autocomplete="off">
-                </el-tooltip>
-                <i class="el-icon-success" :class="telReg.test(userTel)?'on':''"></i>
-              </div>
-              <div class="login_ipt">
-                <input type="text" v-model="code" placeholder="图形验证码" autocomplete="off">
-                <div class="sent"><img :src='regcodeSrc' alt=""></div>
-              </div>
-              <div class="login_ipt">
-                <el-tooltip class="item" effect="light" :content="pwdRegTitle" placement="left">
-                  <input type="password" v-model="userPwd" placeholder="设置密码" autocomplete="off">
-                </el-tooltip>
-                <i class="el-icon-success" :class="pwdReg.test(userPwd)?'on':''"></i>
-              </div>
-              <div class="login_ipt">
-                <input type="password" v-model="userPwd2" :title="pwdRegTitle" placeholder="再次输入密码" autocomplete="off">
-                <i class="el-icon-success" :class="userPwd2==userPwd && pwdReg.test(userPwd)?'on':''"></i>
-              </div>
-              <div class="login_error">{{errorMessage}}</div>
-              <div class="login_btn" @click="goReg()"><button>确定</button></div>
-            </form>
-            <div class="login_tip fix">
-              <!-- <div class="l">还没有帐号?<span class="reg">免费注册</span></div> -->
-              <div class="r forget" @click="goLogin()">立即登录</div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -152,14 +94,14 @@ export default {
     refindActive:0,
     forgetPass:0,
     login:1,
-    reg:0,
-    regcodeSrc:'',
+    // reg:0,
+    // regcodeSrc:'',
     userNameTitle:'',
-    telRegTitle:'',
-    pwdRegTitle:'',
-    nameReg:/\S/,
-    telReg:/\S/,
-    pwdReg:/\S/,
+    // telRegTitle:'',
+    // pwdRegTitle:'',
+    // nameReg:/\S/,
+    // telReg:/\S/,
+    // pwdReg:/\S/,
     userName:'',
     userTel:'',
     userPwd:'',
@@ -175,23 +117,23 @@ export default {
   }),
   mounted(){
     let that=this;
-    that.regcodeSrc=vars.root+'/images/kaptcha.jpg?origin='+location.origin;
+    // that.regcodeSrc=vars.root+'/images/kaptcha.jpg?origin='+location.origin;
     // 获取正则表达式
-    getJson('/common/getRegularExpression.do',{
-      no:'userName,userTel,userPwd'
-    },function(res){
-      if(res.success){
-        that.nameReg=new RegExp(res.data.regularExpression[0].regexp);
-        that.telReg=new RegExp(res.data.regularExpression[1].regexp);
-        that.pwdReg=new RegExp(res.data.regularExpression[2].regexp);
-        that.userNameTitle=res.data.regularExpression[0].regDesc;
-        that.telRegTitle=res.data.regularExpression[1].regDesc;
-        that.pwdRegTitle=res.data.regularExpression[2].regDesc;
-      }else{
-        that.$message({ message: res.errorMessage || '系统错误', type: 'warning' });
+    // getJson('/common/getRegularExpression.do',{
+    //   no:'userName,userTel,userPwd'
+    // },function(res){
+    //   if(res.success){
+    //     that.nameReg=new RegExp(res.data.regularExpression[0].regexp);
+    //     that.telReg=new RegExp(res.data.regularExpression[1].regexp);
+    //     that.pwdReg=new RegExp(res.data.regularExpression[2].regexp);
+    //     that.userNameTitle=res.data.regularExpression[0].regDesc;
+    //     that.telRegTitle=res.data.regularExpression[1].regDesc;
+    //     that.pwdRegTitle=res.data.regularExpression[2].regDesc;
+    //   }else{
+    //     that.$message({ message: res.errorMessage || '系统错误', type: 'warning' });
         
-      }
-    });
+    //   }
+    // });
   },
   methods: {
     // 切换登录块
@@ -221,26 +163,26 @@ export default {
       // this.reg=1; 
       this.$router.push({path:'/register'});
     },
-    goReg(){
-      let that=this;
-      getJson('/member/memberRegister.do',{
-        userName:that.userName,
-        userTel:that.userTel,
-        pwd1:that.userPwd,
-        pwd2:that.userPwd2,
-        code:that.code
-      },function(res){
-        if(res.success){
-          that.$message({
-            showClose: true,
-            message: '恭喜你，注册成功',
-            type: 'success'
-          });
-        }else{
-          that.errorMessage=res.errorMessage;
-        }
-      });
-    },
+    // goReg(){
+    //   let that=this;
+    //   getJson('/member/memberRegister.do',{
+    //     userName:that.userName,
+    //     userTel:that.userTel,
+    //     pwd1:that.userPwd,
+    //     pwd2:that.userPwd2,
+    //     code:that.code
+    //   },function(res){
+    //     if(res.success){
+    //       that.$message({
+    //         showClose: true,
+    //         message: '恭喜你，注册成功',
+    //         type: 'success'
+    //       });
+    //     }else{
+    //       that.errorMessage=res.errorMessage;
+    //     }
+    //   });
+    // },
     gpLogin(){
       let that=this;
       if(!that.loginFlag){
